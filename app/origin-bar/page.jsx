@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Coffee, Leaf, ChevronLeft, ChevronRight, Check, Plus, Minus,
-  Snowflake, MapPin, Clock, Heart
+  Snowflake, MapPin, Heart
 } from "lucide-react";
 
 /* ============================================================
@@ -26,7 +26,31 @@ const FONTS = `
 .ob-label-short { display: none; }
 .ob-welcome { background-image: linear-gradient(90deg, rgba(20,12,8,.96) 0%, rgba(20,12,8,.88) 42%, rgba(20,12,8,.40) 100%), url('/deldiet-cafe-interior.png'); background-size: cover; background-position: center; }
 .ob-welcome-panel { width: min(620px, 100%); margin-right: auto; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+.ob-welcome { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(310px,420px); gap:clamp(28px,6vw,90px); }
+.ob-welcome-dossier { align-self:center; min-height:500px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,.2); background:rgba(26,17,12,.74); color:#F5EDE2; backdrop-filter:blur(18px); box-shadow:0 28px 80px rgba(0,0,0,.28); }
+.ob-welcome-dossier > div:first-child { display:flex; justify-content:space-between; gap:18px; color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+.ob-welcome-dossier h2 { margin:42px 0 12px; font-family:'Young Serif',Georgia,serif; font-size:clamp(38px,4vw,58px); font-weight:400; line-height:.98; }
+.ob-welcome-dossier > p { margin:0; color:#CDBEAE; font-size:16px; line-height:1.65; }
+.ob-welcome-steps { margin-top:36px; border-top:1px solid rgba(255,255,255,.18); }
+.ob-welcome-steps span { min-height:58px; padding:11px 0; display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,.14); font-size:14px; }
+.ob-welcome-steps b { color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; }.ob-welcome-steps small{color:#9F8D7C;font-size:12px;}
+.ob-welcome-actions { margin-top:30px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.ob-welcome-actions button { min-height:52px; padding:0 24px; border-radius:999px; font-size:15px; font-weight:700; cursor:pointer; }
+.ob-welcome-actions .ob-secondary { border:1px solid #8B735F; background:rgba(20,12,8,.28); color:#F5EDE2; }
+.ob-workspace-grid { display:grid; grid-template-columns:190px minmax(0,1fr) 270px; gap:22px; align-items:start; }
+.ob-journey-rail,.ob-cup-stage { position:sticky; top:0; padding:16px; border:1.5px solid #E7DFD3; background:#fff; box-shadow:0 18px 45px rgba(46,30,20,.06); }
+.ob-journey-rail > span,.ob-cup-stage > span { display:block; margin-bottom:12px; color:#8A7A6C; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.13em; text-transform:uppercase; }
+.ob-journey-rail button { width:100%; min-height:52px; padding:10px 8px; display:grid; grid-template-columns:28px 1fr; gap:8px; align-items:center; border:0; border-top:1px solid #E7DFD3; background:none; color:#8A7A6C; text-align:left; font-size:14px; cursor:pointer; }
+.ob-journey-rail button b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:#F3E9DA; color:#6F3E1E; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; }
+.ob-journey-rail button.active { color:#2A1F18; font-weight:700; }.ob-journey-rail button.active b{background:var(--ob-accent,#9C5F2E);color:#fff;}
+.ob-cup-stage { text-align:center; }
+.ob-safety-rail { margin-top:14px; padding:12px; border:1px solid #E7DFD3; background:#F7F4EE; text-align:left; }
+.ob-safety-rail b { display:block; margin-bottom:4px; color:#2A1F18; font-size:13px; }.ob-safety-rail p{margin:0;color:#6E5F53;font-size:12px;line-height:1.5;}
+.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size:28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size:14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size:13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size:14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:20px;height:20px;min-height:20px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
+.ob-truth-note { margin:0 0 18px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; border:1px solid #D8CBB9; background:#FFF9EE; color:#5E4B3D; font-size:13px; line-height:1.5; }
+.origin-bar-app button,.origin-bar-app input,.origin-bar-app select { min-height:44px; }
+.origin-bar-app input,.origin-bar-app select { font-size:16px !important; }
+@media (prefers-reduced-motion: reduce) { .origin-bar-app * { animation: none !important; transition: none !important; } }
 @media (max-width: 640px) {
   .ob-utility { grid-template-columns: 1fr 1fr; padding: 8px 12px; }
   .ob-utility > span { display: none; }
@@ -35,7 +59,11 @@ const FONTS = `
   .ob-label-short { display: inline; }
   .ob-welcome { background-image: linear-gradient(0deg, rgba(20,12,8,.98) 0%, rgba(20,12,8,.78) 64%, rgba(20,12,8,.32) 100%), url('/deldiet-cafe-interior.png'); background-position: 55% center; }
   .ob-welcome-panel { align-items: center; text-align: center; }
+  .ob-welcome { grid-template-columns:1fr; }.ob-welcome-dossier{width:100%;min-height:auto;margin-top:10px;text-align:left;}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
 }
+@media (max-width: 1040px) { .ob-workspace-grid{grid-template-columns:minmax(0,1fr) 250px}.ob-journey-rail{display:none} }
+@media (max-width: 720px) { .ob-workspace-grid{display:block}.ob-cup-stage{display:none} }
+@media (max-width: 720px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{min-height:72px;padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid #5A4435;background:#2A1A12;color:#F5EDE2}.ob-mobile-passport b{display:block;font-size:13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size:11px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px} }
 .ok-scroll::-webkit-scrollbar { width: 6px; }
 .ok-scroll::-webkit-scrollbar-thumb { background: #d8cfc2; border-radius: 99px; }
 `;
@@ -123,6 +151,18 @@ const ORIGINS = {
   "Middle East": [
     { n: "Yemen", f: "🇾🇪", b: ["A"], t: "the original Mocha — wine · dried fruit", m: "1,500–2,400 masl", p: 4.0, x: "Where coffee was first traded" },
   ],
+};
+
+const DEMO_LOT_PROFILES = {
+  Ethiopia: { lotId: "DEMO-ETH-01", region: "Yirgacheffe sample region", producer: "Not supplied", process: "Washed · sample field", harvest: "2025/26 · unverified" },
+  Colombia: { lotId: "DEMO-COL-01", region: "Huila sample region", producer: "Not supplied", process: "Washed · sample field", harvest: "2025/26 · unverified" },
+  Brazil: { lotId: "DEMO-BRA-01", region: "Cerrado sample region", producer: "Not supplied", process: "Natural · sample field", harvest: "2025/26 · unverified" },
+  Rwanda: { lotId: "DEMO-RWA-01", region: "Nyamasheke sample region", producer: "Not supplied", process: "Washed · sample field", harvest: "2025/26 · unverified" },
+};
+
+const lotProfileFor = (origin) => DEMO_LOT_PROFILES[origin?.n] || {
+  lotId: `DEMO-${(origin?.n || "LOT").replace(/[^A-Z]/gi, "").slice(0, 3).toUpperCase()}-01`,
+  region: "Region not supplied", producer: "Not supplied", process: "Not supplied", harvest: "Not verified",
 };
 
 /* ---------------- DRINKS ----------------
@@ -328,7 +368,7 @@ function UtilityBar() {
   return (
     <div className="ob-utility">
       <Link href="/"><ChevronLeft size={12} /><span className="ob-label-wide">Deldiet Coffeehouse &amp; Store</span><span className="ob-label-short">Deldiet Home</span></Link>
-      <span><MapPin size={11} /> In-store kiosk · 48 Water Street</span>
+      <span><MapPin size={11} /> St. John&apos;s concept · demo kiosk</span>
       <Link href="/origin-exchange"><span className="ob-label-wide">Shop Origin Exchange</span><span className="ob-label-short">Origin Exchange</span><ChevronRight size={12} /></Link>
     </div>
   );
@@ -404,30 +444,80 @@ function CupSVG({ uid, roast, hasMilk, foam, whip, iced, blended, drizzle, boost
 
 /* ============================ SCREENS ============================ */
 
-function Welcome({ onBegin }) {
+function Welcome({ onBegin, onTasteMatch }) {
   return (
     <div className="ob-welcome flex items-center px-6 sm:px-10 lg:px-16" style={{ minHeight: "100%", paddingTop: 48, paddingBottom: 48 }}>
       <div className="ob-welcome-panel">
-        <div className="rise"><Tag color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Traceable lots · custom craft · barista prepared</Tag></div>
+        <div className="rise"><Tag color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Origin-led · compatibility-aware · barista confirmed</Tag></div>
         <div className="rise-1" style={{ margin: "26px 0 16px", padding: "12px 22px", borderRadius: 999, background: "rgba(247,244,238,.94)", boxShadow: "0 18px 50px rgba(0,0,0,.24)" }}>
           <CupSVG uid="hero" roast={ROASTS[1]} hasMilk foam sizeIdx={2} width={116} />
         </div>
-        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 12, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · Water Street</div>
+        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 12, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · in-store atelier</div>
         <h1 className="rise-1" style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: "clamp(42px, 7vw, 72px)", lineHeight: 1.02, margin: 0 }}>
-          Deldiet Origin Bar
+          Craft a cup<br/>from somewhere real.
         </h1>
         <p className="rise-2" style={{ fontFamily: F.body, color: "#D6C6B2", fontSize: 15, maxWidth: 510, marginTop: 14, lineHeight: 1.65 }}>
           Build your cup from the bean upward. Choose the origin, roast, drink, milk, extraction and finishing details while your cup and price update live.
         </p>
-        <button onClick={onBegin} className="rise-2" style={{
-          marginTop: 30, fontFamily: F.body, fontWeight: 700, fontSize: 16, color: "#241405",
-          background: "#D9FF66", border: "none", borderRadius: 999, padding: "15px 38px", cursor: "pointer",
-          boxShadow: "0 8px 24px rgba(217,255,102,.20)",
-        }}>
-          Begin your cup →
-        </button>
+        <div className="ob-welcome-actions rise-2">
+          <button onClick={onBegin} style={{ fontFamily: F.body, color: "#241405", background: "#D9FF66", border: "none", boxShadow: "0 8px 24px rgba(217,255,102,.20)" }}>Build my cup →</button>
+          <button className="ob-secondary" onClick={onTasteMatch}>Match my taste</button>
+        </div>
         <div className="rise-2" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#A9957E", marginTop: 26, textTransform: "uppercase" }}>
-          41 origins · 4 bean species · 42 drinks · live cup preview
+          Demonstration catalogue · live cup preview · staff confirmation required
+        </div>
+      </div>
+      <aside className="ob-welcome-dossier rise-2" aria-label="What the Origin Bar creates">
+        <div><span>THE ORIGIN ATELIER</span><span>01—06</span></div>
+        <div>
+          <h2>One Cup Passport</h2>
+          <p>Your selected origin, roast, method, ingredients, allergen signals, illustrative caffeine range and subtotal stay visible from first choice to counter handoff.</p>
+          <div className="ob-welcome-steps">
+            <span><b>01</b>Choose a coffee origin<small>place + flavour</small></span>
+            <span><b>02</b>Match the drink<small>method + milk</small></span>
+            <span><b>03</b>Check the cup<small>safety + subtotal</small></span>
+            <span><b>04</b>Confirm with staff<small>demo request</small></span>
+          </div>
+        </div>
+        <small style={{ color: "#9F8D7C", fontFamily: F.mono, fontSize: 12, lineHeight: 1.55 }}>Origin and availability records are illustrative until Deldiet connects verified supplier, inventory and point-of-sale data.</small>
+      </aside>
+    </div>
+  );
+}
+
+const TASTE_MATCHES = [
+  { id: "bright", label: "Bright & floral", detail: "Jasmine, citrus and a clean finish", country: "Ethiopia", roast: "light", drink: "Pour-Over / Drip", why: "A light roast and filter method preserve the origin's most aromatic notes." },
+  { id: "balanced", label: "Caramel & balanced", detail: "Round sweetness with familiar structure", country: "Colombia", roast: "medium", drink: "Flat White", why: "A balanced origin stays distinct while textured milk adds softness." },
+  { id: "deep", label: "Deep & chocolatey", detail: "Full body, cocoa and low brightness", country: "Brazil", roast: "meddark", drink: "Americano", why: "A slightly deeper roast and long black format hold body without hiding the coffee." },
+  { id: "cold", label: "Cold & refreshing", detail: "Smooth, slow-steeped and easy to customise", country: "Rwanda", roast: "medium", drink: "Cold Brew", why: "The cool extraction softens acidity while keeping a clean fruit-and-cacao profile." },
+];
+
+function TasteMatch({ onBack, onApply }) {
+  const [selected, setSelected] = useState(TASTE_MATCHES[0]);
+  return (
+    <div className="flex-1 overflow-y-auto ok-scroll" style={{ background: C.espresso, color: C.cream }}>
+      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
+        <button onClick={onBack} className="inline-flex items-center gap-1.5" style={{ border: 0, background: "none", color: "#BBA890", fontSize: 14, cursor: "pointer" }}><ChevronLeft size={16}/> Back to Origin Bar</button>
+        <div className="grid lg:grid-cols-2 gap-10 items-start" style={{ marginTop: 32 }}>
+          <div>
+            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 12, letterSpacing: ".16em", textTransform: "uppercase" }}>Transparent Taste Match</div>
+            <h1 style={{ margin: "15px 0 18px", fontFamily: F.disp, fontSize: "clamp(42px,6vw,72px)", lineHeight: .98, fontWeight: 400 }}>What should your coffee feel like?</h1>
+            <p style={{ maxWidth: 540, margin: 0, color: "#CDBEAE", fontSize: 16, lineHeight: 1.7 }}>Choose the profile that sounds closest. Deldiet recommends an editable origin, roast and drink—and shows the reason instead of hiding it behind a score.</p>
+            <div className="grid sm:grid-cols-2 gap-3" style={{ marginTop: 30 }}>
+              {TASTE_MATCHES.map((item) => <button key={item.id} aria-pressed={selected.id === item.id} onClick={() => setSelected(item)} style={{ minHeight: 122, padding: 18, border: `1.5px solid ${selected.id === item.id ? "#D9FF66" : "#5A4435"}`, background: selected.id === item.id ? "rgba(217,255,102,.10)" : "rgba(255,255,255,.035)", color: C.cream, textAlign: "left", cursor: "pointer" }}><b style={{ display: "block", fontSize: 16 }}>{item.label}</b><span style={{ display: "block", marginTop: 8, color: "#A9957E", fontSize: 13, lineHeight: 1.5 }}>{item.detail}</span></button>)}
+            </div>
+          </div>
+          <aside style={{ padding: 26, border: "1px solid #5A4435", background: "#2B1D16" }}>
+            <span style={{ fontFamily: F.mono, color: "#A9957E", fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Editable recommendation</span>
+            <div style={{ margin: "28px 0", padding: 24, background: "#F7F4EE", color: C.ink }}>
+              <div style={{ fontSize: 40 }}>{Object.values(ORIGINS).flat().find((o) => o.n === selected.country)?.f}</div>
+              <h2 style={{ margin: "12px 0 4px", fontFamily: F.disp, fontSize: 38, fontWeight: 400 }}>{selected.country}</h2>
+              <p style={{ margin: 0, fontFamily: F.mono, color: C.faint, fontSize: 13, textTransform: "uppercase" }}>{ROASTS.find((r) => r.id === selected.roast)?.name} roast · {selected.drink}</p>
+            </div>
+            <div style={{ paddingTop: 18, borderTop: "1px solid #5A4435" }}><b style={{ color: "#D9FF66", fontSize: 14 }}>Why this match</b><p style={{ margin: "8px 0 0", color: "#CDBEAE", fontSize: 14, lineHeight: 1.65 }}>{selected.why}</p></div>
+            <button onClick={() => onApply(selected)} style={{ width: "100%", minHeight: 54, marginTop: 28, border: 0, borderRadius: 999, background: "#D9FF66", color: "#241405", fontWeight: 750, fontSize: 15, cursor: "pointer" }}>Use this as my starting cup →</button>
+            <small style={{ display: "block", marginTop: 12, color: "#8F7D69", fontSize: 12, lineHeight: 1.5 }}>This is a preference match, not a health or dietary recommendation. Every choice remains editable.</small>
+          </aside>
         </div>
       </div>
     </div>
@@ -438,6 +528,7 @@ function OriginStep({ sel, set, accent }) {
   const [continent, setContinent] = useState("Africa");
   const [beanFilter, setBeanFilter] = useState("All");
   const list = ORIGINS[continent].filter((c) => beanFilter === "All" || c.b.includes(beanFilter[0]));
+  const lot = sel.origin ? lotProfileFor(sel.origin) : null;
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 1 · Origin & roast"
@@ -480,6 +571,21 @@ function OriginStep({ sel, set, accent }) {
           );
         })}
       </div>
+      {sel.origin && lot && (
+        <article className="ob-lot-passport rise-1" aria-label={`Demonstration lot passport for ${sel.origin.n}`}>
+          <div>
+            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 11, letterSpacing: ".13em", textTransform: "uppercase" }}>Selected origin · field-level verification</div>
+            <h3>{sel.origin.f} {sel.origin.n} dossier</h3>
+            <p>{sel.origin.t}. These fields demonstrate the future lot passport; they do not verify a producer, crop, process, certification or current inventory.</p>
+            <div className="flex flex-wrap gap-2" style={{ marginTop: 14 }}><Tag color="#D9FF66" border="#6B5C39">Illustrative record</Tag><Tag color="#F5EDE2" border="#6D5849">Source not supplied</Tag><Tag color="#F5EDE2" border="#6D5849">Availability not connected</Tag></div>
+          </div>
+          <div className="ob-lot-fields">
+            <span><small>Lot ID</small>{lot.lotId}</span><span><small>Region</small>{lot.region}</span>
+            <span><small>Producer / co-op</small>{lot.producer}</span><span><small>Process</small>{lot.process}</span>
+            <span><small>Harvest</small>{lot.harvest}</span><span><small>Verification</small>Evidence pending</span>
+          </div>
+        </article>
+      )}
       <div style={{ marginTop: 28 }}>
         <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Choose your roast — the room warms with it</div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -501,9 +607,11 @@ function OriginStep({ sel, set, accent }) {
 function DrinkStep({ sel, set, accent }) {
   const list = sel.tab === "classics" ? CLASSICS : SIGNATURES;
   const pick = (d) => {
+    const compactOnly = ["Espresso", "Doppio", "Ristretto", "Macchiato", "Affogato", "Espresso con Panna"];
     const temp = d.fam === "cold" || d.iced ? "Iced" : d.fam === "blended" ? "Blended" : "Hot";
     set({
       drink: d, extraShots: 0, temp,
+      size: compactOnly.includes(d.n) ? "seed" : sel.size,
       extraction: EXTRACTIONS[d.fam][0],
       milk: d.milk ? (sel.milkTouched ? sel.milk : "Organic whole") : "None — black",
     });
@@ -543,7 +651,7 @@ function DrinkStep({ sel, set, accent }) {
 function CraftStep({ sel, set, accent }) {
   const d = sel.drink || { fam: "espresso", sh: 1, n: "" };
   const maxExtraShots = Math.max(0, 4 - d.sh);
-  const tempOptions = d.fam === "cold" ? ["Iced"] : d.fam === "blended" ? ["Blended"] : ["Hot", "Extra hot", "Iced"];
+  const tempOptions = d.fam === "cold" ? ["Iced"] : d.fam === "blended" ? ["Blended"] : d.n === "Affogato" ? ["Hot"] : ["Hot", "Extra hot", "Iced"];
   const ext = EXTRACTIONS[d.fam];
   return (
     <div>
@@ -665,6 +773,7 @@ function EnhanceStep({ sel, set, accent }) {
 }
 
 function FinishStep({ sel, set, accent }) {
+  const compactDrink = ["Espresso", "Doppio", "Ristretto", "Macchiato", "Affogato", "Espresso con Panna"].includes(sel.drink?.n);
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 5 · Finish"
@@ -672,17 +781,19 @@ function FinishStep({ sel, set, accent }) {
         sub="Our sizes grow like the plant does — seed to harvest. Bringing your own cup earns a little back." />
       <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Cup size</div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 rise">
-        {SIZES.map((s, i) => (
-          <Card key={s.id} active={sel.size === s.id} accent={accent} onClick={() => set({ size: s.id })}>
+        {SIZES.map((s, i) => {
+          const disabled = compactDrink && s.id !== "seed";
+          return (
+          <Card key={s.id} active={sel.size === s.id} accent={accent} disabled={disabled} onClick={() => !disabled && set({ size: s.id })}>
             <div className="flex items-end gap-3">
               <span style={{ width: 16, height: 16 + i * 9, background: accent, borderRadius: 4, display: "inline-block", opacity: 0.85, transition: "height .2s ease" }} />
               <div>
                 <div style={{ fontWeight: 700, fontSize: 15 }}>{s.n}</div>
-                <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint }}>{s.oz} oz{s.p > 0 ? ` · +${money(s.p)}` : ""}</div>
+                <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint }}>{s.oz} oz{s.p > 0 ? ` · +${money(s.p)}` : ""}{disabled ? " · not compatible" : ""}</div>
               </div>
             </div>
           </Card>
-        ))}
+        )})}
       </div>
       <div style={{ marginTop: 26 }} className="rise-1">
         <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Your cup, your way</div>
@@ -725,7 +836,7 @@ function ReviewGroup({ g, children, accent, onJump }) {
   );
 }
 
-function ReviewStep({ sel, set, accent, parts, cupProps, tags, onJump }) {
+function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump }) {
   const o = sel.origin, d = sel.drink;
   const sizeObj = SIZES.find((s) => s.id === sel.size);
   const groups = [
@@ -764,9 +875,14 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, onJump }) {
             <Row label="Cup" value={sel.cup} price={parts.cupP < 0 ? `−${money(-parts.cupP)}` : "incl."} green={parts.cupP < 0} />
           </ReviewGroup>
           <div className="flex items-baseline justify-between" style={{ paddingTop: 10 }}>
-            <span style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: C.faint }}>TOTAL · CAD</span>
+            <span style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: C.faint }}>ILLUSTRATIVE SUBTOTAL · CAD</span>
             <span style={{ fontFamily: F.mono, fontSize: 26, fontWeight: 600, color: accent }}>{money(parts.total)}</span>
           </div>
+          <div className="ob-safety-rail" style={{ marginTop: 16 }}>
+            <b>Cup Passport · safety and verification</b>
+            <p><strong>Caffeine:</strong> {safety.caffeine}. <strong>Selected allergen signals:</strong> {safety.allergens.length ? safety.allergens.join(", ") : "none from current selections"}. Shared preparation equipment means cross-contact remains possible; staff must confirm ingredients and availability before preparation.</p>
+          </div>
+          <label className="ob-safety-ack"><input type="checkbox" checked={sel.safetyAck} onChange={(event) => set({ safetyAck: event.target.checked })}/><span>I understand these are selection signals, not an allergen-free guarantee. A barista must verify ingredients, cross-contact, caffeine options and availability before preparing this cup.</span></label>
         </div>
         <div className="lg:col-span-2 rise-1" style={{ background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 16, padding: 18, textAlign: "center" }}>
           <CupSVG uid="review" {...cupProps.svg} width={170} />
@@ -778,7 +894,7 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, onJump }) {
             <input value={sel.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
               style={{ width: "100%", marginTop: 6, fontFamily: F.body, fontSize: 15, padding: "10px 12px", borderRadius: 10, border: `1.5px solid ${C.line}`, outline: "none", background: C.paper, color: C.ink, boxSizing: "border-box" }} />
             <p style={{ fontFamily: F.body, fontSize: 14, color: C.faint, marginTop: 10 }}>
-              Create the order request below. A barista confirms ingredients, allergens, availability and payment at the counter before preparation.
+              Create the demo request below. A barista must confirm ingredients, allergens, cross-contact, availability, tax and payment at the counter before preparation.
             </p>
           </div>
         </div>
@@ -794,12 +910,12 @@ function DoneScreen({ sel, accent, cupProps, orderNo, onReset }) {
       <div className="rise" style={{ width: 56, height: 56, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 10px 28px ${accent}55` }}>
         <Check size={28} color="#fff" strokeWidth={3} />
       </div>
-      <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: 2, color: C.faint, marginTop: 22, textTransform: "uppercase" }}>Kiosk request {orderNo}</div>
+      <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: 2, color: C.faint, marginTop: 22, textTransform: "uppercase" }}>Local demo reference {orderNo}</div>
       <h2 className="rise-1" style={{ fontFamily: F.disp, fontSize: "clamp(26px,4vw,38px)", color: C.ink, margin: "8px 0 0" }}>
-        {sel.name ? `${sel.name}, your` : "Your"} cup is in good hands
+        {sel.name ? `${sel.name}, your` : "Your"} cup draft is ready
       </h2>
       <p className="rise-1" style={{ fontFamily: F.body, color: C.faint, fontSize: 15, marginTop: 10, maxWidth: 420 }}>
-        {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. A barista will review the request; estimated preparation after confirmation is <Clock size={13} style={{ display: "inline", verticalAlign: -2 }} /> 4–6 minutes.
+        {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. This prototype has not sent the request. Show the draft to staff; they confirm ingredients, availability, final price and preparation time.
       </p>
       <div className="rise-2" style={{ marginTop: 20 }}>
         <CupSVG uid="done" {...cupProps.svg} width={140} />
@@ -823,13 +939,16 @@ const FRESH = {
   origin: null, roast: "medium", drink: null, tab: "classics",
   milk: "Organic whole", milkTouched: false, extraShots: 0, temp: "Hot", extraction: "Espresso machine",
   caffeine: "Regular", boosters: [], syrups: [], sweetener: "None", sweetLevel: 2,
-  toppings: [], size: "sprout", cup: "For here · ceramic", name: "",
+  toppings: [], size: "sprout", cup: "For here · ceramic", name: "", safetyAck: false,
 };
 
 export default function OriginBarKiosk() {
   const [step, setStep] = useState(0);
   const [sel, setSel] = useState(FRESH);
   const [orderNo, setOrderNo] = useState("");
+  const [tasteMatchOpen, setTasteMatchOpen] = useState(false);
+  const [matchReason, setMatchReason] = useState("");
+  const [idleWarning, setIdleWarning] = useState(false);
   const set = (patch) => setSel((s) => ({ ...s, ...patch }));
 
   const roastObj = ROASTS.find((r) => r.id === sel.roast) || ROASTS[1];
@@ -877,14 +996,70 @@ export default function OriginBarKiosk() {
     return [...new Set(t)].slice(0, 5);
   }, [sel, roastObj]);
 
-  const canNext = step === 1 ? !!sel.origin : step === 2 ? !!sel.drink : true;
-  const go = (n) => { setStep(n); const el = document.getElementById("ob-scroll"); if (el) el.scrollTop = 0; };
+  const safety = useMemo(() => {
+    const allergens = new Set();
+    const milk = sel.milk || "";
+    if (["Organic whole", "Organic 2%", "Skim", "Lactose-free", "A2 milk", "Half & half"].includes(milk)) allergens.add("Milk");
+    if (["Almond", "Cashew", "Macadamia"].includes(milk) || sel.drink?.n === "Pistachio Silk") allergens.add("Tree nuts");
+    if (milk === "Soy") allergens.add("Soy");
+    if (milk === "Coconut" || sel.boosters.includes("MCT oil") || sel.toppings.includes("Toasted coconut")) allergens.add("Coconut");
+    if (sel.boosters.includes("Grass-fed ghee") || sel.toppings.some((t) => ["Whipped cream", "Vanilla cold foam"].includes(t)) || ["Affogato", "Tiramisu Cloud"].includes(sel.drink?.n)) allergens.add("Milk");
+    if (sel.boosters.includes("Bee pollen")) allergens.add("Bee pollen");
+    if (sel.boosters.includes("Plant protein")) allergens.add("Pea / seed protein");
+    if (sel.syrups.includes("Hazelnut")) allergens.add("Hazelnut ingredient check");
+    const shots = (sel.drink?.sh || 0) + sel.extraShots;
+    let caffeine = sel.caffeine.startsWith("Decaf") ? "approximately 2–15 mg" : sel.drink?.fam === "cold" ? "approximately 100–200 mg" : shots ? `approximately ${shots * 55}–${shots * 85} mg` : "varies by origin and method";
+    if (sel.caffeine === "Half-caf") caffeine = shots ? `approximately ${shots * 28}–${shots * 45} mg` : "approximately half the regular recipe";
+    return { allergens: [...allergens], caffeine };
+  }, [sel]);
+
+  useEffect(() => {
+    let draft = null;
+    try {
+      const saved = window.sessionStorage.getItem("deldiet-origin-bar-draft");
+      if (saved) draft = JSON.parse(saved);
+    } catch { /* start with a clean local kiosk session */ }
+    const frame = window.requestAnimationFrame(() => {
+      if (draft?.sel && draft?.step >= 1 && draft.step <= 6) { setSel(draft.sel); setStep(draft.step); }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (step >= 1 && step <= 6) window.sessionStorage.setItem("deldiet-origin-bar-draft", JSON.stringify({ sel, step }));
+    else window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+  }, [sel, step]);
+
+  useEffect(() => {
+    if (step === 0) return;
+    let warningTimer;
+    let resetTimer;
+    const arm = () => {
+      window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); setIdleWarning(false);
+      warningTimer = window.setTimeout(() => setIdleWarning(true), 60000);
+      resetTimer = window.setTimeout(() => { setSel(FRESH); setStep(0); setMatchReason(""); setIdleWarning(false); }, 90000);
+    };
+    ["pointerdown", "keydown", "touchstart"].forEach((event) => window.addEventListener(event, arm, { passive: true }));
+    arm();
+    return () => { window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); ["pointerdown", "keydown", "touchstart"].forEach((event) => window.removeEventListener(event, arm)); };
+  }, [step]);
+
+  const canNext = step === 1 ? !!sel.origin : step === 2 ? !!sel.drink : step === 6 ? sel.safetyAck : true;
+  const go = (n) => { if (n < 6 && step === 6) setSel((current) => ({ ...current, safetyAck: false })); setStep(n); const el = document.getElementById("ob-scroll"); if (el) el.scrollTop = 0; };
   const next = () => {
     if (!canNext) return;
-    if (step === 6) { setOrderNo("DLB-" + (1000 + Math.floor(Math.random() * 9000))); go(7); }
+    if (step === 6) { setOrderNo(`DEMO-${Date.now().toString(36).slice(-6).toUpperCase()}`); go(7); }
     else go(step + 1);
   };
-  const reset = () => { setSel(FRESH); go(0); };
+  const reset = () => { setSel(FRESH); setMatchReason(""); setTasteMatchOpen(false); go(0); };
+  const applyTasteMatch = (match) => {
+    const origin = Object.values(ORIGINS).flat().find((item) => item.n === match.country);
+    const drink = [...CLASSICS, ...SIGNATURES].find((item) => item.n === match.drink);
+    setSel({ ...FRESH, origin, roast: match.roast, drink, tab: SIGNATURES.includes(drink) ? "signatures" : "classics", extraction: EXTRACTIONS[drink?.fam]?.[0] || "Espresso machine", temp: drink?.iced || drink?.fam === "cold" ? "Iced" : "Hot" });
+    setMatchReason(`${match.label}: ${match.why}`);
+    setTasteMatchOpen(false);
+    go(1);
+  };
 
   const screen =
     step === 1 ? <OriginStep sel={sel} set={set} accent={accent} /> :
@@ -892,43 +1067,50 @@ export default function OriginBarKiosk() {
     step === 3 ? <CraftStep sel={sel} set={set} accent={accent} /> :
     step === 4 ? <EnhanceStep sel={sel} set={set} accent={accent} /> :
     step === 5 ? <FinishStep sel={sel} set={set} accent={accent} /> :
-    step === 6 ? <ReviewStep sel={sel} set={set} accent={accent} parts={parts} cupProps={cupProps} tags={tags} onJump={go} /> :
+    step === 6 ? <ReviewStep sel={sel} set={set} accent={accent} parts={parts} cupProps={cupProps} tags={tags} safety={safety} onJump={go} /> :
     step === 7 ? <DoneScreen sel={sel} accent={accent} cupProps={cupProps} orderNo={orderNo} onReset={reset} /> : null;
 
   return (
-    <div className="origin-bar-app flex flex-col" style={{ height: "100dvh", background: C.paper, fontFamily: F.body }}>
+    <div className="origin-bar-app flex flex-col" style={{ height: "100dvh", background: C.paper, fontFamily: F.body, "--ob-accent": accent }}>
       <style>{FONTS}</style>
       <UtilityBar />
       {step === 0 ? (
-        <div className="flex-1 overflow-y-auto"><Welcome onBegin={() => go(1)} /></div>
+        tasteMatchOpen ? <TasteMatch onBack={() => setTasteMatchOpen(false)} onApply={applyTasteMatch}/> : <div className="flex-1 overflow-y-auto"><Welcome onBegin={() => go(1)} onTasteMatch={() => setTasteMatchOpen(true)} /></div>
       ) : (
         <>
-          <header className="flex items-center justify-between px-4 sm:px-6" style={{ background: C.espresso, height: 54, flexShrink: 0 }}>
+          <header className="flex items-center justify-between px-4 sm:px-6" style={{ background: C.espresso, minHeight: 66, flexShrink: 0, borderBottom: "1px solid #4A372B" }}>
             <div className="flex items-center gap-2">
               <Coffee size={16} color="#D8C4A8" />
-              <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 17 }}>Origin Bar</span>
+              <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 18 }}>Origin Atelier</span>
+              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase" }}>in-store demo</span>
             </div>
             {step <= 6 && (
               <div className="flex items-center gap-3">
                 <span className="hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#BBA890", textTransform: "uppercase" }}>
                   {step}/6 · {STEP_LABELS[step - 1]}
                 </span>
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5" aria-label={`Step ${step} of 6`}>
                   {STEP_LABELS.map((l, i) => (
-                    <span key={l} style={{ width: 7, height: 7, borderRadius: 999, background: i < step ? accent : "#4A372B", transition: "background .2s ease" }} />
+                    <span key={l} aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 999, background: i < step ? accent : "#4A372B", transition: "background .2s ease" }} />
                   ))}
                 </div>
+                <button onClick={reset} style={{ marginLeft: 6, border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: "pointer" }}>Start over</button>
               </div>
             )}
           </header>
           <main id="ob-scroll" className="flex-1 overflow-y-auto ok-scroll">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Demonstration mode.</b> Origins, pricing and availability are sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records. No order is transmitted or charged.</span></div>
+              {matchReason && step <= 5 && <div style={{ marginBottom: 18, padding: "12px 14px", borderLeft: `4px solid ${accent}`, background: "#fff", color: C.ink, fontSize: 13, lineHeight: 1.5 }}><b>Taste Match starting point:</b> {matchReason} Every choice remains editable.</div>}
               {step >= 1 && step <= 5 ? (
-                <div className="lg:grid lg:gap-8" style={{ gridTemplateColumns: "1fr 250px" }}>
+                <div className="ob-workspace-grid">
+                  <aside className="ob-journey-rail" aria-label="Origin Bar journey">
+                    <span>Your journey</span>
+                    {STEP_LABELS.map((label, index) => <button key={label} className={step === index + 1 ? "active" : ""} aria-current={step === index + 1 ? "step" : undefined} disabled={index + 1 > step} onClick={() => index + 1 <= step && go(index + 1)}><b>{index + 1}</b>{label}</button>)}
+                  </aside>
                   <div style={{ minWidth: 0 }}>{screen}</div>
-                  <aside className="hidden lg:block">
-                    <div className="sticky" style={{ top: 0, background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 16, padding: 16, textAlign: "center" }}>
-                      <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: C.faint, textTransform: "uppercase", marginBottom: 10 }}>Your cup · live</div>
+                  <aside className="ob-cup-stage">
+                      <span>Your cup · live</span>
                       <CupSVG uid="rail" {...cupProps.svg} width={130} />
                       <div style={{ marginTop: 10, fontFamily: F.body, fontSize: 14, color: C.ink, fontWeight: 600 }}>
                         {sel.drink ? sel.drink.n : "—"}
@@ -940,14 +1122,20 @@ export default function OriginBarKiosk() {
                         {tags.map((t) => <Tag key={t} color={accent} border={`${accent}55`}>{t}</Tag>)}
                       </div>
                       <div style={{ borderTop: `1px dashed ${C.line}`, marginTop: 12, paddingTop: 10, fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: accent }}>
-                        {money(parts.total)}
+                        {money(parts.total)} <small style={{ display: "block", marginTop: 3, color: C.faint, fontSize: 10 }}>illustrative subtotal</small>
                       </div>
-                    </div>
+                      <div className="ob-safety-rail"><b>Cup Passport</b><p>{safety.caffeine}<br/>{safety.allergens.length ? `Signals: ${safety.allergens.join(", ")}` : "No selected allergen signals · shared equipment"}</p></div>
                   </aside>
                 </div>
               ) : screen}
             </div>
           </main>
+          {step >= 1 && step <= 5 && (
+            <div className="ob-mobile-passport" role="status" aria-live="polite">
+              <div><b>{sel.drink?.n || "Build your cup"} · {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}</b><span>{safety.caffeine} · {safety.allergens.length ? `signals: ${safety.allergens.join(", ")}` : "shared-equipment cross-contact possible"}</span></div>
+              <strong>{money(parts.total)}</strong>
+            </div>
+          )}
           {step >= 1 && step <= 6 && (
             <footer className="flex items-center justify-between gap-3 px-4 sm:px-6" style={{ background: C.espresso, height: 68, flexShrink: 0 }}>
               <button onClick={() => go(step - 1)} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#BBA890", background: "none", border: "none", cursor: "pointer", padding: "10px 4px" }}>
@@ -956,7 +1144,7 @@ export default function OriginBarKiosk() {
               <div className="flex items-center gap-3">
                 <div className="sm:block hidden"><CupSVG uid="foot" {...cupProps.svg} width={34} /></div>
                 <div className="text-right">
-                  <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: "#7A6A58", textTransform: "uppercase" }}>Total · CAD</div>
+                  <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: "#7A6A58", textTransform: "uppercase" }}>Subtotal · CAD</div>
                   <div style={{ fontFamily: F.mono, fontSize: 19, fontWeight: 600, color: "#F5EDE2" }}>{money(parts.total)}</div>
                 </div>
               </div>
@@ -965,12 +1153,13 @@ export default function OriginBarKiosk() {
                 background: canNext ? accent : "#4A372B", border: "none", borderRadius: 999, padding: "13px 22px",
                 cursor: canNext ? "pointer" : "default", opacity: canNext ? 1 : 0.7, transition: "background .2s ease",
               }}>
-                {step === 6 ? "Create order request" : `Next · ${STEP_LABELS[step]}`} <ChevronRight size={16} />
+                {step === 6 ? "Create demo request" : `Next · ${STEP_LABELS[step]}`} <ChevronRight size={16} />
               </button>
             </footer>
           )}
         </>
       )}
+      {idleWarning && <div role="alertdialog" aria-modal="true" aria-labelledby="idle-title" style={{ position: "fixed", zIndex: 100, inset: 0, display: "grid", placeItems: "center", padding: 20, background: "rgba(22,14,10,.78)" }}><div style={{ width: "min(460px,100%)", padding: 28, background: C.card, border: `2px solid ${accent}`, boxShadow: "0 30px 80px rgba(0,0,0,.35)" }}><div style={{ fontFamily: F.mono, color: accent, fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Kiosk privacy reset</div><h2 id="idle-title" style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 36, fontWeight: 400 }}>Still building this cup?</h2><p style={{ margin: 0, color: C.faint, fontSize: 15, lineHeight: 1.6 }}>This local session clears automatically after inactivity so the next guest cannot see your selections.</p><div className="flex gap-3" style={{ marginTop: 22 }}><button onClick={() => setIdleWarning(false)} style={{ flex: 1, border: 0, borderRadius: 999, background: accent, color: "white", fontWeight: 700, cursor: "pointer" }}>Continue</button><button onClick={reset} style={{ flex: 1, border: `1px solid ${C.line}`, borderRadius: 999, background: C.paper, color: C.ink, fontWeight: 700, cursor: "pointer" }}>Clear session</button></div></div></div>}
     </div>
   );
 }
