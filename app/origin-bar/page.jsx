@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import { createIdempotencyKey, submitServiceRequest } from "@/lib/request-client";
 import {
   Coffee, Leaf, ChevronLeft, ChevronRight, Check, Plus, Minus,
   Snowflake, MapPin, Heart
@@ -424,6 +425,10 @@ function CupSVG({ uid, roast, hasMilk, foam, whip, iced, blended, drizzle, boost
               <path d="M42 56 q9 4 18 0 q9 -4 18 0 q9 4 18 0" />
             </g>
           )}
+          <g pointerEvents="none">
+            <rect x="42" y="116" width="56" height="20" rx="5" fill="#FFFDF6" fillOpacity=".86" stroke="#2A1F18" strokeOpacity=".12" />
+            <image href="/brand/deldiet-wordmark.png" x="47" y="120" width="46" height="13.7" preserveAspectRatio="xMidYMid meet" />
+          </g>
         </g>
         {whip && (
           <g fill="#FFF9EE" stroke="#E8DAC2" strokeWidth="1.2">
@@ -891,10 +896,10 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
           </div>
           <div style={{ marginTop: 18, textAlign: "left" }}>
             <label style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: C.faint, textTransform: "uppercase" }}>A name for your cup</label>
-            <input value={sel.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
+            <input value={sel.name} maxLength={80} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
               style={{ width: "100%", marginTop: 6, fontFamily: F.body, fontSize: 15, padding: "10px 12px", borderRadius: 10, border: `1.5px solid ${C.line}`, outline: "none", background: C.paper, color: C.ink, boxSizing: "border-box" }} />
             <p style={{ fontFamily: F.body, fontSize: 14, color: C.faint, marginTop: 10 }}>
-              Create the demo request below. A barista must confirm ingredients, allergens, cross-contact, availability, tax and payment at the counter before preparation.
+              Send the request below. A barista must confirm ingredients, allergens, cross-contact, availability, tax and payment at the counter before preparation.
             </p>
           </div>
         </div>
@@ -910,22 +915,27 @@ function DoneScreen({ sel, accent, cupProps, orderNo, onReset }) {
       <div className="rise" style={{ width: 56, height: 56, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 10px 28px ${accent}55` }}>
         <Check size={28} color="#fff" strokeWidth={3} />
       </div>
-      <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: 2, color: C.faint, marginTop: 22, textTransform: "uppercase" }}>Local demo reference {orderNo}</div>
+      <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: 2, color: C.faint, marginTop: 22, textTransform: "uppercase" }}>Request reference {orderNo}</div>
       <h2 className="rise-1" style={{ fontFamily: F.disp, fontSize: "clamp(26px,4vw,38px)", color: C.ink, margin: "8px 0 0" }}>
-        {sel.name ? `${sel.name}, your` : "Your"} cup draft is ready
+        {sel.name ? `${sel.name}, your` : "Your"} cup request was received
       </h2>
       <p className="rise-1" style={{ fontFamily: F.body, color: C.faint, fontSize: 15, marginTop: 10, maxWidth: 420 }}>
-        {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. This prototype has not sent the request. Show the draft to staff; they confirm ingredients, availability, final price and preparation time.
+        {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. Keep this reference and show it to Deldiet staff. A barista still confirms ingredients, availability, final price and preparation time before making anything.
       </p>
       <div className="rise-2" style={{ marginTop: 20 }}>
         <CupSVG uid="done" {...cupProps.svg} width={140} />
       </div>
-      <button onClick={onReset} className="rise-2" style={{
-        marginTop: 24, fontFamily: F.body, fontWeight: 700, fontSize: 15, color: accent,
-        background: "transparent", border: `2px solid ${accent}`, borderRadius: 999, padding: "12px 28px", cursor: "pointer",
-      }}>
-        Craft another cup
-      </button>
+      <div className="rise-2" style={{ marginTop: 24, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+        <button onClick={onReset} style={{
+          fontFamily: F.body, fontWeight: 700, fontSize: 15, color: accent,
+          background: "transparent", border: `2px solid ${accent}`, borderRadius: 999, padding: "12px 28px", cursor: "pointer",
+        }}>
+          Craft another cup
+        </button>
+        <Link href="/passport?tab=brew" style={{ fontFamily: F.body, fontWeight: 700, fontSize: 15, color: C.ink, textDecoration: "none", border: `1.5px solid ${C.line}`, borderRadius: 999, padding: "13px 22px", background: C.paper }}>
+          Open Brew Lab
+        </Link>
+      </div>
       <div className="rise-2 flex items-center gap-1.5" style={{ marginTop: 22, fontFamily: F.mono, fontSize: 12, letterSpacing: 1.2, color: C.faint, textTransform: "uppercase" }}>
         <Heart size={11} /> crafted at Deldiet Origin Bar
       </div>
@@ -941,6 +951,44 @@ const FRESH = {
   caffeine: "Regular", boosters: [], syrups: [], sweetener: "None", sweetLevel: 2,
   toppings: [], size: "sprout", cup: "For here · ceramic", name: "", safetyAck: false,
 };
+const DRAFT_VERSION = "origin-bar-concept-v1";
+
+function restoreOriginBarDraft(value) {
+  if (!value || value.version !== DRAFT_VERSION || !value.sel || !Number.isInteger(value.step) || value.step < 1 || value.step > 6) return null;
+  const raw = value.sel;
+  const origin = Object.values(ORIGINS).flat().find((item) => item.n === raw.origin?.n) || null;
+  const drink = [...CLASSICS, ...SIGNATURES].find((item) => item.n === raw.drink?.n) || null;
+  if (value.step > 1 && !origin) return null;
+  if (value.step > 2 && !drink) return null;
+  const allowed = (items, catalogue, max = catalogue.length) => Array.isArray(items) && items.length <= max && items.every((item) => catalogue.includes(item)) && new Set(items).size === items.length ? items : [];
+  const boosterNames = BOOSTERS.map((item) => item.n);
+  const toppingNames = TOPPINGS.map((item) => item.n);
+  const milkNames = MILKS.map((item) => item.n);
+  const restored = {
+    ...FRESH,
+    origin,
+    drink,
+    roast: ROASTS.some((item) => item.id === raw.roast) ? raw.roast : FRESH.roast,
+    tab: ["classics", "signatures"].includes(raw.tab) ? raw.tab : FRESH.tab,
+    milk: milkNames.includes(raw.milk) ? raw.milk : FRESH.milk,
+    milkTouched: raw.milkTouched === true,
+    extraShots: Number.isInteger(raw.extraShots) && raw.extraShots >= 0 && raw.extraShots <= 4 ? raw.extraShots : 0,
+    temp: ["Hot", "Extra hot", "Iced", "Blended"].includes(raw.temp) ? raw.temp : FRESH.temp,
+    extraction: Object.values(EXTRACTIONS).flat().includes(raw.extraction) ? raw.extraction : FRESH.extraction,
+    caffeine: CAFFEINE.includes(raw.caffeine) ? raw.caffeine : FRESH.caffeine,
+    boosters: allowed(raw.boosters, boosterNames, 2),
+    syrups: allowed(raw.syrups, SYRUPS),
+    sweetener: SWEETENERS.includes(raw.sweetener) ? raw.sweetener : FRESH.sweetener,
+    sweetLevel: Number.isInteger(raw.sweetLevel) && raw.sweetLevel >= 1 && raw.sweetLevel <= 4 ? raw.sweetLevel : FRESH.sweetLevel,
+    toppings: allowed(raw.toppings, toppingNames),
+    size: SIZES.some((item) => item.id === raw.size) ? raw.size : FRESH.size,
+    cup: CUPS.some((item) => item.n === raw.cup) ? raw.cup : FRESH.cup,
+    name: typeof raw.name === "string" ? raw.name.slice(0, 80) : "",
+    safetyAck: raw.safetyAck === true,
+  };
+  const requestKey = typeof value.requestKey === "string" && /^[A-Za-z0-9:_-]{16,128}$/.test(value.requestKey) ? value.requestKey : "";
+  return { sel: restored, step: value.step, requestKey };
+}
 
 export default function OriginBarKiosk() {
   const [step, setStep] = useState(0);
@@ -949,7 +997,16 @@ export default function OriginBarKiosk() {
   const [tasteMatchOpen, setTasteMatchOpen] = useState(false);
   const [matchReason, setMatchReason] = useState("");
   const [idleWarning, setIdleWarning] = useState(false);
-  const set = (patch) => setSel((s) => ({ ...s, ...patch }));
+  const [requestState, setRequestState] = useState("idle");
+  const [requestError, setRequestError] = useState("");
+  const [requestKey, setRequestKey] = useState("");
+  const submissionRef = useRef({ generation: 0, controller: null });
+  const set = (patch) => {
+    if (requestState === "submitting") return;
+    setRequestError("");
+    setRequestKey("");
+    setSel((s) => ({ ...s, ...patch }));
+  };
 
   const roastObj = ROASTS.find((r) => r.id === sel.roast) || ROASTS[1];
   const accent = roastObj.color;
@@ -1020,15 +1077,20 @@ export default function OriginBarKiosk() {
       if (saved) draft = JSON.parse(saved);
     } catch { /* start with a clean local kiosk session */ }
     const frame = window.requestAnimationFrame(() => {
-      if (draft?.sel && draft?.step >= 1 && draft.step <= 6) { setSel(draft.sel); setStep(draft.step); }
+      const restored = restoreOriginBarDraft(draft);
+      if (restored) {
+        setSel(restored.sel);
+        setStep(restored.step);
+        setRequestKey(restored.requestKey);
+      }
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (step >= 1 && step <= 6) window.sessionStorage.setItem("deldiet-origin-bar-draft", JSON.stringify({ sel, step }));
+    if (step >= 1 && step <= 6) window.sessionStorage.setItem("deldiet-origin-bar-draft", JSON.stringify({ version: DRAFT_VERSION, sel, step, requestKey }));
     else window.sessionStorage.removeItem("deldiet-origin-bar-draft");
-  }, [sel, step]);
+  }, [sel, step, requestKey]);
 
   useEffect(() => {
     if (step === 0) return;
@@ -1037,21 +1099,115 @@ export default function OriginBarKiosk() {
     const arm = () => {
       window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); setIdleWarning(false);
       warningTimer = window.setTimeout(() => setIdleWarning(true), 60000);
-      resetTimer = window.setTimeout(() => { setSel(FRESH); setStep(0); setMatchReason(""); setIdleWarning(false); }, 90000);
+      resetTimer = window.setTimeout(() => {
+        submissionRef.current.generation += 1;
+        submissionRef.current.controller?.abort();
+        submissionRef.current.controller = null;
+        setSel(FRESH);
+        setStep(0);
+        setMatchReason("");
+        setIdleWarning(false);
+        setRequestState("idle");
+        setRequestError("");
+        setRequestKey("");
+        setOrderNo("");
+      }, 90000);
     };
     ["pointerdown", "keydown", "touchstart"].forEach((event) => window.addEventListener(event, arm, { passive: true }));
     arm();
     return () => { window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); ["pointerdown", "keydown", "touchstart"].forEach((event) => window.removeEventListener(event, arm)); };
   }, [step]);
 
-  const canNext = step === 1 ? !!sel.origin : step === 2 ? !!sel.drink : step === 6 ? sel.safetyAck : true;
-  const go = (n) => { if (n < 6 && step === 6) setSel((current) => ({ ...current, safetyAck: false })); setStep(n); const el = document.getElementById("ob-scroll"); if (el) el.scrollTop = 0; };
-  const next = () => {
-    if (!canNext) return;
-    if (step === 6) { setOrderNo(`DEMO-${Date.now().toString(36).slice(-6).toUpperCase()}`); go(7); }
-    else go(step + 1);
+  useEffect(() => () => {
+    submissionRef.current.generation += 1;
+    submissionRef.current.controller?.abort();
+  }, []);
+
+  const submitting = requestState === "submitting";
+  const canNext = !submitting && (step === 1 ? !!sel.origin : step === 2 ? !!sel.drink : step === 6 ? sel.safetyAck : true);
+  const go = (n) => {
+    if (submitting) return;
+    if (n < 6 && step === 6) {
+      setSel((current) => ({ ...current, safetyAck: false }));
+      setRequestError("");
+      setRequestKey("");
+    }
+    setStep(n);
+    const el = document.getElementById("ob-scroll");
+    if (el) el.scrollTop = 0;
   };
-  const reset = () => { setSel(FRESH); setMatchReason(""); setTasteMatchOpen(false); go(0); };
+  const next = async () => {
+    if (!canNext) return;
+    if (step !== 6) {
+      go(step + 1);
+      return;
+    }
+
+    const idempotencyKey = requestKey || createIdempotencyKey("origin-bar");
+    if (!requestKey) setRequestKey(idempotencyKey);
+    submissionRef.current.controller?.abort();
+    const controller = new AbortController();
+    const generation = submissionRef.current.generation + 1;
+    submissionRef.current = { generation, controller };
+    setRequestState("submitting");
+    setRequestError("");
+    try {
+      const receipt = await submitServiceRequest({
+        type: "origin_bar_request",
+        source: "origin-bar",
+        customer: { name: sel.name || undefined },
+        estimatedSubtotalCents: Math.round(parts.total * 100),
+        payload: {
+          schemaVersion: 1,
+          catalogueVersion: "origin-bar-concept-v1",
+          safetyAcknowledged: sel.safetyAck,
+          selection: {
+            origin: sel.origin?.n,
+            roast: sel.roast,
+            drink: sel.drink?.n,
+            drinkMenu: sel.tab,
+            milk: sel.milk,
+            extraShots: sel.extraShots,
+            temperature: sel.temp,
+            extraction: sel.extraction,
+            caffeine: sel.caffeine,
+            boosters: sel.boosters,
+            syrups: sel.syrups,
+            sweetener: sel.sweetener,
+            sweetLevel: sel.sweetLevel,
+            toppings: sel.toppings,
+            size: sel.size,
+            cup: sel.cup,
+            cupName: sel.name.trim(),
+          },
+          pricingState: "illustrative_pending_staff_review",
+        },
+      }, idempotencyKey, { signal: controller.signal });
+      if (submissionRef.current.generation !== generation || controller.signal.aborted) return;
+      setOrderNo(receipt.reference);
+      setRequestState("idle");
+      setStep(7);
+      window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+    } catch (error) {
+      if (submissionRef.current.generation !== generation || controller.signal.aborted) return;
+      setRequestState("error");
+      if (error?.status === 409) setRequestKey("");
+      setRequestError(error instanceof Error ? error.message : "We could not save this request. Your cup is still here—please try again.");
+    } finally {
+      if (submissionRef.current.generation === generation) submissionRef.current.controller = null;
+    }
+  };
+  const reset = () => {
+    if (submitting) return;
+    setSel(FRESH);
+    setMatchReason("");
+    setTasteMatchOpen(false);
+    setRequestState("idle");
+    setRequestError("");
+    setRequestKey("");
+    setOrderNo("");
+    go(0);
+  };
   const applyTasteMatch = (match) => {
     const origin = Object.values(ORIGINS).flat().find((item) => item.n === match.country);
     const drink = [...CLASSICS, ...SIGNATURES].find((item) => item.n === match.drink);
@@ -1082,7 +1238,7 @@ export default function OriginBarKiosk() {
             <div className="flex items-center gap-2">
               <Coffee size={16} color="#D8C4A8" />
               <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 18 }}>Origin Atelier</span>
-              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase" }}>in-store demo</span>
+              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase" }}>staff-review requests</span>
             </div>
             {step <= 6 && (
               <div className="flex items-center gap-3">
@@ -1094,13 +1250,14 @@ export default function OriginBarKiosk() {
                     <span key={l} aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 999, background: i < step ? accent : "#4A372B", transition: "background .2s ease" }} />
                   ))}
                 </div>
-                <button onClick={reset} style={{ marginLeft: 6, border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: "pointer" }}>Start over</button>
+                <button onClick={reset} disabled={submitting} style={{ marginLeft: 6, border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}>Start over</button>
               </div>
             )}
           </header>
           <main id="ob-scroll" className="flex-1 overflow-y-auto ok-scroll">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
-              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Demonstration mode.</b> Origins, pricing and availability are sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records. No order is transmitted or charged.</span></div>
+              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Staff-review mode.</b> Requests are saved durably, but origins, pricing and availability remain sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records. Nothing is prepared or charged automatically.</span></div>
+              {requestError && <div className="ob-truth-note" role="alert" style={{ borderColor: "#B85C4D", background: "#FFF3EF", color: "#6E2E24" }}><span aria-hidden="true">!</span><span><b>Request not saved.</b> {requestError}</span></div>}
               {matchReason && step <= 5 && <div style={{ marginBottom: 18, padding: "12px 14px", borderLeft: `4px solid ${accent}`, background: "#fff", color: C.ink, fontSize: 13, lineHeight: 1.5 }}><b>Taste Match starting point:</b> {matchReason} Every choice remains editable.</div>}
               {step >= 1 && step <= 5 ? (
                 <div className="ob-workspace-grid">
@@ -1138,7 +1295,7 @@ export default function OriginBarKiosk() {
           )}
           {step >= 1 && step <= 6 && (
             <footer className="flex items-center justify-between gap-3 px-4 sm:px-6" style={{ background: C.espresso, height: 68, flexShrink: 0 }}>
-              <button onClick={() => go(step - 1)} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#BBA890", background: "none", border: "none", cursor: "pointer", padding: "10px 4px" }}>
+              <button onClick={() => go(step - 1)} disabled={submitting} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#BBA890", background: "none", border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1, padding: "10px 4px" }}>
                 <ChevronLeft size={16} /> Back
               </button>
               <div className="flex items-center gap-3">
@@ -1148,12 +1305,12 @@ export default function OriginBarKiosk() {
                   <div style={{ fontFamily: F.mono, fontSize: 19, fontWeight: 600, color: "#F5EDE2" }}>{money(parts.total)}</div>
                 </div>
               </div>
-              <button onClick={next} disabled={!canNext} className="flex items-center gap-1.5" style={{
+              <button onClick={next} disabled={!canNext} aria-busy={submitting} className="flex items-center gap-1.5" style={{
                 fontFamily: F.body, fontWeight: 700, fontSize: 15, color: "#fff",
                 background: canNext ? accent : "#4A372B", border: "none", borderRadius: 999, padding: "13px 22px",
                 cursor: canNext ? "pointer" : "default", opacity: canNext ? 1 : 0.7, transition: "background .2s ease",
               }}>
-                {step === 6 ? "Create demo request" : `Next · ${STEP_LABELS[step]}`} <ChevronRight size={16} />
+                {step === 6 ? (submitting ? "Sending request…" : "Send request") : `Next · ${STEP_LABELS[step]}`} <ChevronRight size={16} />
               </button>
             </footer>
           )}
