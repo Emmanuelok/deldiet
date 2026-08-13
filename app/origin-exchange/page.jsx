@@ -3,11 +3,12 @@
 import React, { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { createIdempotencyKey, submitServiceRequest } from "@/lib/request-client";
 import {
   Coffee, Leaf, Search, ShoppingCart, Plus, Minus, X, Check,
-  ChevronLeft, TrendingUp, TrendingDown, Package, CreditCard,
-  Wallet, Landmark, Truck, Star, Filter, Globe,
-  BadgeCheck, Gift, Banknote, Sparkles, MapPin, Clock, Box,
+  ChevronLeft, TrendingUp, TrendingDown, Package,
+  Truck, Star, Filter, Globe,
+  BadgeCheck, Sparkles, Clock, Box,
   Settings, ArrowRight
 } from "lucide-react";
 
@@ -44,6 +45,11 @@ const STYLES = `
 .oex-scroll::-webkit-scrollbar { display: none; }
 .oex-product-photo { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
 .oex-card:hover .oex-product-photo { transform: scale(1.035); }
+.oex-deldiet-mark { position:absolute; z-index:3; right:12px; bottom:12px; width:94px; min-height:28px; padding:5px 8px; display:grid; place-items:center; border:1px solid rgba(34,22,17,.14); border-radius:999px; background:rgba(255,253,246,.9); box-shadow:0 6px 18px rgba(34,22,17,.14); backdrop-filter:blur(8px); pointer-events:none; user-select:none; }
+.oex-deldiet-mark img { position:static!important; display:block; width:100%; height:auto; mix-blend-mode:multiply; }
+.oex-deldiet-mark-detail { width:132px; min-height:38px; padding:8px 11px; }
+.oex-deldiet-mark-lot { right:12px; bottom:10px; width:88px; min-height:26px; }
+.oex-deldiet-mark-compact { right:4px; bottom:4px; width:38px; min-height:13px; padding:2px 3px; border-radius:6px; box-shadow:0 2px 7px rgba(34,22,17,.14); }
 .oex-back-deldiet { display: inline-flex; align-items: center; gap: 8px; color: #D9FF66; text-decoration: none; font-family: ${F.mono}; font-size: 12px; letter-spacing: .15em; font-weight: 600; }
 .oex-back-deldiet:hover { color: #FFFFFF; }
 .oex-label-short { display: none; }
@@ -71,24 +77,12 @@ const STYLES = `
 }
 @media (max-width: 480px) {
   .oex-product-grid{grid-template-columns:1fr!important}.oex-cart-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto}.oex-cart-item .oex-cart-copy{grid-column:2/-1}.oex-cart-item .oex-cart-price{grid-column:2}.oex-status-grid{grid-template-columns:1fr}.oex-exchange-hero h1{font-size:48px}
+  .oex-deldiet-mark{width:80px;min-height:24px;padding:4px 7px}.oex-deldiet-mark-detail{width:112px;min-height:34px}.oex-deldiet-mark-compact{width:38px;min-height:13px;padding:2px 3px}
 }
 @media (prefers-reduced-motion: reduce) {
   .oex-fade, .oex-card, .oex-product-photo { animation: none; transition: none; }
 }
 `;
-
-/* ----------------------------- market tape ----------------------------- */
-const MARKET0 = [
-  { sym: "KC ARABICA", unit: "¢/lb", price: 252.4 },
-  { sym: "ROBUSTA LDN", unit: "$/t", price: 4480 },
-  { sym: "COLOMBIA EXC", unit: "$/kg", price: 9.42 },
-  { sym: "ETHIOPIA YIRG G1", unit: "$/kg", price: 14.85 },
-  { sym: "BRAZIL SANTOS", unit: "$/kg", price: 7.08 },
-  { sym: "KENYA AB", unit: "$/kg", price: 13.55 },
-  { sym: "SUMATRA G1", unit: "$/kg", price: 8.9 },
-  { sym: "VIETNAM R G2", unit: "$/kg", price: 4.28 },
-  { sym: "GEISHA AUCTION", unit: "$/kg", price: 162.0 }
-];
 
 const REGIONS = [
   { id: "all", name: "All origins" },
@@ -183,18 +177,6 @@ const LOTS0 = [
   { id: "L8", no: "LOT-HND-0712", origin: "Honduras", flag: "🇭🇳", grade: "SHG", process: "Honey", crop: "2025/26", score: 85.5, base: 8.7, bags: 150, certs: ["FAIRTRADE", "ORGANIC"] }
 ];
 
-/* ------------------------- payments & logistics ------------------------- */
-const PAYMENTS = [
-  { id: "card", name: "Credit / Debit card", sub: "Provider integration pending · demo fields only", icon: CreditCard },
-  { id: "applepay", name: "Apple Pay", sub: "Concept wallet option · not connected", icon: Wallet },
-  { id: "googlepay", name: "Google Pay", sub: "Concept wallet option · not connected", icon: Wallet },
-  { id: "paypal", name: "PayPal", sub: "Concept wallet option · not connected", icon: Wallet },
-  { id: "interac", name: "Interac e-Transfer", sub: "Concept Canadian payment path", icon: Landmark },
-  { id: "wire", name: "Approved business account", sub: "Retail account workflow · integration pending", icon: Landmark },
-  { id: "gift", name: "Gift card", sub: "Concept redemption flow", icon: Gift },
-  { id: "pickup", name: "Pay at pickup", sub: "Flagship location to be confirmed", icon: Banknote }
-];
-
 const SHIPPING = [
   { id: "standard", name: "Illustrative standard delivery", note: "Calculated after provider connection" },
   { id: "express", name: "Illustrative express delivery", note: "Availability and rate not yet connected" },
@@ -208,6 +190,9 @@ const r2 = (n) => Math.round(n * 100) / 100;
 
 /* ============================ shared pieces ============================ */
 function Delta({ d, dark }) {
+  if (!Number.isFinite(d) || Math.abs(d) < 0.005) {
+    return <span style={{ color: dark ? "#8D7763" : C.sub, fontFamily: F.mono, fontSize: 13 }}>—</span>;
+  }
   const up = d >= 0;
   const col = dark ? (up ? "#8CC79B" : "#E2907F") : (up ? C.up : C.down);
   const Icon = up ? TrendingUp : TrendingDown;
@@ -218,7 +203,9 @@ function Delta({ d, dark }) {
   );
 }
 
-function Ticker({ market, paused, onToggle }) {
+function Ticker({ market, paused, onToggle, feed }) {
+  const asOf = feed.asOf ? new Date(feed.asOf).toLocaleString("en-CA", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZoneName: "short" }) : "";
+  const modeLabel = feed.delayMinutes ? `${feed.mode} · ${feed.delayMinutes} MIN DELAY` : feed.mode;
   const renderRow = (suffix) => market.map((m, i) => (
     <span key={suffix + i} className="inline-flex items-center gap-2" style={{ padding: "0 22px", fontFamily: F.mono, fontSize: 13 }}>
       <span style={{ color: "#C8B69B", letterSpacing: ".06em" }}>{m.sym}</span>
@@ -234,20 +221,22 @@ function Ticker({ market, paused, onToggle }) {
       <div className="flex items-center">
         <div className="hidden sm:flex items-center gap-2 px-4 py-2" style={{ background: "#241710", borderRight: "1px solid #2A1D12", flexShrink: 0 }}>
           <span style={{ width: 7, height: 7, borderRadius: 99, background: C.brass }} />
-          <span style={{ color: "#C8B69B", fontFamily: F.mono, fontSize: 12, letterSpacing: ".12em" }}>INDICATIVE DEMO BOARD</span>
+          <span style={{ color: "#C8B69B", fontFamily: F.mono, fontSize: 12, letterSpacing: ".12em" }}>{market.length ? modeLabel : "MARKET DATA STATUS"}</span>
         </div>
         <div style={{ overflow: "hidden", flex: 1 }}>
-          <div style={{ display: "inline-flex", whiteSpace: "nowrap", width: "max-content", animation: "oexTape 48s linear infinite", animationPlayState: paused ? "paused" : "running", padding: "8px 0" }}>
+          {market.length ? <div style={{ display: "inline-flex", whiteSpace: "nowrap", width: "max-content", animation: "oexTape 48s linear infinite", animationPlayState: paused ? "paused" : "running", padding: "8px 0" }}>
             {renderRow("a")}{renderRow("b")}
-          </div>
+          </div> : <div style={{ padding: "8px 18px", color: "#C8B69B", fontFamily: F.mono, fontSize: 12 }}>{feed.message}</div>}
         </div>
-        <button onClick={onToggle} aria-pressed={paused} style={{ minWidth: 74, border: 0, borderLeft: "1px solid #2A1D12", background: "#241710", color: "#C8B69B", fontFamily: F.mono, fontSize: 12, cursor: "pointer" }}>{paused ? "Play" : "Pause"}</button>
+        {market.length > 0 && <a href={feed.sourceUrl} target="_blank" rel="noreferrer" className="hidden lg:block" style={{ padding: "0 14px", color: "#A99279", fontFamily: F.mono, fontSize: 10, whiteSpace: "nowrap", textDecoration: "none" }}>{feed.providerName} · as of {asOf}</a>}
+        {market.length > 0 && <button onClick={onToggle} aria-pressed={paused} style={{ minWidth: 74, border: 0, borderLeft: "1px solid #2A1D12", background: "#241710", color: "#C8B69B", fontFamily: F.mono, fontSize: 12, cursor: "pointer" }}>{paused ? "Play" : "Pause"}</button>}
       </div>
     </div>
   );
 }
 
 function Sparkline({ data }) {
+  if (!Array.isArray(data) || data.length < 2) return <span style={{ width: 88, color: C.sub, fontFamily: F.mono, fontSize: 10, textAlign: "right" }}>No verified history</span>;
   const w = 88, h = 26;
   const min = Math.min(...data), max = Math.max(...data);
   const span = max - min || 1;
@@ -269,6 +258,11 @@ const PRODUCT_VISUALS = {
   gear: "/origin-exchange-brew-gear.png"
 };
 
+function DeldietProductMark({ detail = false, compact = false, lot = false }) {
+  const className = ["oex-deldiet-mark", detail && "oex-deldiet-mark-detail", compact && "oex-deldiet-mark-compact", lot && "oex-deldiet-mark-lot"].filter(Boolean).join(" ");
+  return <span className={className} aria-hidden="true"><Image src="/brand/deldiet-wordmark.png" alt="" width={432} height={129} unoptimized /></span>;
+}
+
 function ProductArt({ p, detail = false }) {
   const n = Number(String(p.id).replace(/\D/g, "")) || 0;
   const focusSets = {
@@ -287,6 +281,7 @@ function ProductArt({ p, detail = false }) {
       <div style={{ position: "absolute", left: 12, bottom: 12, padding: "6px 9px", borderRadius: 999, background: "rgba(23,16,8,.78)", color: "#FFFFFF", fontFamily: F.mono, fontSize: 12, letterSpacing: ".11em", textTransform: "uppercase", backdropFilter: "blur(8px)" }}>
         {p.origin || p.roaster}
       </div>
+      <DeldietProductMark detail={detail} />
     </div>
   );
 }
@@ -436,6 +431,9 @@ function ProductDetail({ p, onBack, onAdd }) {
           <div className="mt-3" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>
             Catalogue price, inventory, roast date, ingredients, allergens and fulfilment are illustrative until verified provider records are connected.
           </div>
+          <Link href="/passport?tab=brew" className="inline-flex items-center gap-2 mt-4 rounded-xl px-4 py-3" style={{ border: `1px solid ${C.line}`, color: C.ink, fontFamily: F.body, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+            Open Brew Lab for method recipes <ArrowRight size={15}/>
+          </Link>
         </div>
       </div>
     </div>
@@ -447,7 +445,7 @@ function LotCard({ lot, onAdd }) {
   const crop = ["12% 50%", "32% 50%", "52% 50%", "74% 50%", "90% 50%"][Number(lot.id.replace(/\D/g, "")) % 5];
   return (
     <div className="oex-card rounded-2xl p-4 overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
-      <div role="img" aria-label={`Green coffee lot from ${lot.origin}`} style={{ height: 130, margin: "-16px -16px 15px", backgroundImage: "linear-gradient(0deg, rgba(24,15,10,.36), transparent 66%), url('/origin-exchange-green-lots.png')", backgroundSize: "cover", backgroundPosition: crop }} />
+      <div role="img" aria-label={`Green coffee lot from ${lot.origin}`} style={{ position: "relative", height: 130, margin: "-16px -16px 15px", backgroundImage: "linear-gradient(0deg, rgba(24,15,10,.36), transparent 66%), url('/origin-exchange-green-lots.png')", backgroundSize: "cover", backgroundPosition: crop }}><DeldietProductMark lot /></div>
       <div className="flex items-center justify-between">
         <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 600, color: C.brassDeep, letterSpacing: ".08em" }}>{lot.no}</span>
         <span className="rounded-full px-2 py-0.5" style={{ background: "#F3EEE4", color: C.sub, fontFamily: F.mono, fontSize: 12, fontWeight: 600 }}>ILLUSTRATIVE LOT</span>
@@ -498,11 +496,12 @@ function TradeDesk({ lots, onAddLot, inquiryCount, onOpenInquiry }) {
   );
 }
 
-function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit }) {
+function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit, submission }) {
   const [requestType, setRequestType] = useState("sample");
   const [profile, setProfile] = useState({ company: "", name: "", email: "", destination: "", notes: "" });
   const set = (key) => (value) => setProfile((current) => ({ ...current, [key]: value }));
-  const canSubmit = items.length > 0 && profile.name.trim() && profile.email.includes("@") && profile.destination.trim();
+  const saving = submission.status === "submitting";
+  const canSubmit = !saving && items.length > 0 && profile.company.trim() && profile.name.trim() && profile.email.includes("@") && profile.destination.trim();
   if (!items.length) return <div className="oex-fade oex-inquiry-panel" style={{ maxWidth: 720, margin: "0 auto", textAlign: "center", padding: 50 }}><Search size={30} color={C.brassDeep} style={{ margin: "0 auto" }}/><h1 style={{ margin: "16px 0 6px", fontFamily: F.disp, fontSize: 34, fontWeight: 400 }}>No lots in your sourcing enquiry</h1><p style={{ color: C.sub, fontSize: 15 }}>Open the Trade Desk to add illustrative lots for comparison, sampling or a formal quote request.</p><button onClick={onBack} style={{ marginTop: 18, border: 0, borderRadius: 999, background: C.esp, color: C.cream, padding: "11px 18px", fontWeight: 700, cursor: "pointer" }}>Open Trade Desk</button></div>;
   return (
     <div className="oex-fade">
@@ -512,7 +511,7 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit }) {
           <div style={{ fontFamily: F.mono, color: C.brassDeep, fontSize: 12, letterSpacing: ".13em", textTransform: "uppercase" }}>Trade workflow · no checkout</div>
           <h1 style={{ margin: "10px 0 8px", fontFamily: F.disp, fontSize: 40, fontWeight: 400 }}>Build a sourcing enquiry</h1>
           <p style={{ margin: "0 0 22px", color: C.sub, fontSize: 15, lineHeight: 1.65 }}>Compare sample lots, choose the kind of response you need, and request verification. This does not reserve inventory or create a purchase.</p>
-          {items.map((item) => <article key={item.key} className="oex-inquiry-item"><div><b style={{ display: "block", fontSize: 15 }}>{item.name}</b><span style={{ display: "block", marginTop: 4, color: C.sub, fontFamily: F.mono, fontSize: 12 }}>{item.sub}</span></div><Stepper qty={item.qty} setQty={(qty) => setQty(item.key, qty)}/><button onClick={() => removeItem(item.key)} aria-label={`Remove ${item.name}`} style={{ border: 0, background: "none", color: C.sub, cursor: "pointer" }}><X size={16}/></button></article>)}
+          {items.map((item) => <article key={item.key} className="oex-inquiry-item"><div><b style={{ display: "block", fontSize: 15 }}>{item.name}</b><span style={{ display: "block", marginTop: 4, color: C.sub, fontFamily: F.mono, fontSize: 12 }}>{item.sub}</span></div>{requestType === "sample" ? <span style={{ color: C.brassDeep, fontFamily: F.mono, fontSize: 12, fontWeight: 700 }}>1 SAMPLE SET</span> : <Stepper qty={item.qty} setQty={(qty) => setQty(item.key, qty)}/>}<button onClick={() => removeItem(item.key)} aria-label={`Remove ${item.name}`} style={{ border: 0, background: "none", color: C.sub, cursor: "pointer" }}><X size={16}/></button></article>)}
           <h2 style={{ margin: "28px 0 8px", fontFamily: F.disp, fontSize: 28, fontWeight: 400 }}>Required due-diligence record</h2>
           <p style={{ margin: 0, color: C.sub, fontSize: 14, lineHeight: 1.6 }}>Every field stays pending until a named supplier or authorized source provides evidence.</p>
           <div className="oex-document-grid">{[["Lot identity","Pending verification"],["Cupping report","Not supplied"],["Certification evidence","Not supplied"],["Inventory / crop","Pending verification"],["Export & logistics","Quote required"],["Producer consent","Pending verification"]].map(([name,status]) => <span key={name}><b>{name}</b><small>{status}</small></span>)}</div>
@@ -522,8 +521,9 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit }) {
           <div className="grid grid-cols-2 gap-2" style={{ marginTop: 16 }}>{[["sample","Sample request"],["quote","Verified quote"]].map(([id,label]) => <button key={id} aria-pressed={requestType === id} onClick={() => setRequestType(id)} style={{ border: `2px solid ${requestType === id ? C.brass : C.line}`, background: requestType === id ? "#FDF6EB" : "#fff", color: C.ink, padding: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>)}</div>
           {["company","name","email","destination"].map((key) => <label key={key} style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 12, textTransform: "uppercase" }}>{key === "destination" ? "Destination country / city" : key}</span><input value={profile[key]} type={key === "email" ? "email" : "text"} onChange={(event) => set(key)(event.target.value)} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink }}/></label>)}
           <label style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 12, textTransform: "uppercase" }}>Sourcing notes</span><textarea value={profile.notes} onChange={(event) => set("notes")(event.target.value)} rows={3} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink, font: "inherit", resize: "vertical" }}/></label>
-          <button disabled={!canSubmit} onClick={() => onSubmit({ requestType, profile })} style={{ width: "100%", minHeight: 52, marginTop: 20, border: 0, borderRadius: 999, background: canSubmit ? C.brass : "#DDD2C1", color: "#241405", fontWeight: 750, cursor: canSubmit ? "pointer" : "not-allowed" }}>Create demo enquiry reference</button>
-          <small style={{ display: "block", marginTop: 10, color: C.sub, fontSize: 12, lineHeight: 1.5 }}>Prototype only: no supplier is contacted and no stock, price, freight or payment term is promised.</small>
+          {submission.error && <div role="alert" style={{ marginTop: 16, padding: 12, border: "1px solid #D9A18E", background: "#FFF3EF", color: "#6E2E24", fontSize: 13, lineHeight: 1.5 }}>{submission.error}</div>}
+          <button disabled={!canSubmit} aria-busy={saving} onClick={() => onSubmit({ requestType, profile })} style={{ width: "100%", minHeight: 52, marginTop: 20, border: 0, borderRadius: 999, background: canSubmit ? C.brass : "#DDD2C1", color: "#241405", fontWeight: 750, cursor: canSubmit ? "pointer" : "not-allowed" }}>{saving ? "Saving enquiry…" : "Send sourcing enquiry"}</button>
+          <small style={{ display: "block", marginTop: 10, color: C.sub, fontSize: 12, lineHeight: 1.5 }}>This saves a sourcing request only. It does not reserve stock, create a quote or promise price, freight or payment terms.</small>
         </aside>
       </div>
     </div>
@@ -531,7 +531,7 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit }) {
 }
 
 function TradeInquiryDone({ reference, onTrade }) {
-  return <div className="oex-fade oex-inquiry-panel" style={{ maxWidth: 720, margin: "0 auto", padding: 54, textAlign: "center" }}><div style={{ width: 64, height: 64, margin: "0 auto", display: "grid", placeItems: "center", borderRadius: "50%", background: C.leafBg }}><Check size={28} color={C.leaf}/></div><div style={{ marginTop: 18, color: C.brassDeep, fontFamily: F.mono, fontSize: 13, letterSpacing: ".12em" }}>LOCAL DEMO REFERENCE · {reference}</div><h1 style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 42, fontWeight: 400 }}>Your sourcing brief is structured</h1><p style={{ margin: "0 auto", maxWidth: 540, color: C.sub, fontSize: 15, lineHeight: 1.65 }}>Nothing has been sent or reserved. In production, this workflow would route the brief for supplier verification, samples, documents, landed-cost calculation and a formal quote.</p><button onClick={onTrade} style={{ marginTop: 24, border: 0, borderRadius: 999, background: C.esp, color: C.cream, padding: "12px 20px", fontWeight: 700, cursor: "pointer" }}>Return to Trade Desk</button></div>;
+  return <div className="oex-fade oex-inquiry-panel" style={{ maxWidth: 720, margin: "0 auto", padding: 54, textAlign: "center" }}><div style={{ width: 64, height: 64, margin: "0 auto", display: "grid", placeItems: "center", borderRadius: "50%", background: C.leafBg }}><Check size={28} color={C.leaf}/></div><div style={{ marginTop: 18, color: C.brassDeep, fontFamily: F.mono, fontSize: 13, letterSpacing: ".12em" }}>SOURCING REFERENCE · {reference}</div><h1 style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 42, fontWeight: 400 }}>Sourcing enquiry saved</h1><p style={{ margin: "0 auto", maxWidth: 540, color: C.sub, fontSize: 15, lineHeight: 1.65 }}>Keep this reference for follow-up with Deldiet. This is not a quote or reservation; supplier evidence, availability, samples, logistics and landed-cost requirements all remain unverified.</p><button onClick={onTrade} style={{ marginTop: 24, border: 0, borderRadius: 999, background: C.esp, color: C.cream, padding: "12px 20px", fontWeight: 700, cursor: "pointer" }}>Return to Trade Desk</button></div>;
 }
 
 /* ============================ cart & checkout ============================ */
@@ -565,6 +565,7 @@ function CartView({ cart, setQty, removeItem, ship, setShip, totals, onCheckout,
             <div key={it.key} className="oex-cart-item p-4" style={{ borderTop: idx ? `1px solid ${C.line}` : "none" }}>
               <div className="rounded-xl overflow-hidden" style={{ width: 54, height: 54, background: C.cream, flexShrink: 0, position: "relative" }}>
                 <Image src={PRODUCT_VISUALS[it.cat] || PRODUCT_VISUALS.beans} alt="" fill unoptimized sizes="54px" style={{ objectFit: "cover" }} />
+                <DeldietProductMark compact />
               </div>
               <div className="oex-cart-copy flex-1" style={{ minWidth: 0 }}>
                 <div style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>{it.name}</div>
@@ -594,20 +595,20 @@ function CartView({ cart, setQty, removeItem, ship, setShip, totals, onCheckout,
       <div className="md:w-80 mt-4 md:mt-0 rounded-2xl p-5" style={{ background: "#FFFFFF", border: `1px solid ${C.line}`, flexShrink: 0 }}>
         <div style={{ fontFamily: F.disp, fontSize: 18, color: C.ink }}>Order summary</div>
         <div className="mt-3">
-          {[["Subtotal", fmt(totals.sub)], ["Shipping", totals.shipLabel], ["Estimated HST (15%)", fmt(totals.gst)]].map(([k, v]) => (
+          {[["Illustrative catalogue subtotal", fmt(totals.sub)], ["Delivery", "Confirmed after review"], ["Tax", "Confirmed after review"]].map(([k, v]) => (
             <div key={k} className="flex justify-between py-1" style={{ fontFamily: F.body, fontSize: 14, color: C.sub }}>
               <span>{k}</span><span style={{ fontFamily: F.mono, color: C.ink }}>{v}</span>
             </div>
           ))}
         </div>
         <div className="flex justify-between pt-3 mt-2" style={{ borderTop: `1px solid ${C.line}` }}>
-          <span style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>Total</span>
-          <span style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 18, color: C.ink }}>{fmt(totals.total)}</span>
+          <span style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>Final total</span>
+          <span style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 14, color: C.ink }}>Pending</span>
         </div>
         <button onClick={onCheckout} className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 mt-4" style={{ background: C.brass, color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer" }}>
-          Review demo checkout · {fmt(totals.total)} <ArrowRight size={15} />
+          Continue to order review <ArrowRight size={15} />
         </button>
-        <div className="mt-2 text-center" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>No provider is connected and nothing will be charged.</div>
+        <div className="mt-2 text-center" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>No payment is collected. Availability, delivery, tax and final price are confirmed before purchase.</div>
       </div>
     </div>
   );
@@ -618,7 +619,7 @@ function ContactStep({ contact, setContact, onBack, onNext }) {
   const ok = contact.name && contact.email.includes("@") && contact.addr && contact.city && contact.postal;
   return (
     <div className="rounded-3xl p-6" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
-      <div style={{ fontFamily: F.disp, fontSize: 22, color: C.ink }}>Contact & delivery</div>
+      <div style={{ fontFamily: F.disp, fontSize: 22, color: C.ink }}>Contact & destination</div>
       <div className="grid sm:grid-cols-2 gap-3 mt-4">
         <Input label="Full name" value={contact.name} onChange={set("name")} placeholder="Avery Nguyen" />
         <Input label="Email" type="email" value={contact.email} onChange={set("email")} placeholder="you@roastery.ca" />
@@ -638,109 +639,19 @@ function ContactStep({ contact, setContact, onBack, onNext }) {
       <div className="flex items-center justify-between mt-5">
         <button onClick={onBack} className="inline-flex items-center gap-1" style={{ background: "none", border: "none", color: C.sub, fontFamily: F.body, fontSize: 14, fontWeight: 600, cursor: "pointer" }}><ChevronLeft size={14} /> Cart</button>
         <button disabled={!ok} onClick={onNext} className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5" style={{ background: ok ? C.brass : "#E5D9C6", color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: ok ? "pointer" : "not-allowed" }}>
-          Continue to payment <ArrowRight size={14} />
+          Continue to review <ArrowRight size={14} />
         </button>
       </div>
     </div>
   );
 }
 
-function PayStep({ pm, setPm, pf, setPf, totals, contact, onBack, onNext }) {
-  const set = (k) => (v) => setPf({ ...pf, [k]: v });
-  const cardOk = pf.num.replace(/\s/g, "").length === 16 && pf.name && pf.exp.length >= 4 && pf.cvc.length >= 3;
-  const ok = pm && (pm !== "card" || cardOk);
-  return (
-    <div className="rounded-3xl p-6" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
-      <div className="flex items-center justify-between">
-        <div style={{ fontFamily: F.disp, fontSize: 22, color: C.ink }}>Payment</div>
-        <span className="rounded-full px-3 py-1" style={{ background: C.cream, fontFamily: F.mono, fontSize: 13, fontWeight: 600, color: C.brassDeep }}>Due {fmt(totals.total)}</span>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-2 mt-4">
-        {PAYMENTS.map((m) => {
-          const Icon = m.icon; const active = pm === m.id;
-          return (
-            <button key={m.id} onClick={() => setPm(m.id)} className="rounded-xl p-3 text-left flex items-start gap-2.5" style={{ border: `2px solid ${active ? C.brass : C.line}`, background: active ? "#FDF6EB" : "#FFFFFF", cursor: "pointer" }}>
-              <Icon size={16} color={active ? C.brassDeep : C.sub} style={{ marginTop: 2, flexShrink: 0 }} />
-              <span>
-                <span style={{ display: "block", fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>{m.name}</span>
-                <span style={{ display: "block", fontFamily: F.mono, fontSize: 12, color: C.sub, marginTop: 2 }}>{m.sub}</span>
-              </span>
-            </button>
-          );
-        })}
-      </div>
-      {pm === "card" && (
-        <div className="mt-4">
-          <div className="flex flex-wrap gap-1.5 mb-3">
-            {["VISA", "MASTERCARD", "AMEX", "DISCOVER", "JCB", "UNIONPAY"].map((b) => (
-              <span key={b} className="rounded px-2 py-1" style={{ fontFamily: F.mono, fontSize: 12, fontWeight: 600, border: `1px solid ${C.line}`, color: C.sub, letterSpacing: ".06em" }}>{b}</span>
-            ))}
-          </div>
-          <div className="grid sm:grid-cols-2 gap-3">
-            <div className="sm:col-span-2">
-              <Input label="Card number" value={pf.num} onChange={(v) => set("num")(v.replace(/\D/g, "").slice(0, 16).replace(/(\d{4})(?=\d)/g, "$1 "))} placeholder="4242 4242 4242 4242" />
-            </div>
-            <Input label="Name on card" value={pf.name} onChange={set("name")} placeholder="As printed" />
-            <div className="grid grid-cols-2 gap-3">
-              <Input label="Expiry" value={pf.exp} onChange={(v) => set("exp")(v.replace(/[^\d/]/g, "").slice(0, 5))} placeholder="MM/YY" />
-              <Input label="CVC" value={pf.cvc} onChange={(v) => set("cvc")(v.replace(/\D/g, "").slice(0, 4))} placeholder="123" />
-            </div>
-          </div>
-        </div>
-      )}
-      {(pm === "applepay" || pm === "googlepay" || pm === "paypal") && (
-        <div className="mt-4 rounded-2xl p-5 text-center" style={{ background: C.paper, border: `1px dashed ${C.line}` }}>
-          {pm === "applepay" && <button className="rounded-xl px-6 py-3" style={{ background: "#000000", color: "#FFFFFF", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer" }}>Pay with Apple Pay</button>}
-          {pm === "googlepay" && <button className="rounded-xl px-6 py-3" style={{ background: "#FFFFFF", color: "#1F1F1F", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "1.5px solid #DADCE0", cursor: "pointer" }}>Pay with Google Pay</button>}
-          {pm === "paypal" && <button className="rounded-xl px-6 py-3" style={{ background: "#FFC439", color: "#003087", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer" }}>Pay with PayPal</button>}
-          <div className="mt-3" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>The wallet sheet is simulated in this prototype — continue only to preview the review state.</div>
-        </div>
-      )}
-      {pm === "interac" && (
-        <div className="mt-4 grid sm:grid-cols-2 gap-3">
-          <Input label="Your e-Transfer email" value={pf.interacEmail || contact.email} onChange={set("interacEmail")} placeholder="you@bank.ca" />
-          <div className="rounded-xl p-3" style={{ background: C.paper, border: `1px dashed ${C.line}`, fontFamily: F.mono, fontSize: 13, color: C.sub }}>
-            Secure payment instructions are issued after order review. No banking details are stored in this prototype.
-          </div>
-        </div>
-      )}
-      {pm === "wire" && (
-        <div className="mt-4 rounded-2xl p-4" style={{ background: C.paper, border: `1px dashed ${C.line}`, fontFamily: F.mono, fontSize: 13, color: C.ink }}>
-          Wire payment is released only after a wholesale account and lot booking are approved. Secure banking instructions appear on the formal invoice.
-        </div>
-      )}
-      {pm === "gift" && (
-        <div className="mt-4 grid sm:grid-cols-2 gap-3 items-end">
-          <Input label="Gift card code" value={pf.giftcode} onChange={(v) => set("giftcode")(v.toUpperCase())} placeholder="OEX-XXXX-XXXX" />
-          <div style={{ fontFamily: F.mono, fontSize: 13, color: C.sub, paddingBottom: 10 }}>Balance applies before tax · any remainder falls to a second method at capture.</div>
-        </div>
-      )}
-      {pm === "pickup" && (
-        <div className="mt-4 rounded-2xl p-4 flex items-start gap-3" style={{ background: C.paper, border: `1px dashed ${C.line}` }}>
-          <MapPin size={18} color={C.brassDeep} style={{ flexShrink: 0, marginTop: 2 }} />
-          <div style={{ fontFamily: F.body, fontSize: 14, color: C.ink }}>
-            <span style={{ fontWeight: 700 }}>Deldiet flagship coffeehouse · concept pickup path</span>
-            <div style={{ fontFamily: F.mono, fontSize: 13, color: C.sub, marginTop: 3 }}>Location, service hours and readiness promise must be connected before launch.</div>
-          </div>
-        </div>
-      )}
-      <div className="flex items-center justify-between mt-5">
-        <button onClick={onBack} className="inline-flex items-center gap-1" style={{ background: "none", border: "none", color: C.sub, fontFamily: F.body, fontSize: 14, fontWeight: 600, cursor: "pointer" }}><ChevronLeft size={14} /> Contact</button>
-        <button disabled={!ok} onClick={onNext} className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5" style={{ background: ok ? C.brass : "#E5D9C6", color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: ok ? "pointer" : "not-allowed" }}>
-          Review order <ArrowRight size={14} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function ReviewStep({ cart, totals, ship, pm, pf, contact, onBack, onPlace }) {
+function ReviewStep({ cart, totals, ship, contact, onBack, onPlace, submission }) {
   const shipName = (SHIPPING.find((s) => s.id === ship) || {}).name || "";
-  const payName = (PAYMENTS.find((p) => p.id === pm) || {}).name || "";
-  const payDetail = pm === "card" && pf.num ? ` ···· ${pf.num.replace(/\s/g, "").slice(-4)}` : "";
+  const saving = submission.status === "submitting";
   return (
     <div className="rounded-3xl p-6" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
-      <div style={{ fontFamily: F.disp, fontSize: 22, color: C.ink }}>Review checkout prototype</div>
+      <div style={{ fontFamily: F.disp, fontSize: 22, color: C.ink }}>Review availability request</div>
       <div className="rounded-2xl overflow-hidden mt-4" style={{ border: `1px solid ${C.line}` }}>
         {cart.map((it, i) => (
           <div key={it.key} className="flex items-center justify-between gap-3 px-4 py-2.5" style={{ borderTop: i ? `1px solid ${C.line}` : "none" }}>
@@ -750,7 +661,7 @@ function ReviewStep({ cart, totals, ship, pm, pf, contact, onBack, onPlace }) {
         ))}
       </div>
       <div className="grid sm:grid-cols-3 gap-3 mt-4">
-        {[["DELIVER TO", `${contact.name} · ${contact.addr}, ${contact.city} ${contact.prov} ${contact.postal}`], ["DELIVERY", shipName], ["PAYMENT", payName + payDetail]].map(([k, v]) => (
+        {[["DESTINATION", `${contact.name} · ${contact.addr}, ${contact.city} ${contact.prov} ${contact.postal}`], ["DELIVERY PREFERENCE", shipName], ["PAYMENT", "Not collected"]].map(([k, v]) => (
           <div key={k} className="rounded-xl p-3" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
             <div style={{ fontFamily: F.mono, fontSize: 12, color: C.sub, letterSpacing: ".12em" }}>{k}</div>
             <div className="mt-1" style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.ink }}>{v}</div>
@@ -759,25 +670,26 @@ function ReviewStep({ cart, totals, ship, pm, pf, contact, onBack, onPlace }) {
       </div>
       <div className="md:flex items-end justify-between mt-5 gap-6">
         <div className="flex-1">
-          {[["Subtotal", fmt(totals.sub)], ["Shipping", totals.shipLabel], ["Estimated HST (15%)", fmt(totals.gst)]].map(([k, v]) => (
+          {[["Illustrative catalogue subtotal", fmt(totals.sub)], ["Delivery", "To be confirmed"], ["Tax", "To be confirmed"]].map(([k, v]) => (
             <div key={k} className="flex justify-between py-0.5" style={{ fontFamily: F.body, fontSize: 14, color: C.sub, maxWidth: 280 }}>
               <span>{k}</span><span style={{ fontFamily: F.mono, color: C.ink }}>{v}</span>
             </div>
           ))}
           <div className="flex justify-between pt-2 mt-1" style={{ borderTop: `1px solid ${C.line}`, maxWidth: 280 }}>
-            <span style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>Total</span>
-            <span style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 17, color: C.ink }}>{fmt(totals.total)}</span>
+            <span style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>Final total</span>
+            <span style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 14, color: C.ink }}>Confirmed after review</span>
           </div>
         </div>
         <div className="mt-4 md:mt-0 text-right">
-          <button onClick={onPlace} className="inline-flex items-center gap-2 rounded-xl px-6 py-3" style={{ background: C.brass, color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 15, border: "none", cursor: "pointer" }}>
-            <Check size={16} /> Complete demo · {fmt(totals.total)}
+          {submission.error && <div role="alert" style={{ marginBottom: 10, maxWidth: 360, padding: 10, border: "1px solid #D9A18E", background: "#FFF3EF", color: "#6E2E24", fontFamily: F.body, fontSize: 13, textAlign: "left" }}>{submission.error}</div>}
+          <button onClick={onPlace} disabled={saving} aria-busy={saving} className="inline-flex items-center gap-2 rounded-xl px-6 py-3" style={{ background: saving ? "#DDD2C1" : C.brass, color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 15, border: "none", cursor: saving ? "not-allowed" : "pointer" }}>
+            <Check size={16} /> {saving ? "Saving request…" : "Send for availability review"}
           </button>
-          <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>Prototype checkout — nothing is charged.</div>
+          <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>This saves a review request only. Nothing is charged or reserved.</div>
         </div>
       </div>
       <div className="mt-4">
-        <button onClick={onBack} className="inline-flex items-center gap-1" style={{ background: "none", border: "none", color: C.sub, fontFamily: F.body, fontSize: 14, fontWeight: 600, cursor: "pointer" }}><ChevronLeft size={14} /> Payment</button>
+        <button onClick={onBack} disabled={saving} className="inline-flex items-center gap-1" style={{ background: "none", border: "none", color: C.sub, fontFamily: F.body, fontSize: 14, fontWeight: 600, cursor: saving ? "not-allowed" : "pointer", opacity: saving ? .6 : 1 }}><ChevronLeft size={14} /> Contact</button>
       </div>
     </div>
   );
@@ -791,12 +703,12 @@ function DoneView({ order, onShop, onTrade }) {
           <Check size={30} color={C.leaf} strokeWidth={2.5} />
         </div>
       </div>
-      <div style={{ fontFamily: F.disp, fontSize: 26, marginTop: 14, color: C.ink }}>Checkout prototype complete</div>
+      <div style={{ fontFamily: F.disp, fontSize: 26, marginTop: 14, color: C.ink }}>Order review request saved</div>
       <div className="mt-1" style={{ fontFamily: F.mono, fontSize: 14, color: C.brassDeep, fontWeight: 600, letterSpacing: ".06em" }}>{order.num}</div>
       <div className="mt-3" style={{ fontFamily: F.body, fontSize: 14, color: C.sub }}>
-        Illustrative total {fmt(order.total)} · no confirmation was sent and nothing was charged.
+        Keep this reference for follow-up with Deldiet. Nothing has been charged or reserved.
       </div>
-      <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>Local demo reference only. Inventory, fulfilment and payment require live integrations.</div>
+      <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>Deldiet will confirm inventory, fulfilment, final price, tax and payment next steps.</div>
       <div className="flex flex-wrap justify-center gap-3 mt-6">
         <button onClick={onShop} className="rounded-xl px-5 py-2.5" style={{ background: C.esp, color: C.cream, fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer" }}>Continue shopping</button>
         <button onClick={onTrade} className="inline-flex items-center gap-1.5 rounded-xl px-5 py-2.5" style={{ background: "none", color: C.ink, fontFamily: F.body, fontWeight: 700, fontSize: 14, border: `1.5px solid ${C.line}`, cursor: "pointer" }}><TrendingUp size={14} /> View trade desk</button>
@@ -806,7 +718,7 @@ function DoneView({ order, onShop, onTrade }) {
 }
 
 /* ================================= app ================================= */
-const STEP_LABEL = { contact: "CONTACT", pay: "PAYMENT", review: "REVIEW" };
+const STEP_LABEL = { contact: "CONTACT", review: "REVIEW" };
 
 export default function OriginExchangeHub() {
   const [view, setView] = useState("home");
@@ -817,19 +729,17 @@ export default function OriginExchangeHub() {
   const [cart, setCart] = useState([]);
   const [ship, setShip] = useState("standard");
   const [contact, setContact] = useState({ name: "", email: "", phone: "", addr: "", city: "St. John's", prov: "NL", postal: "" });
-  const [pm, setPm] = useState(null);
-  const [pf, setPf] = useState({ num: "", name: "", exp: "", cvc: "", giftcode: "", interacEmail: "" });
   const [step, setStep] = useState("contact");
   const [order, setOrder] = useState(null);
   const [tickerPaused, setTickerPaused] = useState(false);
   const [cartReady, setCartReady] = useState(false);
   const [tradeItems, setTradeItems] = useState([]);
   const [inquiryReference, setInquiryReference] = useState("");
-  const [market] = useState(() => MARKET0.map((m) => ({ ...m, base: m.price, delta: 0 })));
-  const [lots] = useState(() => LOTS0.map((l) => {
-    const hist = Array.from({ length: 12 }, (_, i) => r2(l.base * (1 + Math.sin(i * 1.7) * 0.012 + (i - 6) * 0.0015)));
-    return { ...l, price: l.base, delta: 0, hist };
-  }));
+  const [orderSubmission, setOrderSubmission] = useState({ status: "idle", error: "", key: "", fingerprint: "" });
+  const [tradeSubmission, setTradeSubmission] = useState({ status: "idle", error: "", key: "", fingerprint: "" });
+  const [market, setMarket] = useState([]);
+  const [marketFeed, setMarketFeed] = useState({ mode: "UNAVAILABLE", status: "UNAVAILABLE", message: "Market data unavailable · no licensed feed connected.", providerName: "", sourceUrl: "", asOf: null, delayMinutes: null });
+  const [lots] = useState(() => LOTS0.map((l) => ({ ...l, price: l.base, delta: null, hist: [] })));
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -852,6 +762,44 @@ export default function OriginExchangeHub() {
     if (!cartReady) return;
     try { window.localStorage.setItem("deldiet-origin-exchange-retail-cart", JSON.stringify(cart)); } catch { /* local persistence is optional */ }
   }, [cart, cartReady]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let controller = null;
+    const unavailableFeed = { mode: "UNAVAILABLE", status: "UNAVAILABLE", message: "Market data unavailable · no licensed feed connected.", providerName: "", sourceUrl: "", asOf: null, delayMinutes: null };
+    const loadMarket = async () => {
+      controller?.abort();
+      controller = new AbortController();
+      try {
+        const response = await fetch("/api/market/coffee", { headers: { Accept: "application/json" }, signal: controller.signal, cache: "no-store" });
+        const result = await response.json();
+        if (cancelled || !result?.feed) return;
+        setMarketFeed({
+          mode: result.feed.mode,
+          status: result.feed.status,
+          message: result.feed.message || "Market feed status unavailable.",
+          providerName: result.provider?.name || "Licensed provider",
+          sourceUrl: result.provider?.sourceUrl || "",
+          asOf: result.feed.asOf || null,
+          delayMinutes: result.feed.delayMinutes ?? null,
+        });
+        if (!response.ok || !result.feed.displayAllowed || result.feed.status !== "OK" || !Array.isArray(result.instruments)) { setMarket([]); return; }
+        setMarket(result.instruments.map((instrument) => ({
+          sym: `${instrument.symbol} ${instrument.contractCode}`,
+          unit: instrument.nativeUnit === "USD_PER_TONNE" ? "$/t" : "¢/lb",
+          price: Number(instrument.value),
+          delta: instrument.changePct === null ? null : Number(instrument.changePct),
+        })).filter((item) => Number.isFinite(item.price)));
+      } catch (error) {
+        if (!cancelled && error?.name !== "AbortError") { setMarket([]); setMarketFeed(unavailableFeed); }
+      }
+    };
+    const refreshWhenVisible = () => { if (document.visibilityState === "visible") void loadMarket(); };
+    void loadMarket();
+    const interval = window.setInterval(loadMarket, 60_000);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => { cancelled = true; controller?.abort(); window.clearInterval(interval); document.removeEventListener("visibilitychange", refreshWhenVisible); };
+  }, []);
 
   const list = useMemo(() => {
     let xs = PRODUCTS.filter((p) => cat === "all" || p.cat === cat);
@@ -907,17 +855,73 @@ export default function OriginExchangeHub() {
   const removeTradeItem = (key) => setTradeItems((items) => items.filter((it) => it.key !== key));
   const goCheckout = () => {
     if (!cart.length) return;
+    setOrderSubmission((current) => ({ ...current, status: "idle", error: "" }));
     setStep("contact"); goView("checkout");
   };
-  const placeOrder = () => {
-    const num = `OEX-DEMO-${Date.now().toString(36).slice(-6).toUpperCase()}`;
-    setOrder({ num, total: totals.total, email: contact.email, pm, ship });
-    setCart([]); setPm(null); setPf({ num: "", name: "", exp: "", cvc: "", giftcode: "", interacEmail: "" }); goView("done");
+  const placeOrder = async () => {
+    if (orderSubmission.status === "submitting") return;
+    const submittedKeys = new Set(cart.map((item) => item.key));
+    const items = cart.map((item) => ({
+      id: item.id,
+      name: item.name,
+      variant: item.sub,
+      quantity: item.qty,
+      cataloguePriceSnapshotCents: Math.round(item.unit * 100),
+    }));
+    const payload = {
+      schemaVersion: 1,
+      items,
+      fulfilmentPreference: ship,
+      destination: { address: contact.addr, city: contact.city, province: contact.prov, postalCode: contact.postal, country: "CA" },
+      pricingState: "illustrative_pending_availability_review",
+    };
+    const fingerprint = JSON.stringify({ items, contact, ship });
+    const key = orderSubmission.key && orderSubmission.fingerprint === fingerprint ? orderSubmission.key : createIdempotencyKey("origin-exchange-retail");
+    setOrderSubmission({ status: "submitting", error: "", key, fingerprint });
+    try {
+      const receipt = await submitServiceRequest({
+        type: "origin_exchange_order_review",
+        source: "origin-exchange-retail",
+        customer: { name: contact.name, email: contact.email, phone: contact.phone },
+        estimatedSubtotalCents: Math.round(totals.sub * 100),
+        payload,
+      }, key);
+      setOrder({ num: receipt.reference, total: totals.sub, email: contact.email, ship, status: receipt.status });
+      setCart((current) => current.filter((item) => !submittedKeys.has(item.key)));
+      setOrderSubmission({ status: "idle", error: "", key: "", fingerprint: "" });
+      goView("done");
+    } catch (error) {
+      setOrderSubmission({ status: "error", error: error instanceof Error ? error.message : "We could not save this order review. Nothing was charged or reserved; please try again.", key, fingerprint });
+    }
   };
-  const submitTradeInquiry = () => {
-    setInquiryReference(`SOURCE-DEMO-${Date.now().toString(36).slice(-6).toUpperCase()}`);
-    setTradeItems([]);
-    goView("inquiry-done");
+  const submitTradeInquiry = async ({ requestType, profile }) => {
+    if (tradeSubmission.status === "submitting") return;
+    const submittedKeys = new Set(tradeItems.map((item) => item.key));
+    const items = tradeItems.map((item) => ({ id: item.id, name: item.name, quantity: requestType === "sample" ? 1 : item.qty }));
+    const payload = {
+      schemaVersion: 1,
+      requestType,
+      items,
+      profile: { company: profile.company, destination: profile.destination, notes: profile.notes },
+      verificationState: "supplier_evidence_and_availability_pending",
+    };
+    const fingerprint = JSON.stringify({ requestType, profile, items });
+    const key = tradeSubmission.key && tradeSubmission.fingerprint === fingerprint ? tradeSubmission.key : createIdempotencyKey("origin-exchange-trade");
+    setTradeSubmission({ status: "submitting", error: "", key, fingerprint });
+    try {
+      const receipt = await submitServiceRequest({
+        type: "origin_exchange_trade_inquiry",
+        source: "origin-exchange-trade",
+        customer: { name: profile.name, email: profile.email },
+        payload,
+      }, key);
+      setInquiryReference(receipt.reference);
+      setTradeItems((current) => current.filter((item) => !submittedKeys.has(item.key)));
+      setTradeSubmission({ status: "idle", error: "", key: "", fingerprint: "" });
+      goView("inquiry-done");
+    } catch (error) {
+      setTradeSubmission({ status: "error", error: error instanceof Error ? error.message : "We could not save this sourcing enquiry. Your selections are still here—please try again.", key, fingerprint });
+    }
   };
 
   return (
@@ -966,7 +970,7 @@ export default function OriginExchangeHub() {
         </div>
       </header>
       <div className="oex-truth-banner" role="status"><BadgeCheck size={16} style={{ flexShrink: 0, marginTop: 2 }}/><span><strong>Interactive concept catalogue.</strong> Products, lots, prices, reviews, certifications, availability and logistics are illustrative unless a field explicitly shows a verified source and date.</span></div>
-      <Ticker market={market} paused={tickerPaused} onToggle={() => setTickerPaused((paused) => !paused)} />
+      <Ticker market={market} feed={marketFeed} paused={tickerPaused} onToggle={() => setTickerPaused((paused) => !paused)} />
       <div style={{ background: C.paper, borderBottom: `1px solid ${C.line}` }}>
         <div className="max-w-6xl mx-auto px-4 py-2.5 flex gap-2 overflow-x-auto oex-scroll">
           {CATS.map((c) => <Chip key={c.id} active={view === "browse" && cat === c.id} onClick={() => goBrowse(c.id)}>{c.name}</Chip>)}
@@ -993,7 +997,7 @@ export default function OriginExchangeHub() {
                 <span>Exchange status</span><h2>Evidence before claims.</h2>
                 <div><b>Catalogue records</b><small>Illustrative demo</small></div>
                 <div><b>Lot documents</b><small>Pending / not supplied</small></div>
-                <div><b>Market data</b><small>Static sample · no feed</small></div>
+                <div><b>Market data</b><small>{market.length ? `${marketFeed.mode} · ${marketFeed.providerName}` : "Unavailable · licensed feed required"}</small></div>
                 <div><b>Display currency</b><small>CAD · indicative only</small></div>
               </aside>
             </section>
@@ -1050,7 +1054,7 @@ export default function OriginExchangeHub() {
 
         {view === "trade" && <TradeDesk lots={lots} onAddLot={addLot} inquiryCount={tradeCount} onOpenInquiry={() => goView("inquiry")} />}
 
-        {view === "inquiry" && <TradeInquiryView items={tradeItems} setQty={setTradeQty} removeItem={removeTradeItem} onBack={() => goView("trade")} onSubmit={submitTradeInquiry} />}
+        {view === "inquiry" && <TradeInquiryView items={tradeItems} setQty={setTradeQty} removeItem={removeTradeItem} onBack={() => goView("trade")} onSubmit={submitTradeInquiry} submission={tradeSubmission} />}
 
         {view === "inquiry-done" && inquiryReference && <TradeInquiryDone reference={inquiryReference} onTrade={() => goView("trade")} />}
 
@@ -1061,16 +1065,15 @@ export default function OriginExchangeHub() {
         {view === "checkout" && (
           <div className="oex-fade" style={{ maxWidth: 760, margin: "0 auto" }}>
             <div className="flex items-center gap-2 mb-4" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: ".1em" }}>
-              {["contact", "pay", "review"].map((s, i) => (
+              {["contact", "review"].map((s, i) => (
                 <React.Fragment key={s}>
                   {i > 0 && <span style={{ color: C.line }}>——</span>}
                   <span style={{ color: step === s ? C.brassDeep : C.sub, fontWeight: step === s ? 700 : 500 }}>{i + 1} {STEP_LABEL[s]}</span>
                 </React.Fragment>
               ))}
             </div>
-            {step === "contact" && <ContactStep contact={contact} setContact={setContact} onBack={() => goView("cart")} onNext={() => { setStep("pay"); window.scrollTo(0, 0); }} />}
-            {step === "pay" && <PayStep pm={pm} setPm={setPm} pf={pf} setPf={setPf} totals={totals} contact={contact} onBack={() => setStep("contact")} onNext={() => { setStep("review"); window.scrollTo(0, 0); }} />}
-            {step === "review" && <ReviewStep cart={cart} totals={totals} ship={ship} pm={pm} pf={pf} contact={contact} onBack={() => setStep("pay")} onPlace={placeOrder} />}
+            {step === "contact" && <ContactStep contact={contact} setContact={setContact} onBack={() => goView("cart")} onNext={() => { setStep("review"); window.scrollTo(0, 0); }} />}
+            {step === "review" && <ReviewStep cart={cart} totals={totals} ship={ship} contact={contact} onBack={() => setStep("contact")} onPlace={placeOrder} submission={orderSubmission} />}
           </div>
         )}
 
@@ -1079,7 +1082,7 @@ export default function OriginExchangeHub() {
 
       <footer className="py-8 text-center" style={{ borderTop: `1px solid ${C.line}` }}>
         <div className="px-4" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub, letterSpacing: ".06em" }}>
-          DELDIET ORIGIN EXCHANGE — interactive prototype · retail checkout and trade sourcing are separate · prices, reviews, claims, indices, lots and fulfilment are illustrative · HST display is an estimate
+          DELDIET ORIGIN EXCHANGE — interactive concept · retail review and trade sourcing are separate · prices, reviews, claims, lots and fulfilment are illustrative unless a field shows its licensed source and timestamp
         </div>
       </footer>
     </div>
