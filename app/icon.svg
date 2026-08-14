@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Deldiet origin sunrise</title>
+  <rect width="64" height="64" rx="14" fill="#17100c"/>
+  <g fill="none" stroke="#c98b43" stroke-linecap="round" stroke-width="2.5">
+    <path d="M32 36V14"/>
+    <path d="M32 36 22.7 16"/>
+    <path d="M32 36 15.6 22.3"/>
+    <path d="M32 36 11.2 31.7"/>
+    <path d="M32 36 41.3 16"/>
+    <path d="M32 36 48.4 22.3"/>
+    <path d="M32 36 52.8 31.7"/>
+  </g>
+  <path d="M24 39a8 8 0 0 1 16 0Z" fill="#f6f2e8"/>
+  <path d="M11 39h42" stroke="#f6f2e8" stroke-linecap="round" stroke-width="3"/>
+  <path d="M18 49h28" stroke="#a8b39b" stroke-linecap="round" stroke-width="2.5"/>
+</svg>

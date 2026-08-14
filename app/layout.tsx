@@ -13,15 +13,26 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://deldiet.vercel.app"),
   title: "Deldiet — The World in Your Cup",
   description:
     "Explore traceable coffee origins, build your exact cup, and bring the same coffee home in every format you brew.",
+  openGraph: {
+    type: "website",
+    locale: "en_CA",
+    siteName: "Deldiet",
+    title: "Deldiet — The World in Your Cup",
+    description:
+      "Explore traceable coffee origins, build your exact cup, and bring the same coffee home in every format you brew.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Deldiet — The World in Your Cup",
+    description:
+      "Explore traceable coffee origins, build your exact cup, and bring the same coffee home in every format you brew.",
+  },
   other: {
     "codex-preview": "development",
-  },
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
   },
 };
 
