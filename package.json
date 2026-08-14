@@ -13,7 +13,7 @@
     "build:sites": "bash scripts/build-verified.sh",
     "start": "next start",
     "start:sites": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "node --test tests/passport-requests.test.mjs tests/origin-bar-request.test.mjs tests/mobile-hero.test.mjs",
+    "test": "node --test tests/passport-requests.test.mjs tests/origin-bar-request.test.mjs tests/mobile-hero.test.mjs tests/metadata-assets.test.mjs",
     "test:sites": "npm run build:sites && node --test tests/*.test.mjs",
     "validate:artifact": "bash scripts/validate-artifact.sh",
     "lint": "bash scripts/sites-env.sh -- eslint . --ignore-pattern dist --ignore-pattern .next",
