@@ -20,15 +20,17 @@ const FONTS = `
 .rise { animation: riseIn .45s ease both; }
 .rise-1 { animation: riseIn .45s .08s ease both; }
 .rise-2 { animation: riseIn .45s .16s ease both; }
-.ob-utility { min-height: 38px; padding: 7px 18px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #17100C; border-bottom: 1px solid #4A372B; }
-.ob-utility a { display: inline-flex; align-items: center; gap: 6px; color: #D8C4A8; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 600; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; }
+.origin-bar-app { width: 100%; max-width: 100vw; min-height: 100svh; overflow: hidden; }
+.ob-scroll-region { min-height: 0; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+.ob-utility { min-height: calc(44px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left)); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #17100C; border-bottom: 1px solid #4A372B; }
+.ob-utility a { min-height:44px; display: inline-flex; align-items: center; gap: 6px; color: #D8C4A8; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 600; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; }
 .ob-utility a:last-child { justify-self: end; color: #D9FF66; }
 .ob-utility > span { display: inline-flex; align-items: center; gap: 6px; color: #8F7D69; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
 .ob-label-short { display: none; }
 .ob-welcome { background-image: linear-gradient(90deg, rgba(20,12,8,.96) 0%, rgba(20,12,8,.88) 42%, rgba(20,12,8,.40) 100%), url('/deldiet-cafe-interior.png'); background-size: cover; background-position: center; }
-.ob-welcome-panel { width: min(620px, 100%); margin-right: auto; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
+.ob-welcome-panel { width: min(620px, 100%); min-width: 0; margin-right: auto; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
 .ob-welcome { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(310px,420px); gap:clamp(28px,6vw,90px); }
-.ob-welcome-dossier { align-self:center; min-height:500px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,.2); background:rgba(26,17,12,.74); color:#F5EDE2; backdrop-filter:blur(18px); box-shadow:0 28px 80px rgba(0,0,0,.28); }
+.ob-welcome-dossier { min-width:0; align-self:center; min-height:500px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,.2); background:rgba(26,17,12,.74); color:#F5EDE2; backdrop-filter:blur(18px); box-shadow:0 28px 80px rgba(0,0,0,.28); }
 .ob-welcome-dossier > div:first-child { display:flex; justify-content:space-between; gap:18px; color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
 .ob-welcome-dossier h2 { margin:42px 0 12px; font-family:'Young Serif',Georgia,serif; font-size:clamp(38px,4vw,58px); font-weight:400; line-height:.98; }
 .ob-welcome-dossier > p { margin:0; color:#CDBEAE; font-size:16px; line-height:1.65; }
@@ -47,24 +49,70 @@ const FONTS = `
 .ob-cup-stage { text-align:center; }
 .ob-safety-rail { margin-top:14px; padding:12px; border:1px solid #E7DFD3; background:#F7F4EE; text-align:left; }
 .ob-safety-rail b { display:block; margin-bottom:4px; color:#2A1F18; font-size:13px; }.ob-safety-rail p{margin:0;color:#6E5F53;font-size:12px;line-height:1.5;}
-.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size:28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size:14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size:13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size:14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:20px;height:20px;min-height:20px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
+.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size:28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size:14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size:13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size:14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:22px;height:22px;min-height:22px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
 .ob-truth-note { margin:0 0 18px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; border:1px solid #D8CBB9; background:#FFF9EE; color:#5E4B3D; font-size:13px; line-height:1.5; }
+.ob-truth-extra { display:inline; }
+.ob-horizontal-scroll { scrollbar-width:none; -ms-overflow-style:none; overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
+.ob-horizontal-scroll::-webkit-scrollbar { display:none; }
+.ob-horizontal-scroll > * { scroll-snap-align:start; }
+.ob-extraction-status { display:inline-flex; max-width:100%; white-space:normal !important; line-height:1.35; }
+.ob-choice-tabs button { min-width:0; }
+.ob-tab-short { display:none; }
+.ob-review-row { padding:8px 0; display:grid; grid-template-columns:minmax(90px,.45fr) minmax(0,1fr) auto; gap:12px; align-items:baseline; border-bottom:1px dashed #E7DFD3; }
+.ob-review-label { color:#6E5F53; }
+.ob-review-value { min-width:0; overflow-wrap:anywhere; text-align:right; }
+.ob-kiosk-header { background:#221611; min-height:66px; flex-shrink:0; border-bottom:1px solid #4A372B; padding-left:max(16px,env(safe-area-inset-left)) !important; padding-right:max(16px,env(safe-area-inset-right)) !important; }
+.ob-kiosk-brand { min-width:0; }
+.ob-kiosk-progress { display:flex; align-items:center; gap:12px; margin-left:auto; }
+.ob-progress-dots { display:flex; gap:6px; }
+.ob-reset-short { display:none; }
+.ob-reset-button { flex:none; }
+.ob-flow-footer { background:#221611; min-height:calc(68px + env(safe-area-inset-bottom)); height:auto; flex-shrink:0; padding:9px max(16px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)) !important; }
+.ob-next { min-width:0; white-space:nowrap; }
+.ob-next-target { display:inline; }
+.ob-idle-actions { display:flex; gap:12px; }
 .origin-bar-app button,.origin-bar-app input,.origin-bar-app select { min-height:44px; }
+.origin-bar-app button { touch-action:manipulation; }
 .origin-bar-app input,.origin-bar-app select { font-size:16px !important; }
 @media (prefers-reduced-motion: reduce) { .origin-bar-app * { animation: none !important; transition: none !important; } }
 @media (max-width: 640px) {
-  .ob-utility { grid-template-columns: 1fr 1fr; padding: 8px 12px; }
+  .ob-utility { min-height:calc(44px + env(safe-area-inset-top)); grid-template-columns: minmax(0,1fr) minmax(0,1fr); padding:env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left)); gap:8px; }
   .ob-utility > span { display: none; }
-  .ob-utility a { font-size: 12px; letter-spacing: .09em; }
+  .ob-utility a { min-width:0; font-size: 11px; letter-spacing: .08em; white-space:nowrap; }
   .ob-label-wide { display: none; }
   .ob-label-short { display: inline; }
   .ob-welcome { background-image: linear-gradient(0deg, rgba(20,12,8,.98) 0%, rgba(20,12,8,.78) 64%, rgba(20,12,8,.32) 100%), url('/deldiet-cafe-interior.png'); background-position: 55% center; }
   .ob-welcome-panel { align-items: center; text-align: center; }
-  .ob-welcome { grid-template-columns:1fr; }.ob-welcome-dossier{width:100%;min-height:auto;margin-top:10px;text-align:left;}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
+  .ob-welcome { grid-template-columns:minmax(0,1fr); gap:24px; padding:28px 18px !important; }.ob-welcome-panel,.ob-welcome-dossier{min-width:0;width:100%;}.ob-welcome-dossier{min-height:auto;margin-top:0;padding:20px;text-align:left;}.ob-welcome-dossier h2{margin:24px 0 10px;font-size:34px}.ob-welcome-dossier>p{font-size:15px}.ob-welcome-steps{margin-top:20px}.ob-welcome-steps span{min-height:50px;grid-template-columns:30px minmax(0,1fr);}.ob-welcome-steps small{display:none}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
 }
-@media (max-width: 1040px) { .ob-workspace-grid{grid-template-columns:minmax(0,1fr) 250px}.ob-journey-rail{display:none} }
-@media (max-width: 720px) { .ob-workspace-grid{display:block}.ob-cup-stage{display:none} }
-@media (max-width: 720px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{min-height:72px;padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid #5A4435;background:#2A1A12;color:#F5EDE2}.ob-mobile-passport b{display:block;font-size:13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size:11px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:15px} }
+@media (max-width: 1199px) { .ob-workspace-grid{grid-template-columns:minmax(0,1fr) 250px}.ob-journey-rail{display:none} }
+@media (max-width: 899px) { .ob-workspace-grid{display:block}.ob-cup-stage{display:none} }
+@media (max-width: 899px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{display:block;flex:none;border-top:1px solid #5A4435;background:linear-gradient(90deg,#21140f,#342018);color:#F5EDE2}.ob-mobile-passport summary{min-height:62px;padding:9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none}.ob-mobile-passport summary::-webkit-details-marker{display:none}.ob-mobile-passport b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size:12px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:16px}.ob-mobile-passport-panel{padding:12px max(14px,env(safe-area-inset-right)) 14px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr 1fr;gap:1px;border-top:1px solid #4A372B;background:#291912}.ob-mobile-passport-panel div{padding:9px;background:#342219}.ob-mobile-passport-panel small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.ob-mobile-passport-panel p{margin:0;color:#D8C4A8;font-size:12px;line-height:1.45} }
+@media (max-width: 720px) {
+  .ob-kiosk-header { min-height:86px; padding:9px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"brand reset" "progress progress"; gap:7px 10px; }
+  .ob-kiosk-brand { grid-area:brand; }.ob-reset-button{grid-area:reset}.ob-kiosk-progress { grid-area:progress; width:100%; margin:0; justify-content:space-between; }
+  .ob-progress-copy { display:inline !important; font-size:12px !important; }
+  .ob-flow-footer { min-height:calc(68px + env(safe-area-inset-bottom)); padding:9px max(14px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:auto minmax(0,1fr); gap:10px !important; }
+  .ob-footer-subtotal { display:none !important; }
+  .ob-next { width:100%; justify-content:center; padding:12px 16px !important; }
+  .ob-truth-note { margin-bottom:14px; padding:10px 12px; font-size:12px; }
+  .ob-truth-extra { display:none; }
+  .ob-choice-tabs { display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important; }
+  .ob-choice-tabs button { width:100%; padding:8px 9px !important; white-space:normal !important; line-height:1.25; }
+  .ob-tab-wide { display:none; }.ob-tab-short{display:inline;}
+  .ob-review-row { grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; align-items:start; }
+  .ob-review-label { grid-column:1; font-size:12px !important; }
+  .ob-review-value { grid-column:1/-1; grid-row:2; text-align:left; font-size:14px !important; }
+  .ob-review-price { grid-column:2; grid-row:1; font-size:13px !important; }
+}
+@media (max-width: 360px) {
+  .ob-kiosk-header { padding-left:max(12px,env(safe-area-inset-left)) !important; padding-right:max(12px,env(safe-area-inset-right)) !important; }
+  .ob-kiosk-brand span { font-size:16px !important; }
+  .ob-reset-wide { display:none; }.ob-reset-short{display:inline;}
+  .ob-progress-dots { gap:4px; }
+  .ob-narrow-stack { grid-template-columns:1fr !important; }
+  .ob-idle-actions { flex-direction:column; }
+}
 .ok-scroll::-webkit-scrollbar { width: 6px; }
 .ok-scroll::-webkit-scrollbar-thumb { background: #d8cfc2; border-radius: 99px; }
 `;
@@ -72,7 +120,7 @@ const FONTS = `
 const C = {
   espresso: "#221611",
   ink: "#2A1F18",
-  faint: "#8A7A6C",
+  faint: "#6E5F53",
   paper: "#F7F4EE",
   card: "#FFFFFF",
   line: "#E7DFD3",
@@ -295,12 +343,13 @@ const CUPS = [
 const EXTRA_SHOT = 1.0;
 const STEP_LABELS = ["Origin", "Drink", "Craft", "Enhance", "Finish", "Review"];
 const money = (x) => `$${x.toFixed(2)}`;
+const readableAccent = (color) => color === ROASTS[0].color ? "#754019" : color;
 
 /* ============================ UI ATOMS ============================ */
 
-function Tag({ children, color = C.faint, bg = "transparent", border = C.line }) {
+function Tag({ children, color = C.faint, bg = "transparent", border = C.line, wrap = false }) {
   return (
-    <span style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+    <span style={{ maxWidth: wrap ? "100%" : undefined, fontFamily: F.mono, fontSize: 12, lineHeight: wrap ? 1.35 : undefined, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: wrap ? "normal" : "nowrap", overflowWrap: wrap ? "anywhere" : undefined }}>
       {children}
     </span>
   );
@@ -309,33 +358,35 @@ function Tag({ children, color = C.faint, bg = "transparent", border = C.line })
 function SectionTitle({ kicker, title, sub, accent }) {
   return (
     <div className="rise" style={{ marginBottom: 20 }}>
-      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: accent, textTransform: "uppercase", marginBottom: 8 }}>{kicker}</div>
-      <h2 style={{ fontFamily: F.disp, fontSize: "clamp(24px, 3.4vw, 34px)", color: C.ink, lineHeight: 1.15, margin: 0 }}>{title}</h2>
+      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 8 }}>{kicker}</div>
+      <h2 className="ob-step-heading" tabIndex={-1} style={{ fontFamily: F.disp, fontSize: "clamp(24px, 3.4vw, 34px)", color: C.ink, lineHeight: 1.15, margin: 0 }}>{title}</h2>
       {sub && <p style={{ fontFamily: F.body, color: C.faint, fontSize: 14, marginTop: 8, maxWidth: 560 }}>{sub}</p>}
     </div>
   );
 }
 
 function Pill({ active, onClick, children, accent }) {
+  const activeText = accent === ROASTS[0].color ? C.espresso : "#fff";
   return (
-    <button onClick={onClick} style={{
+    <button type="button" aria-pressed={active} onClick={onClick} style={{
       fontFamily: F.body, fontSize: 14, fontWeight: 600, padding: "8px 14px", borderRadius: 999, cursor: "pointer",
-      border: `1.5px solid ${active ? accent : C.line}`, background: active ? accent : C.card, color: active ? "#fff" : C.ink,
+      border: `1.5px solid ${active ? accent : C.line}`, background: active ? accent : C.card, color: active ? activeText : C.ink,
       transition: "all .15s ease", whiteSpace: "nowrap",
     }}>{children}</button>
   );
 }
 
 function Card({ active, onClick, accent, children, pad = 14, disabled = false }) {
+  const activeText = accent === ROASTS[0].color ? C.espresso : "#fff";
   return (
-    <button onClick={onClick} disabled={disabled} aria-disabled={disabled} className="text-left w-full" style={{
+    <button type="button" onClick={onClick} disabled={disabled} aria-disabled={disabled} aria-pressed={active} className="text-left w-full" style={{
       position: "relative", background: C.card, borderRadius: 14, padding: pad, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.48 : 1,
       border: `1.5px solid ${active ? accent : C.line}`, boxShadow: active ? `0 0 0 3px ${accent}22` : "0 1px 2px rgba(34,22,17,.04)",
       transition: "border-color .15s ease, box-shadow .15s ease", fontFamily: F.body, color: C.ink,
     }}>
       {active && (
         <span style={{ position: "absolute", top: 10, right: 10, width: 20, height: 20, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <Check size={12} color="#fff" strokeWidth={3} />
+          <Check size={12} color={activeText} strokeWidth={3} />
         </span>
       )}
       {children}
@@ -343,16 +394,16 @@ function Card({ active, onClick, accent, children, pad = 14, disabled = false })
   );
 }
 
-function Qty({ value, onMinus, onPlus, min = 0, max = 4, accent }) {
+function Qty({ value, onMinus, onPlus, min = 0, max = 4, accent, label = "quantity" }) {
   const btn = (dis) => ({
-    width: 30, height: 30, borderRadius: 999, border: `1.5px solid ${dis ? C.line : accent}`,
-    color: dis ? C.line : accent, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: dis ? "default" : "pointer",
+    width: 44, minWidth: 44, height: 44, borderRadius: 999, border: `1.5px solid ${dis ? C.line : accent}`,
+    color: dis ? C.faint : accent, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center", cursor: dis ? "not-allowed" : "pointer",
   });
   return (
     <div className="flex items-center gap-3">
-      <button style={btn(value <= min)} onClick={() => value > min && onMinus()}><Minus size={14} /></button>
+      <button type="button" aria-label={`Decrease ${label}`} disabled={value <= min} style={btn(value <= min)} onClick={onMinus}><Minus size={16} /></button>
       <span style={{ fontFamily: F.mono, fontSize: 16, fontWeight: 600, minWidth: 18, textAlign: "center", color: C.ink }}>{value}</span>
-      <button style={btn(value >= max)} onClick={() => value < max && onPlus()}><Plus size={14} /></button>
+      <button type="button" aria-label={`Increase ${label}`} disabled={value >= max} style={btn(value >= max)} onClick={onPlus}><Plus size={16} /></button>
     </div>
   );
 }
@@ -453,7 +504,7 @@ function Welcome({ onBegin, onTasteMatch }) {
   return (
     <div className="ob-welcome flex items-center px-6 sm:px-10 lg:px-16" style={{ minHeight: "100%", paddingTop: 48, paddingBottom: 48 }}>
       <div className="ob-welcome-panel">
-        <div className="rise"><Tag color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Origin-led · compatibility-aware · barista confirmed</Tag></div>
+        <div className="rise"><Tag wrap color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Origin-led · compatibility-aware · barista confirmed</Tag></div>
         <div className="rise-1" style={{ margin: "26px 0 16px", padding: "12px 22px", borderRadius: 999, background: "rgba(247,244,238,.94)", boxShadow: "0 18px 50px rgba(0,0,0,.24)" }}>
           <CupSVG uid="hero" roast={ROASTS[1]} hasMilk foam sizeIdx={2} width={116} />
         </div>
@@ -544,7 +595,7 @@ function OriginStep({ sel, set, accent }) {
           <Pill key={b} active={beanFilter === b} accent={accent} onClick={() => setBeanFilter(b)}>{b}</Pill>
         ))}
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-2 rise" style={{ marginBottom: 14 }}>
+      <div className="ob-horizontal-scroll flex gap-2 overflow-x-auto pb-2 rise" style={{ marginBottom: 14 }}>
         {Object.keys(ORIGINS).map((ct) => (
           <Pill key={ct} active={continent === ct} accent={accent} onClick={() => setContinent(ct)}>{ct}</Pill>
         ))}
@@ -563,12 +614,12 @@ function OriginStep({ sel, set, accent }) {
                 <span style={{ fontSize: 26, lineHeight: 1 }}>{c.f}</span>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 700, fontSize: 15 }}>{c.n}</div>
-                  {c.x && <div style={{ fontFamily: F.body, fontSize: 14, color: accent, fontWeight: 600 }}>{c.x}</div>}
+                  {c.x && <div style={{ fontFamily: F.body, fontSize: 14, color: readableAccent(accent), fontWeight: 600 }}>{c.x}</div>}
                   <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint, marginTop: 5 }}>{c.t}</div>
                   <div className="flex flex-wrap items-center gap-1.5" style={{ marginTop: 8 }}>
                     {c.b.map((bt) => <Tag key={bt}>{BEAN_NAMES[bt]}</Tag>)}
                     <Tag>{c.m}</Tag>
-                    {c.p > 0 && <Tag color={accent} border={`${accent}66`}>+{money(c.p)}</Tag>}
+                    {c.p > 0 && <Tag color={readableAccent(accent)} border={`${accent}66`}>+{money(c.p)}</Tag>}
                   </div>
                 </div>
               </div>
@@ -592,8 +643,8 @@ function OriginStep({ sel, set, accent }) {
         </article>
       )}
       <div style={{ marginTop: 28 }}>
-        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Choose your roast — the room warms with it</div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Choose your roast — the room warms with it</div>
+      <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-4 gap-3">
           {ROASTS.map((r) => (
             <Card key={r.id} active={sel.roast === r.id} accent={r.color} onClick={() => set({ roast: r.id })}>
               <div className="flex items-center gap-2.5">
@@ -626,9 +677,9 @@ function DrinkStep({ sel, set, accent }) {
       <SectionTitle accent={accent} kicker="Step 2 · The make"
         title="Now — what are we making?"
         sub="Every house classic from the world's great coffee menus, or one of our signature creations. Your origin and roast carry through either way." />
-      <div className="flex gap-2 rise" style={{ marginBottom: 16 }}>
-        <Pill active={sel.tab === "classics"} accent={accent} onClick={() => set({ tab: "classics" })}>House classics · {CLASSICS.length}</Pill>
-        <Pill active={sel.tab === "signatures"} accent={accent} onClick={() => set({ tab: "signatures" })}>Signature creations · {SIGNATURES.length}</Pill>
+      <div className="ob-choice-tabs flex gap-2 rise" style={{ marginBottom: 16 }}>
+        <Pill active={sel.tab === "classics"} accent={accent} onClick={() => set({ tab: "classics", drink: null })}><span className="ob-tab-wide">House classics · </span><span className="ob-tab-short">Classics · </span>{CLASSICS.length}</Pill>
+        <Pill active={sel.tab === "signatures"} accent={accent} onClick={() => set({ tab: "signatures", drink: null })}><span className="ob-tab-wide">Signature creations · </span><span className="ob-tab-short">Signatures · </span>{SIGNATURES.length}</Pill>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {list.map((d) => {
@@ -643,7 +694,7 @@ function DrinkStep({ sel, set, accent }) {
               <div className="flex flex-wrap gap-1.5" style={{ marginTop: 8 }}>
                 {d.fam === "cold" && <Tag><Snowflake size={9} style={{ display: "inline", marginRight: 3 }} />cold</Tag>}
                 {d.fam === "blended" && <Tag>blended</Tag>}
-                {(d.tag || []).map((t) => <Tag key={t} color={accent} border={`${accent}55`}>{t}</Tag>)}
+                {(d.tag || []).map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
               </div>
             </Card>
           );
@@ -665,8 +716,8 @@ function CraftStep({ sel, set, accent }) {
         sub={`Milk, shots, heat and extraction for your ${d.n || "drink"} — small choices, big difference.`} />
       <div className="grid lg:grid-cols-2 gap-x-8 gap-y-7">
         <div className="rise">
-          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Milk & alternatives</div>
-          <div className="grid grid-cols-2 gap-2">
+          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Milk & alternatives</div>
+          <div className="ob-narrow-stack grid grid-cols-2 gap-2">
             {MILKS.map((m) => (
               <Card key={m.n} pad={11} active={sel.milk === m.n} accent={accent} onClick={() => set({ milk: m.n, milkTouched: true })}>
                 <div className="flex items-baseline justify-between gap-2" style={{ paddingRight: sel.milk === m.n ? 20 : 0 }}>
@@ -680,29 +731,30 @@ function CraftStep({ sel, set, accent }) {
         </div>
         <div className="flex flex-col gap-7">
           <div className="rise-1">
-            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Espresso shots</div>
+            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Espresso shots</div>
             <div className="flex items-center justify-between" style={{ background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 14, padding: "12px 14px" }}>
               <div>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{d.sh} included{sel.extraShots > 0 ? ` + ${sel.extraShots} extra` : ""}</div>
                 <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint, marginTop: 2 }}>extra shot +{money(EXTRA_SHOT)}</div>
               </div>
               <Qty value={sel.extraShots} min={0} max={maxExtraShots} accent={accent}
+                label="extra shots"
                 onMinus={() => set({ extraShots: sel.extraShots - 1 })}
                 onPlus={() => set({ extraShots: sel.extraShots + 1 })} />
             </div>
           </div>
           <div className="rise-1">
-            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Temperature</div>
+            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Temperature</div>
             <Seg options={tempOptions} value={sel.temp} onChange={(v) => set({ temp: v })} accent={accent} />
           </div>
           <div className="rise-2">
-            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Extraction</div>
+            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Extraction</div>
             {ext.length === 1
-              ? <Tag color={C.ink} bg={C.cream} border={C.line}>{ext[0]} — set by your drink</Tag>
+              ? <span className="ob-extraction-status"><Tag wrap color={C.ink} bg={C.cream} border={C.line}>{ext[0]} — set by your drink</Tag></span>
               : <Seg options={ext} value={sel.extraction} onChange={(v) => set({ extraction: v })} accent={accent} />}
           </div>
           <div className="rise-2">
-            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Caffeine</div>
+            <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Caffeine</div>
             <Seg options={CAFFEINE} value={sel.caffeine} onChange={(v) => set({ caffeine: v })} accent={accent} />
             <p style={{ fontFamily: F.body, fontSize: 14, color: C.faint, marginTop: 9, lineHeight: 1.5 }}>Caffeine varies by bean, method, size and shots. Ask the barista for an estimate or choose half-caf or decaf.</p>
           </div>
@@ -723,8 +775,8 @@ function EnhanceStep({ sel, set, accent }) {
       <SectionTitle accent={accent} kicker="Step 4 · Enhance"
         title="Flavours, optional add-ins & finishing touches"
         sub="Choose syrups, sweeteners, toppings and up to two optional functional ingredients. Bar staff confirm ingredient availability and suitability." />
-      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Optional add-ins · choose up to 2</div>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 rise">
+      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Optional add-ins · choose up to 2</div>
+      <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 rise">
         {BOOSTERS.map((b) => (
           <Card key={b.n} pad={11} active={sel.boosters.includes(b.n)} disabled={!sel.boosters.includes(b.n) && boosterLimitReached} accent={accent} onClick={() => toggle("boosters", b.n)}>
             <div className="flex items-baseline justify-between gap-2" style={{ paddingRight: sel.boosters.includes(b.n) ? 20 : 0 }}>
@@ -740,13 +792,13 @@ function EnhanceStep({ sel, set, accent }) {
       </p>
       <div className="grid lg:grid-cols-2 gap-x-8 gap-y-7" style={{ marginTop: 26 }}>
         <div className="rise-1">
-          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Flavour syrups · +{money(SYRUP_PRICE)} each</div>
+          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Flavour syrups · +{money(SYRUP_PRICE)} each</div>
           <div className="flex flex-wrap gap-2">
             {SYRUPS.map((s) => <Pill key={s} active={sel.syrups.includes(s)} accent={accent} onClick={() => toggle("syrups", s)}>{s}</Pill>)}
           </div>
         </div>
         <div className="rise-1">
-          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Sweetener · on the house</div>
+          <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Sweetener · on the house</div>
           <div className="flex flex-wrap gap-2">
             {SWEETENERS.map((s) => <Pill key={s} active={sel.sweetener === s} accent={accent} onClick={() => set({ sweetener: s })}>{s}</Pill>)}
           </div>
@@ -761,8 +813,8 @@ function EnhanceStep({ sel, set, accent }) {
         </div>
       </div>
       <div style={{ marginTop: 26 }} className="rise-2">
-        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Toppings</div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
+        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Toppings</div>
+        <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2">
           {TOPPINGS.map((t) => (
             <Card key={t.n} pad={11} active={sel.toppings.includes(t.n)} accent={accent} onClick={() => toggle("toppings", t.n)}>
               <div className="flex items-baseline justify-between gap-2" style={{ paddingRight: sel.toppings.includes(t.n) ? 20 : 0 }}>
@@ -784,8 +836,8 @@ function FinishStep({ sel, set, accent }) {
       <SectionTitle accent={accent} kicker="Step 5 · Finish"
         title="Size it and send it"
         sub="Our sizes grow like the plant does — seed to harvest. Bringing your own cup earns a little back." />
-      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Cup size</div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 rise">
+      <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Cup size</div>
+      <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-4 gap-3 rise">
         {SIZES.map((s, i) => {
           const disabled = compactDrink && s.id !== "seed";
           return (
@@ -801,7 +853,7 @@ function FinishStep({ sel, set, accent }) {
         )})}
       </div>
       <div style={{ marginTop: 26 }} className="rise-1">
-        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: accent, textTransform: "uppercase", marginBottom: 10 }}>Your cup, your way</div>
+        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Your cup, your way</div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {CUPS.map((c) => (
             <Card key={c.n} active={sel.cup === c.n} accent={accent} onClick={() => set({ cup: c.n })}>
@@ -821,10 +873,10 @@ function FinishStep({ sel, set, accent }) {
 function Row({ label, value, price, green }) {
   if (!value) return null;
   return (
-    <div className="flex items-baseline justify-between gap-4" style={{ padding: "7px 0", borderBottom: `1px dashed ${C.line}` }}>
-      <span style={{ fontFamily: F.body, fontSize: 14, color: C.faint, flexShrink: 0 }}>{label}</span>
-      <span style={{ fontFamily: F.body, fontSize: 14, fontWeight: 600, color: C.ink, textAlign: "right" }}>{value}</span>
-      {price !== undefined && <span style={{ fontFamily: F.mono, fontSize: 14, color: green ? C.leaf : C.faint, flexShrink: 0, minWidth: 52, textAlign: "right" }}>{price}</span>}
+    <div className="ob-review-row">
+      <span className="ob-review-label" style={{ fontFamily: F.body, fontSize: 14 }}>{label}</span>
+      <span className="ob-review-value" style={{ fontFamily: F.body, fontSize: 14, fontWeight: 600, color: C.ink }}>{value}</span>
+      {price !== undefined && <span className="ob-review-price" style={{ fontFamily: F.mono, fontSize: 14, color: green ? C.leaf : C.faint, flexShrink: 0, minWidth: 52, textAlign: "right" }}>{price}</span>}
     </div>
   );
 }
@@ -833,7 +885,7 @@ function ReviewGroup({ g, children, accent, onJump }) {
   return (
     <div style={{ marginBottom: 18 }}>
       <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
-        <span style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: accent, textTransform: "uppercase" }}>{g.t}</span>
+        <span style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: readableAccent(accent), textTransform: "uppercase" }}>{g.t}</span>
         <button onClick={() => onJump(g.step)} style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1, color: C.faint, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>EDIT</button>
       </div>
       {children}
@@ -881,7 +933,7 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
           </ReviewGroup>
           <div className="flex items-baseline justify-between" style={{ paddingTop: 10 }}>
             <span style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: C.faint }}>ILLUSTRATIVE SUBTOTAL · CAD</span>
-            <span style={{ fontFamily: F.mono, fontSize: 26, fontWeight: 600, color: accent }}>{money(parts.total)}</span>
+            <span style={{ fontFamily: F.mono, fontSize: 26, fontWeight: 600, color: readableAccent(accent) }}>{money(parts.total)}</span>
           </div>
           <div className="ob-safety-rail" style={{ marginTop: 16 }}>
             <b>Cup Passport · safety and verification</b>
@@ -892,11 +944,11 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
         <div className="lg:col-span-2 rise-1" style={{ background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 16, padding: 18, textAlign: "center" }}>
           <CupSVG uid="review" {...cupProps.svg} width={170} />
           <div className="flex flex-wrap justify-center gap-1.5" style={{ marginTop: 12 }}>
-            {tags.map((t) => <Tag key={t} color={accent} border={`${accent}55`}>{t}</Tag>)}
+            {tags.map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
           </div>
           <div style={{ marginTop: 18, textAlign: "left" }}>
-            <label style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: C.faint, textTransform: "uppercase" }}>A name for your cup</label>
-            <input value={sel.name} maxLength={80} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
+            <label htmlFor="ob-cup-name" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: C.faint, textTransform: "uppercase" }}>A name for your cup</label>
+            <input id="ob-cup-name" value={sel.name} maxLength={80} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
               style={{ width: "100%", marginTop: 6, fontFamily: F.body, fontSize: 15, padding: "10px 12px", borderRadius: 10, border: `1.5px solid ${C.line}`, outline: "none", background: C.paper, color: C.ink, boxSizing: "border-box" }} />
             <p style={{ fontFamily: F.body, fontSize: 14, color: C.faint, marginTop: 10 }}>
               Send the request below. A barista must confirm ingredients, allergens, cross-contact, availability, tax and payment at the counter before preparation.
@@ -908,26 +960,47 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
   );
 }
 
-function DoneScreen({ sel, accent, cupProps, orderNo, onReset }) {
+function DoneScreen({ sel, accent, cupProps, receipt, onReset }) {
   const sizeObj = SIZES.find((s) => s.id === sel.size);
+  const [copied, setCopied] = useState(false);
+  const orderNo = receipt?.reference || "Reference unavailable";
+  const onAccent = accent === ROASTS[0].color ? C.espresso : "#fff";
+  const copyReference = async () => {
+    try {
+      await navigator.clipboard.writeText(orderNo);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2400);
+    } catch { setCopied(false); }
+  };
+  const shareReference = async () => {
+    if (!navigator.share) return copyReference();
+    try { await navigator.share({ title: "Deldiet Origin Bar request", text: `Deldiet request ${orderNo}` }); } catch { /* sharing was cancelled */ }
+  };
   return (
     <div className="flex flex-col items-center justify-center text-center px-6" style={{ minHeight: "100%", paddingTop: 40, paddingBottom: 40 }}>
       <div className="rise" style={{ width: 56, height: 56, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: `0 10px 28px ${accent}55` }}>
-        <Check size={28} color="#fff" strokeWidth={3} />
+        <Check size={28} color={onAccent} strokeWidth={3} />
       </div>
-      <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 14, letterSpacing: 2, color: C.faint, marginTop: 22, textTransform: "uppercase" }}>Request reference {orderNo}</div>
+      <div className="rise-1" style={{ maxWidth: "100%", fontFamily: F.mono, fontSize: 14, letterSpacing: 1.2, color: C.faint, marginTop: 22, textTransform: "uppercase", overflowWrap: "anywhere" }}>Request reference {orderNo}</div>
       <h2 className="rise-1" style={{ fontFamily: F.disp, fontSize: "clamp(26px,4vw,38px)", color: C.ink, margin: "8px 0 0" }}>
         {sel.name ? `${sel.name}, your` : "Your"} cup request was received
       </h2>
       <p className="rise-1" style={{ fontFamily: F.body, color: C.faint, fontSize: 15, marginTop: 10, maxWidth: 420 }}>
         {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. Keep this reference and show it to Deldiet staff. A barista still confirms ingredients, availability, final price and preparation time before making anything.
       </p>
+      <p className="rise-1" style={{ fontFamily: F.mono, color: C.faint, fontSize: 12, margin: "8px 0 0", maxWidth: 420, lineHeight: 1.5 }}>
+        For kiosk privacy, this receipt clears from this device after 10 minutes. Copy or share the reference now.
+      </p>
       <div className="rise-2" style={{ marginTop: 20 }}>
         <CupSVG uid="done" {...cupProps.svg} width={140} />
       </div>
-      <div className="rise-2" style={{ marginTop: 24, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+      <div className="rise-2" style={{ marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+        <button type="button" onClick={copyReference} style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink, background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 999, padding: "11px 18px", cursor: "pointer" }}>{copied ? "Reference copied" : "Copy reference"}</button>
+        <button type="button" onClick={shareReference} style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink, background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 999, padding: "11px 18px", cursor: "pointer" }}>Share</button>
+      </div>
+      <div className="rise-2" style={{ marginTop: 12, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
         <button onClick={onReset} style={{
-          fontFamily: F.body, fontWeight: 700, fontSize: 15, color: accent,
+          fontFamily: F.body, fontWeight: 700, fontSize: 15, color: readableAccent(accent),
           background: "transparent", border: `2px solid ${accent}`, borderRadius: 999, padding: "12px 28px", cursor: "pointer",
         }}>
           Craft another cup
@@ -952,6 +1025,8 @@ const FRESH = {
   toppings: [], size: "sprout", cup: "For here · ceramic", name: "", safetyAck: false,
 };
 const DRAFT_VERSION = "origin-bar-concept-v1";
+const RECEIPT_VERSION = "origin-bar-receipt-v1";
+const RECEIPT_TTL_MS = 10 * 60 * 1000;
 
 function restoreOriginBarDraft(value) {
   if (!value || value.version !== DRAFT_VERSION || !value.sel || !Number.isInteger(value.step) || value.step < 1 || value.step > 6) return null;
@@ -969,7 +1044,7 @@ function restoreOriginBarDraft(value) {
     origin,
     drink,
     roast: ROASTS.some((item) => item.id === raw.roast) ? raw.roast : FRESH.roast,
-    tab: ["classics", "signatures"].includes(raw.tab) ? raw.tab : FRESH.tab,
+    tab: drink && SIGNATURES.some((item) => item.n === drink.n) ? "signatures" : "classics",
     milk: milkNames.includes(raw.milk) ? raw.milk : FRESH.milk,
     milkTouched: raw.milkTouched === true,
     extraShots: Number.isInteger(raw.extraShots) && raw.extraShots >= 0 && raw.extraShots <= 4 ? raw.extraShots : 0,
@@ -990,17 +1065,38 @@ function restoreOriginBarDraft(value) {
   return { sel: restored, step: value.step, requestKey };
 }
 
+function restoreOriginBarReceipt(value) {
+  if (!value || value.version !== RECEIPT_VERSION || !value.receipt || !value.sel) return null;
+  const savedAt = Number(value.savedAt);
+  const age = Date.now() - savedAt;
+  if (!Number.isFinite(savedAt) || age < 0 || age >= RECEIPT_TTL_MS) return null;
+  const reference = typeof value.receipt.reference === "string" ? value.receipt.reference : "";
+  const trackingToken = typeof value.receipt.trackingToken === "string" ? value.receipt.trackingToken : "";
+  const origin = Object.values(ORIGINS).flat().find((item) => item.n === value.sel.origin?.n) || null;
+  const drink = [...CLASSICS, ...SIGNATURES].find((item) => item.n === value.sel.drink?.n) || null;
+  if (!reference || !trackingToken || !origin || !drink) return null;
+  const draft = restoreOriginBarDraft({ version: DRAFT_VERSION, sel: value.sel, step: 6, requestKey: "" });
+  if (!draft) return null;
+  return { receipt: { ...value.receipt, savedAt }, sel: draft.sel };
+}
+
 export default function OriginBarKiosk() {
   const [step, setStep] = useState(0);
   const [sel, setSel] = useState(FRESH);
-  const [orderNo, setOrderNo] = useState("");
+  const [receipt, setReceipt] = useState(null);
   const [tasteMatchOpen, setTasteMatchOpen] = useState(false);
   const [matchReason, setMatchReason] = useState("");
   const [idleWarning, setIdleWarning] = useState(false);
   const [requestState, setRequestState] = useState("idle");
   const [requestError, setRequestError] = useState("");
   const [requestKey, setRequestKey] = useState("");
+  const [idleCycle, setIdleCycle] = useState(0);
   const submissionRef = useRef({ generation: 0, controller: null });
+  const idleWarningRef = useRef(false);
+  const idleDialogRef = useRef(null);
+  const idleContinueRef = useRef(null);
+  const lastFocusedRef = useRef(null);
+  const requestErrorRef = useRef(null);
   const set = (patch) => {
     if (requestState === "submitting") return;
     setRequestError("");
@@ -1010,6 +1106,7 @@ export default function OriginBarKiosk() {
 
   const roastObj = ROASTS.find((r) => r.id === sel.roast) || ROASTS[1];
   const accent = roastObj.color;
+  const onAccent = roastObj.id === "light" ? C.espresso : "#fff";
 
   const cupProps = useMemo(() => {
     const milkObj = MILKS.find((m) => m.n === sel.milk);
@@ -1072,11 +1169,24 @@ export default function OriginBarKiosk() {
 
   useEffect(() => {
     let draft = null;
+    let savedReceipt = null;
     try {
       const saved = window.sessionStorage.getItem("deldiet-origin-bar-draft");
       if (saved) draft = JSON.parse(saved);
+      const success = window.sessionStorage.getItem("deldiet-origin-bar-receipt");
+      if (success) savedReceipt = JSON.parse(success);
     } catch { /* start with a clean local kiosk session */ }
     const frame = window.requestAnimationFrame(() => {
+      const restoredReceipt = restoreOriginBarReceipt(savedReceipt);
+      if (restoredReceipt) {
+        setSel(restoredReceipt.sel);
+        setReceipt(restoredReceipt.receipt);
+        setStep(7);
+        return;
+      }
+      if (savedReceipt) {
+        try { window.sessionStorage.removeItem("deldiet-origin-bar-receipt"); } catch { /* ignore unavailable storage */ }
+      }
       const restored = restoreOriginBarDraft(draft);
       if (restored) {
         setSel(restored.sel);
@@ -1088,17 +1198,44 @@ export default function OriginBarKiosk() {
   }, []);
 
   useEffect(() => {
-    if (step >= 1 && step <= 6) window.sessionStorage.setItem("deldiet-origin-bar-draft", JSON.stringify({ version: DRAFT_VERSION, sel, step, requestKey }));
-    else window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+    try {
+      if (step >= 1 && step <= 6) window.sessionStorage.setItem("deldiet-origin-bar-draft", JSON.stringify({ version: DRAFT_VERSION, sel, step, requestKey }));
+      else window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+    } catch { /* the kiosk remains usable when storage is unavailable */ }
   }, [sel, step, requestKey]);
 
   useEffect(() => {
-    if (step === 0) return;
+    idleWarningRef.current = idleWarning;
+  }, [idleWarning]);
+
+  useEffect(() => {
+    if (!idleWarning) return;
+    lastFocusedRef.current = document.activeElement;
+    window.requestAnimationFrame(() => idleContinueRef.current?.focus());
+    return () => lastFocusedRef.current?.focus?.();
+  }, [idleWarning]);
+
+  useEffect(() => {
+    if (!requestError) return;
+    window.requestAnimationFrame(() => {
+      requestErrorRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      requestErrorRef.current?.focus();
+    });
+  }, [requestError]);
+
+  useEffect(() => {
+    if (step < 1 || step > 6) return;
+    window.requestAnimationFrame(() => document.querySelector("#ob-scroll .ob-step-heading")?.focus());
+  }, [step]);
+
+  useEffect(() => {
+    if (step === 0 || step === 7) return;
     let warningTimer;
     let resetTimer;
     const arm = () => {
-      window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); setIdleWarning(false);
-      warningTimer = window.setTimeout(() => setIdleWarning(true), 60000);
+      if (idleWarningRef.current) return;
+      window.clearTimeout(warningTimer); window.clearTimeout(resetTimer);
+      warningTimer = window.setTimeout(() => setIdleWarning(true), 240000);
       resetTimer = window.setTimeout(() => {
         submissionRef.current.generation += 1;
         submissionRef.current.controller?.abort();
@@ -1110,13 +1247,35 @@ export default function OriginBarKiosk() {
         setRequestState("idle");
         setRequestError("");
         setRequestKey("");
-        setOrderNo("");
-      }, 90000);
+        setReceipt(null);
+      }, 300000);
     };
     ["pointerdown", "keydown", "touchstart"].forEach((event) => window.addEventListener(event, arm, { passive: true }));
     arm();
     return () => { window.clearTimeout(warningTimer); window.clearTimeout(resetTimer); ["pointerdown", "keydown", "touchstart"].forEach((event) => window.removeEventListener(event, arm)); };
-  }, [step]);
+  }, [step, idleCycle]);
+
+  useEffect(() => {
+    if (step !== 7 || !receipt?.savedAt) return;
+    const remaining = RECEIPT_TTL_MS - (Date.now() - receipt.savedAt);
+    const clearReceipt = () => {
+      setSel(FRESH);
+      setMatchReason("");
+      setTasteMatchOpen(false);
+      setReceipt(null);
+      setStep(0);
+      setRequestState("idle");
+      setRequestError("");
+      setRequestKey("");
+      try { window.sessionStorage.removeItem("deldiet-origin-bar-receipt"); } catch { /* ignore unavailable storage */ }
+    };
+    if (remaining <= 0) {
+      const frame = window.requestAnimationFrame(clearReceipt);
+      return () => window.cancelAnimationFrame(frame);
+    }
+    const timer = window.setTimeout(clearReceipt, remaining);
+    return () => window.clearTimeout(timer);
+  }, [step, receipt?.savedAt]);
 
   useEffect(() => () => {
     submissionRef.current.generation += 1;
@@ -1137,7 +1296,7 @@ export default function OriginBarKiosk() {
     if (el) el.scrollTop = 0;
   };
   const next = async () => {
-    if (!canNext) return;
+    if (!canNext || (step === 6 && submissionRef.current.controller)) return;
     if (step !== 6) {
       go(step + 1);
       return;
@@ -1184,10 +1343,14 @@ export default function OriginBarKiosk() {
         },
       }, idempotencyKey, { signal: controller.signal });
       if (submissionRef.current.generation !== generation || controller.signal.aborted) return;
-      setOrderNo(receipt.reference);
+      const savedAt = Date.now();
+      setReceipt({ ...receipt, savedAt });
       setRequestState("idle");
       setStep(7);
-      window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+      try {
+        window.sessionStorage.removeItem("deldiet-origin-bar-draft");
+        window.sessionStorage.setItem("deldiet-origin-bar-receipt", JSON.stringify({ version: RECEIPT_VERSION, receipt, sel, savedAt }));
+      } catch { /* the on-screen receipt remains available */ }
     } catch (error) {
       if (submissionRef.current.generation !== generation || controller.signal.aborted) return;
       setRequestState("error");
@@ -1202,11 +1365,30 @@ export default function OriginBarKiosk() {
     setSel(FRESH);
     setMatchReason("");
     setTasteMatchOpen(false);
+    setIdleWarning(false);
     setRequestState("idle");
     setRequestError("");
     setRequestKey("");
-    setOrderNo("");
+    setReceipt(null);
+    try { window.sessionStorage.removeItem("deldiet-origin-bar-receipt"); } catch { /* ignore unavailable storage */ }
     go(0);
+  };
+  const continueSession = () => {
+    setIdleWarning(false);
+    setIdleCycle((cycle) => cycle + 1);
+  };
+  const handleIdleKeyDown = (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      continueSession();
+      return;
+    }
+    if (event.key !== "Tab" || !idleDialogRef.current) return;
+    const focusable = [...idleDialogRef.current.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((item) => !item.disabled);
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   };
   const applyTasteMatch = (match) => {
     const origin = Object.values(ORIGINS).flat().find((item) => item.n === match.country);
@@ -1224,40 +1406,40 @@ export default function OriginBarKiosk() {
     step === 4 ? <EnhanceStep sel={sel} set={set} accent={accent} /> :
     step === 5 ? <FinishStep sel={sel} set={set} accent={accent} /> :
     step === 6 ? <ReviewStep sel={sel} set={set} accent={accent} parts={parts} cupProps={cupProps} tags={tags} safety={safety} onJump={go} /> :
-    step === 7 ? <DoneScreen sel={sel} accent={accent} cupProps={cupProps} orderNo={orderNo} onReset={reset} /> : null;
+    step === 7 ? <DoneScreen sel={sel} accent={accent} cupProps={cupProps} receipt={receipt} onReset={reset} /> : null;
 
   return (
     <div className="origin-bar-app flex flex-col" style={{ height: "100dvh", background: C.paper, fontFamily: F.body, "--ob-accent": accent }}>
       <style>{FONTS}</style>
       <UtilityBar />
       {step === 0 ? (
-        tasteMatchOpen ? <TasteMatch onBack={() => setTasteMatchOpen(false)} onApply={applyTasteMatch}/> : <div className="flex-1 overflow-y-auto"><Welcome onBegin={() => go(1)} onTasteMatch={() => setTasteMatchOpen(true)} /></div>
+        tasteMatchOpen ? <TasteMatch onBack={() => setTasteMatchOpen(false)} onApply={applyTasteMatch}/> : <div className="ob-scroll-region flex-1 overflow-y-auto"><Welcome onBegin={() => go(1)} onTasteMatch={() => setTasteMatchOpen(true)} /></div>
       ) : (
         <>
-          <header className="flex items-center justify-between px-4 sm:px-6" style={{ background: C.espresso, minHeight: 66, flexShrink: 0, borderBottom: "1px solid #4A372B" }}>
-            <div className="flex items-center gap-2">
+          <header className="ob-kiosk-header flex items-center justify-between px-4 sm:px-6">
+            <div className="ob-kiosk-brand flex items-center gap-2">
               <Coffee size={16} color="#D8C4A8" />
               <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 18 }}>Origin Atelier</span>
               <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase" }}>staff-review requests</span>
             </div>
             {step <= 6 && (
-              <div className="flex items-center gap-3">
-                <span className="hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#BBA890", textTransform: "uppercase" }}>
+              <div className="ob-kiosk-progress">
+                <span className="ob-progress-copy hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#D8C4A8", textTransform: "uppercase" }}>
                   {step}/6 · {STEP_LABELS[step - 1]}
                 </span>
-                <div className="flex gap-1.5" aria-label={`Step ${step} of 6`}>
+                <div className="ob-progress-dots" role="progressbar" aria-label="Origin Bar progress" aria-valuemin={1} aria-valuemax={6} aria-valuenow={step} aria-valuetext={`${step} of 6 · ${STEP_LABELS[step - 1]}`}>
                   {STEP_LABELS.map((l, i) => (
                     <span key={l} aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 999, background: i < step ? accent : "#4A372B", transition: "background .2s ease" }} />
                   ))}
                 </div>
-                <button onClick={reset} disabled={submitting} style={{ marginLeft: 6, border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}>Start over</button>
               </div>
             )}
+            {step <= 6 && <button type="button" className="ob-reset-button" aria-label="Start over and clear this cup" onClick={reset} disabled={submitting} style={{ border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}><span className="ob-reset-wide">Start over</span><span className="ob-reset-short">Reset</span></button>}
           </header>
-          <main id="ob-scroll" className="flex-1 overflow-y-auto ok-scroll">
+          <main id="ob-scroll" className="ob-scroll-region flex-1 overflow-y-auto ok-scroll">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
-              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Staff-review mode.</b> Requests are saved durably, but origins, pricing and availability remain sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records. Nothing is prepared or charged automatically.</span></div>
-              {requestError && <div className="ob-truth-note" role="alert" style={{ borderColor: "#B85C4D", background: "#FFF3EF", color: "#6E2E24" }}><span aria-hidden="true">!</span><span><b>Request not saved.</b> {requestError}</span></div>}
+              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Staff-review mode.</b> Requests are saved for staff review; nothing is prepared or charged automatically. <span className="ob-truth-extra">Origins, pricing and availability remain sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records.</span></span></div>
+              {requestError && <div ref={requestErrorRef} tabIndex={-1} className="ob-truth-note" role="alert" style={{ borderColor: "#B85C4D", background: "#FFF3EF", color: "#6E2E24" }}><span aria-hidden="true">!</span><span><b>Request not saved.</b> {requestError}</span></div>}
               {matchReason && step <= 5 && <div style={{ marginBottom: 18, padding: "12px 14px", borderLeft: `4px solid ${accent}`, background: "#fff", color: C.ink, fontSize: 13, lineHeight: 1.5 }}><b>Taste Match starting point:</b> {matchReason} Every choice remains editable.</div>}
               {step >= 1 && step <= 5 ? (
                 <div className="ob-workspace-grid">
@@ -1276,9 +1458,9 @@ export default function OriginBarKiosk() {
                         {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}
                       </div>
                       <div className="flex flex-wrap justify-center gap-1" style={{ marginTop: 10 }}>
-                        {tags.map((t) => <Tag key={t} color={accent} border={`${accent}55`}>{t}</Tag>)}
+                        {tags.map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
                       </div>
-                      <div style={{ borderTop: `1px dashed ${C.line}`, marginTop: 12, paddingTop: 10, fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: accent }}>
+                      <div style={{ borderTop: `1px dashed ${C.line}`, marginTop: 12, paddingTop: 10, fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: readableAccent(accent) }}>
                         {money(parts.total)} <small style={{ display: "block", marginTop: 3, color: C.faint, fontSize: 10 }}>illustrative subtotal</small>
                       </div>
                       <div className="ob-safety-rail"><b>Cup Passport</b><p>{safety.caffeine}<br/>{safety.allergens.length ? `Signals: ${safety.allergens.join(", ")}` : "No selected allergen signals · shared equipment"}</p></div>
@@ -1288,35 +1470,41 @@ export default function OriginBarKiosk() {
             </div>
           </main>
           {step >= 1 && step <= 5 && (
-            <div className="ob-mobile-passport" role="status" aria-live="polite">
-              <div><b>{sel.drink?.n || "Build your cup"} · {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}</b><span>{safety.caffeine} · {safety.allergens.length ? `signals: ${safety.allergens.join(", ")}` : "shared-equipment cross-contact possible"}</span></div>
-              <strong>{money(parts.total)}</strong>
-            </div>
+            <details className="ob-mobile-passport">
+              <summary>
+                <div><b>{sel.drink?.n || "Build your cup"} · {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}</b><span>Tap for Cup Passport · {safety.allergens.length} allergen signal{safety.allergens.length === 1 ? "" : "s"}</span></div>
+                <strong aria-live="polite">{money(parts.total)}</strong>
+              </summary>
+              <div className="ob-mobile-passport-panel">
+                <div><small>Caffeine</small><p>{safety.caffeine}</p></div>
+                <div><small>Safety</small><p>{safety.allergens.length ? safety.allergens.join(", ") : "No selected signals"}. Shared-equipment cross-contact remains possible.</p></div>
+              </div>
+            </details>
           )}
           {step >= 1 && step <= 6 && (
-            <footer className="flex items-center justify-between gap-3 px-4 sm:px-6" style={{ background: C.espresso, height: 68, flexShrink: 0 }}>
-              <button onClick={() => go(step - 1)} disabled={submitting} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#BBA890", background: "none", border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1, padding: "10px 4px" }}>
+            <footer className="ob-flow-footer flex items-center justify-between gap-3 px-4 sm:px-6">
+              <button type="button" onClick={() => go(step - 1)} disabled={submitting} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#D8C4A8", background: "none", border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1, padding: "10px 4px" }}>
                 <ChevronLeft size={16} /> Back
               </button>
-              <div className="flex items-center gap-3">
+              <div className="ob-footer-subtotal flex items-center gap-3">
                 <div className="sm:block hidden"><CupSVG uid="foot" {...cupProps.svg} width={34} /></div>
                 <div className="text-right">
-                  <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: "#7A6A58", textTransform: "uppercase" }}>Subtotal · CAD</div>
+                  <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: "#BBA890", textTransform: "uppercase" }}>Subtotal · CAD</div>
                   <div style={{ fontFamily: F.mono, fontSize: 19, fontWeight: 600, color: "#F5EDE2" }}>{money(parts.total)}</div>
                 </div>
               </div>
-              <button onClick={next} disabled={!canNext} aria-busy={submitting} className="flex items-center gap-1.5" style={{
-                fontFamily: F.body, fontWeight: 700, fontSize: 15, color: "#fff",
+              <button type="button" onClick={next} disabled={!canNext} aria-busy={submitting} aria-label={step === 6 ? (submitting ? "Sending cup request" : `Send cup request, estimated subtotal ${money(parts.total)}`) : `Continue to ${STEP_LABELS[step]}`} className="ob-next flex items-center gap-1.5" style={{
+                fontFamily: F.body, fontWeight: 700, fontSize: 15, color: onAccent,
                 background: canNext ? accent : "#4A372B", border: "none", borderRadius: 999, padding: "13px 22px",
                 cursor: canNext ? "pointer" : "default", opacity: canNext ? 1 : 0.7, transition: "background .2s ease",
               }}>
-                {step === 6 ? (submitting ? "Sending request…" : "Send request") : `Next · ${STEP_LABELS[step]}`} <ChevronRight size={16} />
+                {step === 6 ? (submitting ? "Sending…" : <><span>Send request</span><span className="ob-next-target"> · {money(parts.total)}</span></>) : <><span>Continue</span><span className="ob-next-target"> · {STEP_LABELS[step]}</span></>} <ChevronRight size={16} />
               </button>
             </footer>
           )}
         </>
       )}
-      {idleWarning && <div role="alertdialog" aria-modal="true" aria-labelledby="idle-title" style={{ position: "fixed", zIndex: 100, inset: 0, display: "grid", placeItems: "center", padding: 20, background: "rgba(22,14,10,.78)" }}><div style={{ width: "min(460px,100%)", padding: 28, background: C.card, border: `2px solid ${accent}`, boxShadow: "0 30px 80px rgba(0,0,0,.35)" }}><div style={{ fontFamily: F.mono, color: accent, fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Kiosk privacy reset</div><h2 id="idle-title" style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 36, fontWeight: 400 }}>Still building this cup?</h2><p style={{ margin: 0, color: C.faint, fontSize: 15, lineHeight: 1.6 }}>This local session clears automatically after inactivity so the next guest cannot see your selections.</p><div className="flex gap-3" style={{ marginTop: 22 }}><button onClick={() => setIdleWarning(false)} style={{ flex: 1, border: 0, borderRadius: 999, background: accent, color: "white", fontWeight: 700, cursor: "pointer" }}>Continue</button><button onClick={reset} style={{ flex: 1, border: `1px solid ${C.line}`, borderRadius: 999, background: C.paper, color: C.ink, fontWeight: 700, cursor: "pointer" }}>Clear session</button></div></div></div>}
+      {idleWarning && <div role="alertdialog" aria-modal="true" aria-labelledby="idle-title" style={{ position: "fixed", zIndex: 100, inset: 0, display: "grid", placeItems: "center", padding: "max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))", background: "rgba(22,14,10,.78)" }}><div ref={idleDialogRef} onKeyDown={handleIdleKeyDown} style={{ width: "min(460px,100%)", padding: 28, background: C.card, border: `2px solid ${accent}`, boxShadow: "0 30px 80px rgba(0,0,0,.35)" }}><div style={{ fontFamily: F.mono, color: readableAccent(accent), fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Kiosk privacy reset</div><h2 id="idle-title" style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 36, fontWeight: 400 }}>Still building this cup?</h2><p style={{ margin: 0, color: C.faint, fontSize: 15, lineHeight: 1.6 }}>This local session clears automatically after inactivity so the next guest cannot see your selections.</p><div className="ob-idle-actions" style={{ marginTop: 22 }}><button ref={idleContinueRef} type="button" onClick={continueSession} style={{ flex: 1, border: 0, borderRadius: 999, background: accent, color: onAccent, fontWeight: 700, cursor: "pointer" }}>Continue</button><button type="button" onClick={reset} style={{ flex: 1, border: `1px solid ${C.line}`, borderRadius: 999, background: C.paper, color: C.ink, fontWeight: 700, cursor: "pointer" }}>Clear session</button></div></div></div>}
     </div>
   );
 }

@@ -203,7 +203,7 @@ export default function PassportPage() {
         </section>
       </div>
 
-      <nav className={styles.mobileNav} aria-label="Passport sections">{TABS.map(({ id, short, icon: Icon }) => <button key={id} className={tab === id ? styles.active : ""} onClick={() => chooseTab(id)}><Icon size={18}/><span>{short}</span></button>)}</nav>
+      <nav className={styles.mobileNav} aria-label="Passport sections">{TABS.map(({ id, short, label, icon: Icon }) => <button key={id} aria-label={label} aria-current={tab === id ? "page" : undefined} className={tab === id ? styles.active : ""} onClick={() => chooseTab(id)}><Icon size={18}/><span>{short}</span></button>)}</nav>
     </main>
   );
 }
