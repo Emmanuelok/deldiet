@@ -553,11 +553,50 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   }, [toast]);
 
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      heroVideoRef.current?.pause();
-      const frame = window.requestAnimationFrame(() => setHeroPlaying(false));
-      return () => window.cancelAnimationFrame(frame);
-    }
+    const video = heroVideoRef.current;
+    if (!video) return;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let cancelled = false;
+
+    const syncPlaybackState = () => {
+      if (!cancelled) setHeroPlaying(!video.paused && !video.ended);
+    };
+    const startMotion = async () => {
+      if (reducedMotion.matches) {
+        video.pause();
+        syncPlaybackState();
+        return;
+      }
+      video.muted = true;
+      try {
+        await video.play();
+      } catch {
+        // Mobile browsers can block autoplay in low-power or data-saving modes.
+      }
+      syncPlaybackState();
+    };
+    const handleMotionPreference = () => {
+      if (reducedMotion.matches) {
+        video.pause();
+        syncPlaybackState();
+      } else {
+        void startMotion();
+      }
+    };
+
+    video.addEventListener("play", syncPlaybackState);
+    video.addEventListener("pause", syncPlaybackState);
+    video.addEventListener("ended", syncPlaybackState);
+    reducedMotion.addEventListener("change", handleMotionPreference);
+    void startMotion();
+
+    return () => {
+      cancelled = true;
+      video.removeEventListener("play", syncPlaybackState);
+      video.removeEventListener("pause", syncPlaybackState);
+      video.removeEventListener("ended", syncPlaybackState);
+      reducedMotion.removeEventListener("change", handleMotionPreference);
+    };
   }, []);
 
   useEffect(() => {
@@ -689,12 +728,18 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
     setTasteResult(`${match} · ${taste.mood === "Bold" ? "medium" : "light"} roast · ${taste.brew}`);
   }
 
-  function toggleHeroMotion() {
+  async function toggleHeroMotion() {
     const video = heroVideoRef.current;
     if (!video) return;
     if (video.paused) {
-      void video.play();
-      setHeroPlaying(true);
+      video.muted = true;
+      try {
+        await video.play();
+        setHeroPlaying(true);
+      } catch {
+        setHeroPlaying(false);
+        setToast("Motion could not start on this device. Check Low Power or data-saving mode.");
+      }
     } else {
       video.pause();
       setHeroPlaying(false);
@@ -873,13 +918,21 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           poster="/deldiet-hero-motion-poster.webp"
           aria-hidden="true"
+          onPlay={() => setHeroPlaying(true)}
+          onPause={() => setHeroPlaying(false)}
+          onError={() => setHeroPlaying(false)}
         >
+          <source media="(max-width: 640px)" src="/deldiet-hero-motion-mobile.mp4" type="video/mp4" />
           <source src="/deldiet-hero-motion.mp4" type="video/mp4" />
         </video>
         <div className="hero-shade" />
+        <button type="button" className="hero-mobile-motion" aria-label={heroPlaying ? "Pause cinematic hero motion" : "Play cinematic hero motion"} aria-pressed={heroPlaying} onClick={toggleHeroMotion}>
+          <span className="play-dot"><Icon name={heroPlaying ? "pause" : "play"} /></span>
+          <span>{heroPlaying ? "Motion on" : "Play motion"}</span>
+        </button>
         <div className="hero-content">
           <p className="eyebrow light">From altitude to aroma · one connected coffee world</p>
           <h1 id="hero-title">The world,<br /><em>brewed live.</em></h1>
@@ -898,7 +951,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
             <strong>Bloom → pour</strong>
             <p>Macro brewing study · motion loops silently</p>
           </div>
-          <button aria-label={heroPlaying ? "Pause hero motion" : "Play hero motion"} aria-pressed={!heroPlaying} onClick={toggleHeroMotion}>{heroPlaying ? <Icon name="pause" /> : <Icon name="play" />}</button>
+          <button aria-label={heroPlaying ? "Pause hero motion" : "Play hero motion"} aria-pressed={heroPlaying} onClick={toggleHeroMotion}>{heroPlaying ? <Icon name="pause" /> : <Icon name="play" />}</button>
         </div>
         <div className="hero-index" aria-hidden="true"><span>Origin</span><i /><span>Cup</span></div>
       </section>
