@@ -75,7 +75,9 @@ function validItems(value: unknown): value is Record<string, unknown>[] {
 
 const PROVINCES = new Set(["AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"]);
 const ORIGIN_BAR_ORIGINS = new Set("Ethiopia|Kenya|Rwanda|Burundi|Tanzania|Uganda|DR Congo|Cameroon|Côte d'Ivoire|Malawi|Zambia|Colombia|Brazil|Peru|Ecuador|Bolivia|Venezuela|Costa Rica|Guatemala|Honduras|El Salvador|Nicaragua|Panama|Mexico|Jamaica|Dominican Republic|Cuba|Haiti|Indonesia|Vietnam|India|Papua New Guinea|China · Yunnan|Thailand|Philippines|Laos|Myanmar|Timor-Leste|Hawai'i · USA|Australia|Yemen".split("|"));
-const ORIGIN_BAR_DRINKS = new Set("Espresso|Doppio|Ristretto|Lungo|Americano|Long Black|Latte|Cappuccino|Flat White|Cortado|Macchiato|Caramel Macchiato|Mocha|White Mocha|Café au Lait|Pour-Over / Drip|Red Eye|Double-Double|Cold Brew|Nitro Cold Brew|Iced Latte|Frosted Blend|Affogato|Espresso con Panna|Vienna|Turkish|Golden Sunrise Latte|Lavender Cloud|Maple Woods Cortado|Sahara Gold|Rose Velvet Mocha|Midnight Cherry Mocha|Coconut Cascade|Brown Sugar Shaken Oat|Pistachio Silk|Ube Dream|Matcha Eclipse|Orange Blossom Tonic|Tiramisu Cloud|Azteca Chili Mocha|Honey Fig Cappuccino|Forest Mint Mocha".split("|"));
+const ORIGIN_BAR_CLASSIC_DRINKS = new Set("Espresso|Doppio|Ristretto|Lungo|Americano|Long Black|Latte|Cappuccino|Flat White|Cortado|Macchiato|Caramel Macchiato|Mocha|White Mocha|Café au Lait|Pour-Over / Drip|Red Eye|Double-Double|Cold Brew|Nitro Cold Brew|Iced Latte|Frosted Blend|Affogato|Espresso con Panna|Vienna|Turkish".split("|"));
+const ORIGIN_BAR_SIGNATURE_DRINKS = new Set("Golden Sunrise Latte|Lavender Cloud|Maple Woods Cortado|Sahara Gold|Rose Velvet Mocha|Midnight Cherry Mocha|Coconut Cascade|Brown Sugar Shaken Oat|Pistachio Silk|Ube Dream|Matcha Eclipse|Orange Blossom Tonic|Tiramisu Cloud|Azteca Chili Mocha|Honey Fig Cappuccino|Forest Mint Mocha".split("|"));
+const ORIGIN_BAR_DRINKS = new Set([...ORIGIN_BAR_CLASSIC_DRINKS, ...ORIGIN_BAR_SIGNATURE_DRINKS]);
 const ORIGIN_BAR_MILKS = new Set("Organic whole|Organic 2%|Skim|Lactose-free|A2 milk|Half & half|Oat (barista)|Almond|Soy|Coconut|Cashew|Macadamia|Hemp|Pea (barista)|Rice|None — black".split("|"));
 const ORIGIN_BAR_EXTRACTIONS = new Set("Espresso machine|Pour-over V60|Chemex|French press|AeroPress|Siphon|Batch drip|18-hr slow steep|Nitro-charged".split("|"));
 const ORIGIN_BAR_BOOSTERS = new Set("Collagen peptides|Plant protein|MCT oil|Grass-fed ghee|Lion's mane|Chaga|Reishi|Cordyceps|Ashwagandha|Maca root|Panax ginseng|L-theanine|Raw cacao nibs|Bee pollen|Vitamin B12|Electrolyte minerals".split("|"));
@@ -179,6 +181,9 @@ function normalizePayload(type: ServiceRequestType, payload: Record<string, unkn
       cupName: text(selection.cupName, 80) ?? "",
     };
     if (Object.values(normalized).some((value) => value === null) || !Number.isInteger(normalized.extraShots) || normalized.extraShots < 0 || normalized.extraShots > 4 || !Number.isInteger(normalized.sweetLevel) || normalized.sweetLevel < 1 || normalized.sweetLevel > 4) return null;
+    const drink = normalized.drink;
+    const drinkMenu = normalized.drinkMenu;
+    if (!drink || !drinkMenu || (drinkMenu === "classics" && !ORIGIN_BAR_CLASSIC_DRINKS.has(drink)) || (drinkMenu === "signatures" && !ORIGIN_BAR_SIGNATURE_DRINKS.has(drink))) return null;
     return { schemaVersion: 1, catalogueVersion: "origin-bar-concept-v1", safetyAcknowledged: true, selection: normalized, pricingState: "illustrative_pending_staff_review" };
   }
 

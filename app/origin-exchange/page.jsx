@@ -50,10 +50,12 @@ const STYLES = `
 .oex-deldiet-mark-detail { width:132px; min-height:38px; padding:8px 11px; }
 .oex-deldiet-mark-lot { right:12px; bottom:10px; width:88px; min-height:26px; }
 .oex-deldiet-mark-compact { right:4px; bottom:4px; width:38px; min-height:13px; padding:2px 3px; border-radius:6px; box-shadow:0 2px 7px rgba(34,22,17,.14); }
-.oex-back-deldiet { display: inline-flex; align-items: center; gap: 8px; color: #D9FF66; text-decoration: none; font-family: ${F.mono}; font-size: 12px; letter-spacing: .15em; font-weight: 600; }
+.oex-shell-header { padding-top: env(safe-area-inset-top); }
+.oex-back-deldiet { min-height:44px; display: inline-flex; align-items: center; gap: 8px; color: #D9FF66; text-decoration: none; font-family: ${F.mono}; font-size: 12px; letter-spacing: .15em; font-weight: 600; }
 .oex-back-deldiet:hover { color: #FFFFFF; }
 .oex-label-short { display: none; }
 .oex-app button,.oex-app input,.oex-app select { min-height:44px; }
+.oex-app { max-width:100vw; overflow-x:hidden; }
 .oex-app input,.oex-app select { font-size:16px !important; }
 .oex-truth-banner { padding:11px 16px; display:flex; justify-content:center; gap:10px; background:#FFF1CF; border-bottom:1px solid #D9C28D; color:#5D431E; font-family:${F.body}; font-size:13px; line-height:1.45; text-align:center; }
 .oex-exchange-hero { min-height:610px; padding:clamp(34px,6vw,76px); position:relative; overflow:hidden; display:grid; grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr); gap:clamp(28px,6vw,90px); align-items:end; color:#fff; background-image:linear-gradient(90deg,rgba(19,11,7,.95) 0%,rgba(19,11,7,.76) 48%,rgba(19,11,7,.25) 100%),url('/origin-exchange-hero.png'); background-size:cover; background-position:center; box-shadow:0 28px 80px rgba(34,22,17,.12); }
@@ -68,15 +70,16 @@ const STYLES = `
 .oex-verification-ledger div { min-height:58px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; border-top:1px solid rgba(255,255,255,.16); font-size:14px; }.oex-verification-ledger small{color:#BBA890;font-size:12px;text-align:right}
 .oex-status-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px; }.oex-status-grid article{min-height:130px;padding:18px;background:#fff;border:1px solid #E6DFD3}.oex-status-grid b{display:block;margin:12px 0 5px;font-size:15px}.oex-status-grid span{color:#7A6A5C;font-family:${F.mono};font-size:12px;line-height:1.45}
 .oex-inquiry-view { display:grid; grid-template-columns:minmax(0,1fr) minmax(290px,360px); gap:24px; align-items:start; }.oex-inquiry-panel{padding:22px;background:#fff;border:1px solid #E6DFD3}.oex-inquiry-item{padding:16px 0;display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;border-bottom:1px solid #E6DFD3}.oex-inquiry-item:first-child{border-top:1px solid #E6DFD3}.oex-document-grid{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.oex-document-grid span{min-height:54px;padding:10px;display:flex;flex-direction:column;justify-content:center;border:1px solid #E6DFD3;background:#F7F4EE;font-size:13px}.oex-document-grid small{margin-top:3px;color:#9A6C2B;font-size:11px}
-.oex-app button:focus-visible,.oex-app a:focus-visible,.oex-app input:focus-visible,.oex-app select:focus-visible,.oex-app textarea:focus-visible{outline:3px solid #D9FF66;outline-offset:3px}.oex-product-grid{display:grid}.oex-cart-item{display:flex;align-items:center;gap:12px}
+.oex-app button:focus-visible,.oex-app a:focus-visible,.oex-app input:focus-visible,.oex-app select:focus-visible,.oex-app textarea:focus-visible{outline:3px solid #D9FF66;outline-offset:3px}.oex-product-grid{display:grid}.oex-cart-item{display:flex;align-items:center;gap:12px}.oex-main-header{display:flex;align-items:center;gap:12px}.oex-brand-button{min-width:0}.oex-brand-button>span:last-child{min-width:0}.oex-search{min-width:0}.oex-inquiry-sticky{position:sticky;top:18px}.oex-cart-remove{flex:none}.oex-head-inquiry,.oex-head-cart,.oex-cart-remove,.oex-stepper button{min-width:44px}
 @media (max-width: 640px) {
   .oex-back-deldiet { gap: 5px; font-size: 12px; letter-spacing: .08em; }
   .oex-label-wide { display: none; }
   .oex-label-short { display: inline; }
-  .oex-exchange-hero{min-height:760px;padding:50px 22px;grid-template-columns:1fr;align-items:end;background-image:linear-gradient(0deg,rgba(19,11,7,.97) 0%,rgba(19,11,7,.78) 62%,rgba(19,11,7,.22) 100%),url('/origin-exchange-hero.png')}.oex-exchange-hero h1{font-size:56px}.oex-exchange-hero p{font-size:15px}.oex-mode-switch{grid-template-columns:1fr}.oex-mode-switch button{border-right:0;border-bottom:1px solid rgba(255,255,255,.22)}.oex-mode-switch button:last-child{border-bottom:0}.oex-status-grid{grid-template-columns:1fr 1fr}.oex-inquiry-view{grid-template-columns:1fr}.oex-inquiry-item{grid-template-columns:1fr auto}.oex-inquiry-item>div:first-child{grid-column:1/-1}.oex-document-grid{grid-template-columns:1fr}.oex-truth-banner{text-align:left}
+  .oex-main-header{padding:10px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))!important;display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"brand inquiry cart" "search search search";gap:9px}.oex-brand-button{grid-area:brand;justify-self:start}.oex-brand-button>span:last-child span:first-child{max-width:175px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.oex-search{grid-area:search!important;width:100%;max-width:none!important;margin:0!important}.oex-head-inquiry{grid-area:inquiry}.oex-head-cart{grid-area:cart}
+  .oex-exchange-hero{min-height:760px;padding:50px 22px;grid-template-columns:1fr;align-items:end;background-image:linear-gradient(0deg,rgba(19,11,7,.97) 0%,rgba(19,11,7,.78) 62%,rgba(19,11,7,.22) 100%),url('/origin-exchange-hero.png')}.oex-exchange-hero h1{font-size:56px}.oex-exchange-hero p{font-size:15px}.oex-mode-switch{grid-template-columns:1fr}.oex-mode-switch button{border-right:0;border-bottom:1px solid rgba(255,255,255,.22)}.oex-mode-switch button:last-child{border-bottom:0}.oex-status-grid{grid-template-columns:1fr 1fr}.oex-inquiry-view{grid-template-columns:1fr}.oex-inquiry-sticky{position:static}.oex-inquiry-item{grid-template-columns:1fr auto}.oex-inquiry-item>div:first-child{grid-column:1/-1}.oex-document-grid{grid-template-columns:1fr}.oex-truth-banner{text-align:left}
 }
 @media (max-width: 480px) {
-  .oex-product-grid{grid-template-columns:1fr!important}.oex-cart-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto}.oex-cart-item .oex-cart-copy{grid-column:2/-1}.oex-cart-item .oex-cart-price{grid-column:2}.oex-status-grid{grid-template-columns:1fr}.oex-exchange-hero h1{font-size:48px}
+  .oex-product-grid{grid-template-columns:1fr!important}.oex-cart-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto;grid-template-areas:"thumb copy remove" "thumb qty price";align-items:center}.oex-cart-thumb{grid-area:thumb}.oex-cart-item .oex-cart-copy{grid-area:copy}.oex-cart-item .oex-stepper{grid-area:qty;justify-self:start}.oex-cart-item .oex-cart-price{grid-area:price;min-width:0!important;justify-self:end}.oex-cart-remove{grid-area:remove}.oex-status-grid{grid-template-columns:1fr}.oex-exchange-hero h1{font-size:48px}
   .oex-deldiet-mark{width:80px;min-height:24px;padding:4px 7px}.oex-deldiet-mark-detail{width:112px;min-height:34px}.oex-deldiet-mark-compact{width:38px;min-height:13px;padding:2px 3px}
 }
 @media (prefers-reduced-motion: reduce) {
@@ -321,7 +324,7 @@ function Chip({ active, onClick, children }) {
 
 function Stepper({ qty, setQty }) {
   return (
-    <div className="inline-flex items-center rounded-xl overflow-hidden" style={{ border: `1.5px solid ${C.line}`, background: "#FFFFFF" }}>
+    <div className="oex-stepper inline-flex items-center rounded-xl overflow-hidden" style={{ border: `1.5px solid ${C.line}`, background: "#FFFFFF" }}>
       <button aria-label="Decrease quantity" onClick={() => setQty(qty - 1)} className="px-2.5 py-2" style={{ background: "none", border: "none", cursor: "pointer", color: C.ink }}><Minus size={13} /></button>
       <span style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 14, minWidth: 30, textAlign: "center" }}>{qty}</span>
       <button aria-label="Increase quantity" onClick={() => setQty(qty + 1)} className="px-2.5 py-2" style={{ background: "none", border: "none", cursor: "pointer", color: C.ink }}><Plus size={13} /></button>
@@ -516,7 +519,7 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit, submiss
           <p style={{ margin: 0, color: C.sub, fontSize: 14, lineHeight: 1.6 }}>Every field stays pending until a named supplier or authorized source provides evidence.</p>
           <div className="oex-document-grid">{[["Lot identity","Pending verification"],["Cupping report","Not supplied"],["Certification evidence","Not supplied"],["Inventory / crop","Pending verification"],["Export & logistics","Quote required"],["Producer consent","Pending verification"]].map(([name,status]) => <span key={name}><b>{name}</b><small>{status}</small></span>)}</div>
         </section>
-        <aside className="oex-inquiry-panel" style={{ position: "sticky", top: 18 }}>
+        <aside className="oex-inquiry-panel oex-inquiry-sticky">
           <h2 style={{ margin: 0, fontFamily: F.disp, fontSize: 30, fontWeight: 400 }}>What should Deldiet prepare?</h2>
           <div className="grid grid-cols-2 gap-2" style={{ marginTop: 16 }}>{[["sample","Sample request"],["quote","Verified quote"]].map(([id,label]) => <button key={id} aria-pressed={requestType === id} onClick={() => setRequestType(id)} style={{ border: `2px solid ${requestType === id ? C.brass : C.line}`, background: requestType === id ? "#FDF6EB" : "#fff", color: C.ink, padding: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>)}</div>
           {["company","name","email","destination"].map((key) => <label key={key} style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 12, textTransform: "uppercase" }}>{key === "destination" ? "Destination country / city" : key}</span><input value={profile[key]} type={key === "email" ? "email" : "text"} onChange={(event) => set(key)(event.target.value)} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink }}/></label>)}
@@ -563,7 +566,7 @@ function CartView({ cart, setQty, removeItem, ship, setShip, totals, onCheckout,
         <div className="rounded-2xl overflow-hidden" style={{ background: "#FFFFFF", border: `1px solid ${C.line}` }}>
           {cart.map((it, idx) => (
             <div key={it.key} className="oex-cart-item p-4" style={{ borderTop: idx ? `1px solid ${C.line}` : "none" }}>
-              <div className="rounded-xl overflow-hidden" style={{ width: 54, height: 54, background: C.cream, flexShrink: 0, position: "relative" }}>
+              <div className="oex-cart-thumb rounded-xl overflow-hidden" style={{ width: 54, height: 54, background: C.cream, flexShrink: 0, position: "relative" }}>
                 <Image src={PRODUCT_VISUALS[it.cat] || PRODUCT_VISUALS.beans} alt="" fill unoptimized sizes="54px" style={{ objectFit: "cover" }} />
                 <DeldietProductMark compact />
               </div>
@@ -573,7 +576,7 @@ function CartView({ cart, setQty, removeItem, ship, setShip, totals, onCheckout,
               </div>
               <Stepper qty={it.qty} setQty={(q) => setQty(it.key, q)} />
               <div className="oex-cart-price" style={{ fontFamily: F.mono, fontWeight: 600, fontSize: 14, minWidth: 76, textAlign: "right", color: C.ink }}>{fmt(r2(it.unit * it.qty))}</div>
-              <button onClick={() => removeItem(it.key)} aria-label="Remove item" style={{ background: "none", border: "none", cursor: "pointer", color: C.sub }}><X size={16} /></button>
+              <button className="oex-cart-remove" onClick={() => removeItem(it.key)} aria-label="Remove item" style={{ background: "none", border: "none", cursor: "pointer", color: C.sub }}><X size={16} /></button>
             </div>
           ))}
         </div>
@@ -927,15 +930,15 @@ export default function OriginExchangeHub() {
   return (
     <div className="oex-app" style={{ background: C.paper, minHeight: "100vh", color: C.ink, fontFamily: F.body }}>
       <style>{STYLES}</style>
-      <header style={{ background: C.esp }}>
+      <header className="oex-shell-header" style={{ background: C.esp }}>
         <div style={{ borderBottom: "1px solid #3A2818" }}>
           <div className="max-w-6xl mx-auto px-4 py-2 flex items-center justify-between gap-4">
             <Link href="/" className="oex-back-deldiet"><ChevronLeft size={13} /><span className="oex-label-wide">DELDIET COFFEEHOUSE &amp; STORE</span><span className="oex-label-short">DELDIET HOME</span></Link>
             <Link href="/origin-bar" className="oex-back-deldiet"><span className="oex-label-wide">BUILD AT ORIGIN BAR</span><span className="oex-label-short">ORIGIN BAR</span><ArrowRight size={13} /></Link>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button onClick={() => goView("home")} className="flex items-center gap-2.5" style={{ background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}>
+        <div className="oex-main-header max-w-6xl mx-auto px-4 py-3">
+          <button onClick={() => goView("home")} className="oex-brand-button flex items-center gap-2.5" style={{ background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}>
             <span className="flex items-center justify-center rounded-full" style={{ width: 34, height: 34, background: C.brass }}>
               <Coffee size={18} color="#241405" />
             </span>
@@ -944,7 +947,7 @@ export default function OriginExchangeHub() {
               <span className="hidden sm:block" style={{ fontFamily: F.mono, fontSize: 12, color: "#C8B69B", letterSpacing: ".18em", marginTop: 3 }}>DISCOVER SENSORY · SOURCE WITH EVIDENCE</span>
             </span>
           </button>
-          <div className="flex-1 relative" style={{ maxWidth: 460, marginLeft: "auto" }}>
+          <div className="oex-search flex-1 relative" style={{ maxWidth: 460, marginLeft: "auto" }}>
             <Search size={14} color="#9A8772" style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)" }} />
             <input
               value={query}
@@ -957,11 +960,11 @@ export default function OriginExchangeHub() {
           <button onClick={() => goView("trade")} className="hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-2" style={{ border: `1.5px solid ${C.brass}`, color: C.brass, background: "none", fontFamily: F.mono, fontSize: 13, fontWeight: 600, letterSpacing: ".06em", cursor: "pointer", flexShrink: 0 }}>
             <TrendingUp size={13} /> TRADE DESK
           </button>
-          <button onClick={() => goView("inquiry")} className="relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open sourcing enquiry">
+          <button onClick={() => goView("inquiry")} className="oex-head-inquiry relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open sourcing enquiry">
             <BadgeCheck size={17} color={C.brass} />
             {tradeCount > 0 && <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: "#D9FF66", color: "#241405", fontFamily: F.mono, fontSize: 12, fontWeight: 700, padding: "0 4px" }}>{tradeCount}</span>}
           </button>
-          <button onClick={() => goView("cart")} className="relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open cart">
+          <button onClick={() => goView("cart")} className="oex-head-cart relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open cart">
             <ShoppingCart size={17} color={C.cream} />
             {count > 0 && (
               <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: C.brass, color: "#241405", fontFamily: F.mono, fontSize: 12, fontWeight: 700, padding: "0 4px" }}>{count}</span>
