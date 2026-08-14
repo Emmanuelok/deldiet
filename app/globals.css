@@ -89,7 +89,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
 .hero { position: relative; min-height: calc(100vh - 104px); height: 820px; max-height: 920px; overflow: hidden; display: flex; align-items: center; color: white; background: #17130f; }
 .hero-image { position: absolute; inset: 0; background-image: url('/deldiet-hero.png'); background-size: cover; background-position: center; animation: hero-drift 16s ease-in-out infinite alternate; }
-.hero-video { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(.9) contrast(1.05); }
+.hero-video { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; background: #17130f; filter: saturate(.9) contrast(1.05); transform: translateZ(0); }
+.hero-mobile-motion { display: none; }
 @keyframes hero-drift { from { transform: scale(1.01); } to { transform: scale(1.055); } }
 .hero-shade { position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, rgba(10,9,7,.94) 0%, rgba(10,9,7,.78) 32%, rgba(10,9,7,.18) 73%, rgba(10,9,7,.06) 100%), linear-gradient(0deg, rgba(10,9,7,.67), transparent 48%); }
 .hero-content { position: relative; z-index: 2; width: min(720px, 58vw); padding-left: clamp(32px, 6.5vw, 112px); margin-top: -20px; }
@@ -562,7 +563,8 @@ footer { padding: 78px clamp(24px, 6.5vw, 112px) 24px; background: #171812; colo
   .main-nav { position: fixed; top: 96px; left: 0; right: 0; padding: 24px; display: none; flex-direction: column; gap: 0; background: var(--paper); border-bottom: 1px solid var(--line); box-shadow: 0 20px 40px rgba(0,0,0,.13); }.main-nav.open { display: flex; }.main-nav button, .main-nav a { padding: 15px 0; text-align: left; border-bottom: 1px solid var(--line); }
   .menu-button { display: block; }.desktop-only { display: none; }
   .experience-switch { grid-template-columns: repeat(4, 1fr); }.experience-switch-label { display: none; }.experience-switch > button, .experience-switch > a { padding: 12px; }
-  .hero { min-height: 820px; height: calc(100svh - 96px); align-items: flex-end; }.hero-image { background-position: 64% center; }.hero-video { object-position: 67% center; }.hero-shade { background: linear-gradient(0deg, rgba(10,9,7,.97) 2%, rgba(10,9,7,.72) 57%, rgba(10,9,7,.12) 100%); }
+  .hero { min-height: 820px; height: calc(100svh - 96px); align-items: flex-end; }.hero-image { background-position: 64% center; }.hero-video { object-position: center; }.hero-shade { background: linear-gradient(0deg, rgba(10,9,7,.97) 2%, rgba(10,9,7,.72) 57%, rgba(10,9,7,.12) 100%); }
+  .hero-mobile-motion { position: absolute; z-index: 3; top: max(14px, env(safe-area-inset-top)); right: max(16px, env(safe-area-inset-right)); min-height: 44px; padding: 5px 12px 5px 6px; display: inline-flex; align-items: center; gap: 9px; border: 1px solid rgba(255,255,255,.34); border-radius: 999px; background: rgba(17,14,11,.66); color: white; font-size: 11px; font-weight: 750; letter-spacing: .04em; backdrop-filter: blur(12px); cursor: pointer; }.hero-mobile-motion .play-dot { width: 32px; height: 32px; }
   .hero-content { width: 100%; padding: 0 24px 104px; margin: 0; }.hero h1 { font-size: clamp(57px, 17vw, 86px); }.hero-copy { font-size: 14px; margin: 23px 0; }.hero-origin-card { display: none; }.hero-index { display: none; }.hero-route { margin-top: 30px; }
   .journey-planner { grid-template-columns: 1fr; }.journey-planner-copy, .journey-result { min-height: 650px; padding: 80px 24px; }.journey-tabs { margin-top: 40px; }.journey-orbit { width: 650px; height: 650px; }
   .promise-strip { grid-template-columns: 1fr 1fr; }.promise-strip > div:nth-child(2) { border-right: 0; }.promise-strip > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
@@ -616,6 +618,10 @@ footer { padding: 78px clamp(24px, 6.5vw, 112px) 24px; background: #171812; colo
   .concierge-button span { display: none; }.concierge-button { width: 48px; padding: 0; justify-content: center; }
 }
 
+@media (min-width: 641px) and (max-width: 820px) {
+  .hero-video { object-position: 67% center; }
+}
+
 @media (max-width: 540px) {
   .deldiet-product-mark { width: 82px; min-height: 24px; padding: 4px 7px; }
   .deldiet-product-mark-menu { width: 44px; min-height: 17px; padding: 2px 4px; }
@@ -627,7 +633,6 @@ footer { padding: 78px clamp(24px, 6.5vw, 112px) 24px; background: #171812; colo
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .hero-video { display: none; }
   .cafe-menu-grid article:hover .cafe-menu-visual img { transform: none; }
 }
 
