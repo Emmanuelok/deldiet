@@ -1,4 +1,5 @@
 import type { ServiceRequestType } from "./service-requests";
+import { readLocal, writeLocal } from "./local-state";
 
 export type ServiceRequestInput = {
   type: ServiceRequestType;
@@ -67,8 +68,13 @@ export async function submitServiceRequest(
     if (!response.ok || !result?.request) {
       throw new ServiceRequestError(result?.error || "Deldiet could not save this request. Please try again.", response.status);
     }
+    const { trackingToken: _privateToken, ...publicReceipt } = result.request;
+    const previous = readLocal<unknown>("deldiet-receipts-v1", []);
+    writeLocal("deldiet-receipts-v1", [publicReceipt, ...(Array.isArray(previous) ? previous.filter(item => item && item.reference !== publicReceipt.reference) : [])].slice(0, 100));
+    window.dispatchEvent(new CustomEvent("deldiet:receipt", { detail: result.request }));
     return result.request;
   } catch (error) {
+    if (!options.signal?.aborted && (!(error instanceof ServiceRequestError) || error.status === 0 || error.status >= 500)) window.dispatchEvent(new CustomEvent("deldiet:unsent", { detail: { status: "SUBMISSION_UNCONFIRMED", savedAt: new Date().toISOString(), ...input, idempotencyKey } }));
     if (error instanceof ServiceRequestError) throw error;
     if (controller.signal.aborted) {
       throw new ServiceRequestError("The request took too long to save. Your selections are still here—please try again.");

@@ -3,6 +3,12 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import HomeCollection from "./home-collection";
+import dynamic from "next/dynamic";
+const CollectionContent = dynamic(() => import("./collection-content"));
+const BrewStudioContent = dynamic(() => import("./brew-studio"));
+const JournalContent = dynamic(() => import("./journal-content"));
+import { readLocal, writeLocal, passportData, mergePassport, validCartItems, canonicalBrewer } from "@/lib/local-state";
 import { createIdempotencyKey, submitServiceRequest, type ServiceRequestInput } from "@/lib/request-client";
 
 type Origin = {
@@ -461,7 +467,9 @@ export type DeldietView =
   | "clarity"
   | "trace"
   | "business"
-  | "journal";
+  | "journal"
+  | "collection"
+  | "brew-lab";
 
 const pageIntros: Record<Exclude<DeldietView, "home">, {
   label: string;
@@ -472,6 +480,8 @@ const pageIntros: Record<Exclude<DeldietView, "home">, {
   primary: string;
   href: string;
 }> = {
+  "brew-lab": { label: "The Brew Studio", title: "Small details.", emphasis: "Beautiful coffee.", copy: "A recipe for your brewer, a timer for the moment, and a journal for your favourite cups.", accent: "#18372d", primary: "Make a recipe", href: "#brew-studio" },
+  collection: { label: "Your personal collection", title: "The things", emphasis: "you come back to.", copy: "Your favourite finds, saved Brewprints, origin records and request references. Kept together on this device.", accent: "#18372d", primary: "Explore my collection", href: "#my-collection" },
   discover: { label: "Choose your route", title: "One coffee world.", emphasis: "Start your way.", copy: "Tell Deldiet what you came to do and move directly into the right experience—without searching through one endless page.", accent: "#75482b", primary: "Meet the paths", href: "#journey" },
   coffeehouse: { label: "Deldiet Coffeehouse", title: "A room built", emphasis: "around coffee.", copy: "Browse the full menu, choose how you want to be served, plan a visit and send a prepared-order request from one focused coffeehouse page.", accent: "#59604a", primary: "Browse the menu", href: "#cafe-menu" },
   events: { label: "Coffeehouse experiences", title: "Taste. Learn.", emphasis: "Meet the world.", copy: "Explore planned cuppings, practical brew classes and producer conversations, then join the interest list for the sessions that fit you.", accent: "#75482b", primary: "See the calendar", href: "#events" },
@@ -489,6 +499,7 @@ const pageIntros: Record<Exclude<DeldietView, "home">, {
 
 export default function DeldietExperience({ view = "home" }: { view?: DeldietView }) {
   const heroVideoRef = useRef<HTMLVideoElement>(null);
+  const [compareOrigins, setCompareOrigins] = useState<string[]>([]);
   const [region, setRegion] = useState("All origins");
   const [activeOrigin, setActiveOrigin] = useState(origins[0]);
   const [format, setFormat] = useState("All");
@@ -508,6 +519,9 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   const [cafeSearch, setCafeSearch] = useState("");
   const [shopCategory, setShopCategory] = useState("All");
   const [shopSearch, setShopSearch] = useState("");
+  const [shopSort, setShopSort] = useState("featured");
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [savedProductIds, setSavedProductIds] = useState<string[]>([]);
   const [reservationOpen, setReservationOpen] = useState(false);
   const [reservationTime, setReservationTime] = useState("Morning");
   const [selectedProduct, setSelectedProduct] = useState<RetailProduct | null>(null);
@@ -530,20 +544,20 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      const stored = window.localStorage.getItem("deldiet-cart");
-      if (stored) {
-        try {
-          const saved = JSON.parse(stored) as Array<CartItem & { channel?: "cafe" | "shop" }>;
-          setCart(saved.map((item) => ({ ...item, channel: item.channel || "shop" })));
-        } catch { /* ignore malformed local data */ }
-      }
+      setCart(validCartItems(readLocal("deldiet-cart", [])));
+      const passport = passportData();
+      if (Array.isArray(passport.savedProducts)) setSavedProductIds(passport.savedProducts.filter((v): v is string => typeof v === "string"));
+      const recipeId = new URLSearchParams(window.location.search).get("recipe");
+      const recipes = Array.isArray(passport.brewprints) ? passport.brewprints : [];
+      const recipe = recipes.find((v: { id?: string }) => v?.id === recipeId);
+      if (recipe?.cup && Object.entries(cupOptions).every(([key, values]) => values.includes(recipe.cup[key])) && ["Hot", "Iced"].includes(recipe.cup.temperature)) setCup(recipe.cup);
       setCartHydrated(true);
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (cartHydrated) window.localStorage.setItem("deldiet-cart", JSON.stringify(cart));
+    if (cartHydrated) writeLocal("deldiet-cart", cart);
   }, [cart, cartHydrated]);
 
   useEffect(() => {
@@ -668,8 +682,8 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   const visibleShopProducts = retailProducts.filter((item) => {
     const inCategory = shopCategory === "All" || item.category === shopCategory;
     const haystack = `${item.name} ${item.category} ${item.description} ${item.code}`.toLowerCase();
-    return inCategory && haystack.includes(shopSearch.trim().toLowerCase());
-  });
+    return inCategory && (!savedOnly || savedProductIds.includes(item.id)) && haystack.includes(shopSearch.trim().toLowerCase());
+  }).sort((a, b) => shopSort === "price-low" ? a.price - b.price : shopSort === "price-high" ? b.price - a.price : shopSort === "name" ? a.name.localeCompare(b.name) : 0);
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const cafeCart = cart.filter((item) => item.channel === "cafe");
@@ -689,7 +703,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
     const normalized = { ...item, channel: item.channel || "shop" } as Omit<CartItem, "quantity">;
     setCart((current) => {
       const exists = current.find((entry) => entry.id === normalized.id);
-      if (exists) return current.map((entry) => entry.id === normalized.id ? { ...entry, quantity: entry.quantity + 1 } : entry);
+      if (exists) return current.map((entry) => entry.id === normalized.id ? { ...entry, quantity: Math.min(99, entry.quantity + 1) } : entry);
       return [...current, { ...normalized, quantity: 1 }];
     });
     setToast(`${normalized.name} added to your ${normalized.channel === "cafe" ? "coffeehouse order" : "shop bag"}`);
@@ -701,13 +715,14 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   }
 
   function updateLocalPassport(update: Record<string, unknown>, message: string) {
-    try {
-      const stored = JSON.parse(window.localStorage.getItem("deldiet-passport-v1") || "{}") as Record<string, unknown>;
-      window.localStorage.setItem("deldiet-passport-v1", JSON.stringify({ ...stored, ...update }));
-      setToast(message);
-    } catch {
-      setToast("This device could not update the local Passport preview");
-    }
+    setToast(mergePassport(update) ? message : "This device could not save your preferences.");
+  }
+
+  function saveBrewprint() {
+    const data = passportData();
+    const previous = Array.isArray(data.brewprints) ? data.brewprints : [];
+    const item = { id: crypto.randomUUID(), name: `${cup.origin} · ${cup.style}`, cup: { ...cup }, createdAt: new Date().toISOString() };
+    setToast(mergePassport({ brewprints: [item, ...previous].slice(0, 50) }) ? "Brewprint saved. Find it in My collection." : "Your browser could not save this Brewprint.");
   }
 
   function saveProductToPassport(product: RetailProduct) {
@@ -716,16 +731,22 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       const stored = JSON.parse(window.localStorage.getItem("deldiet-passport-v1") || "{}") as { savedProducts?: unknown };
       if (Array.isArray(stored.savedProducts)) savedProducts = stored.savedProducts.filter((item): item is string => typeof item === "string");
     } catch { /* start a clean local preview */ }
-    updateLocalPassport({ savedProducts: [...new Set([...savedProducts, product.id])].slice(-20) }, `${product.name} saved to this device’s Passport preview`);
+    const next = [...new Set([...savedProducts, product.id])].slice(-100);
+    if (mergePassport({ savedProducts: next })) { setSavedProductIds(next); setToast(`${product.name} saved to My collection`); } else setToast("This browser could not save the product.");
   }
 
   function updateQuantity(id: string, delta: number) {
-    setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: item.quantity + delta } : item).filter((item) => item.quantity > 0));
+    setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: Math.min(99, item.quantity + delta) } : item).filter((item) => item.quantity > 0));
   }
 
   function calculateTasteprint() {
-    const match = taste.note === "Fruit-forward" ? "Ethiopia · Guji" : taste.note === "Chocolate & nuts" ? "Brazil · Cerrado" : "Rwanda · Nyamasheke";
-    setTasteResult(`${match} · ${taste.mood === "Bold" ? "medium" : "light"} roast · ${taste.brew}`);
+    const note = taste.note === "Chocolate & nuts" ? "Chocolate & nuts" : taste.note === "Floral & tea-like" ? "Floral & citrus" : "Fruit-forward";
+    const roast = taste.mood === "Bold" ? "Medium-dark" : taste.mood === "Balanced" ? "Medium" : "Light";
+    const brew = taste.brew === "Espresso" ? "Espresso machine" : taste.brew;
+    const match = taste.note === "Chocolate & nuts" ? "Brazil · Cerrado" : taste.note === "Floral & tea-like" ? "Ethiopia · Guji" : taste.mood === "Bold" ? "Colombia · Huila" : "Kenya · Nyeri";
+    const saved = mergePassport({ taste: { note, roast, brew, adventure: taste.mood === "Bright" ? "4" : "2" }, brewer: brew });
+    setTasteResult(`${match} · ${taste.mood.toLowerCase()} cup · ${taste.brew}`);
+    setToast(saved ? "Your taste preferences are saved in Passport." : "Your match is ready. This browser could not save your preferences.");
   }
 
   async function toggleHeroMotion() {
@@ -860,16 +881,16 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   }
 
   const activeJourney = journeyPaths[journeyIntent];
-  const pageIntro = view === "home" ? null : pageIntros[view];
+  const pageIntro = view === "home" || view === "brew-lab" ? null : pageIntros[view];
 
   return (
     <>
     <a className="skip-link" href="#main-content">Skip to main content</a>
     <main id="main-content" className={`deldiet-home view-${view}`}>
       <div className="announcement">
-        <span><i className="live-dot" /><span className="announcement-wide">One Deldiet · every experience has its own page</span><span className="announcement-mobile">One Deldiet</span></span>
+        <span><i className="live-dot" /><span className="announcement-wide">Coffee, craft &amp; a little curiosity</span><span className="announcement-mobile">One Deldiet</span></span>
         <span className="announcement-copy">St. John&apos;s, Newfoundland · location and opening details to be confirmed</span>
-        <a href="/coffeehouse#cafe-menu">Order ahead <Icon name="arrow" size={15} /></a>
+        <a href="/coffeehouse#cafe-menu">Explore the menu <Icon name="arrow" size={15} /></a>
       </div>
 
       <header className="site-header">
@@ -879,16 +900,16 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
         <nav ref={mobileMenuRef} id="primary-navigation" className={menuOpen ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
           <a href="/coffeehouse" aria-current={view === "coffeehouse" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Coffeehouse</a>
           <a href="/origins" aria-current={view === "origins" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Origins</a>
-          <a href="/build-a-cup" aria-current={view === "build" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Build a cup</a>
+          <a href="/brew-lab" onClick={() => setMenuOpen(false)}>Brew Studio</a>
           <a href="/origin-bar" onClick={() => setMenuOpen(false)}>Origin Bar</a>
           <a href="/coffee-at-home" aria-current={view === "formats" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Coffee at home</a>
           <a href="/shop" aria-current={view === "shop" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Shop</a>
           <a href="/origin-exchange" onClick={() => setMenuOpen(false)}>Exchange</a>
-          <a className="mobile-nav-extra" href="/shop#shop-catalogue" onClick={() => setMenuOpen(false)}>Search the shop</a>
+          <a className="mobile-nav-extra" href="/my-collection" onClick={() => setMenuOpen(false)}>My collection</a>
           <a className="mobile-nav-extra" href="/passport" onClick={() => setMenuOpen(false)}>Deldiet Passport</a>
         </nav>
         <div className="header-actions">
-          <a className="icon-button desktop-only" aria-label="Search the Deldiet shop" href="/shop"><Icon name="search" /></a>
+          <button className="icon-button desktop-only" aria-label="Search all Deldiet tools" onClick={() => window.dispatchEvent(new Event("deldiet:search"))}><Icon name="search" /></button>
           <a className="icon-button desktop-only" aria-label="Open Deldiet Passport" href="/passport"><Icon name="user" /></a>
           <button className="bag-button" aria-label={`Shopping bag with ${cartCount} items`} onClick={() => { setMenuOpen(false); setCartOpen(true); }}>
             <Icon name="bag" /><span>{cartCount}</span>
@@ -903,9 +924,9 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           <p className="eyebrow light">{pageIntro.label}</p>
           <h1 id="section-page-title">{pageIntro.title}<br/><em>{pageIntro.emphasis}</em></h1>
           <p>{pageIntro.copy}</p>
-          <div><a className="button button-light" href={pageIntro.href}>{pageIntro.primary}<Icon name="arrow"/></a><a className="text-link light" href="/discover">View every Deldiet page<Icon name="arrow" size={16}/></a></div>
+          <div><a className="button button-light" href={pageIntro.href}>{pageIntro.primary}<Icon name="arrow"/></a><a className="text-link light" href="/discover">Explore more<Icon name="arrow" size={16}/></a></div>
         </div>
-        <div className="section-page-orbit" aria-hidden="true"><i/><i/><i/><i/><span className="brand-seed"/></div>
+        <div className="dd-page-photo" aria-hidden="true" style={{ backgroundImage: `url(${view === "coffeehouse" || view === "events" ? "/deldiet-cafe-interior.png" : view === "origins" || view === "trace" || view === "business" ? "/origin-exchange-hero.png" : view === "shop" ? "/deldiet-merch-apparel.png" : view === "clarity" ? "/products/clarity-sticks.webp" : "/deldiet-hero-motion-poster.webp"})` }} />
       </section>}
 
       {view === "home" && <>
@@ -934,12 +955,12 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           <span>{heroPlaying ? "Motion on" : "Play motion"}</span>
         </button>
         <div className="hero-content">
-          <p className="eyebrow light">From altitude to aroma · one connected coffee world</p>
-          <h1 id="hero-title">The world,<br /><em>brewed live.</em></h1>
-          <p className="hero-copy">Choose a real origin, watch it become your exact cup, then take that same coffee home as beans, grounds, capsules, brew cups, filter bags or a subscription built around your brewer.</p>
+          <p className="eyebrow light">Coffee is a journey. Make it yours.</p>
+          <h1 id="hero-title">Life happens.<br /><em>Coffee helps.</em></h1>
+          <p className="hero-copy">Extraordinary origins. Your kind of cup. Discover a whole world of coffee, made for your everyday.</p>
           <div className="hero-actions">
-            <a className="button button-light" href="/origin-bar">Enter the Origin Bar <Icon name="arrow" /></a>
-            <a className="text-link light" href="/discover">Find my Deldiet path <Icon name="arrow" size={17} /></a>
+            <a className="button button-light" href="/shop">Find your next favourite <Icon name="arrow" /></a>
+            <a className="text-link light" href="/tasteprint">Find my flavour <Icon name="arrow" size={17} /></a>
           </div>
           <div className="hero-route" aria-label="The Deldiet coffee journey">
             {[["01","Origin"],["02","Roast"],["03","Craft"],["04","Take home"]].map(([number,label]) => <span key={number}><b>{number}</b><small>{label}</small></span>)}
@@ -947,9 +968,9 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
         </div>
         <div className="hero-origin-card glass-card">
           <div>
-            <span className="micro-label">Now in the visual journey</span>
-            <strong>Bloom → pour</strong>
-            <p>Macro brewing study · motion loops silently</p>
+            <span className="micro-label">THE EVERYDAY, EXTRAORDINARY</span>
+            <strong>A moment, well brewed.</strong>
+            <p>Take a breath. Follow your curiosity.</p>
           </div>
           <button aria-label={heroPlaying ? "Pause hero motion" : "Play hero motion"} aria-pressed={heroPlaying} onClick={toggleHeroMotion}>{heroPlaying ? <Icon name="pause" /> : <Icon name="play" />}</button>
         </div>
@@ -957,29 +978,17 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       </section>
 
       <section className="promise-strip" aria-label="Deldiet commitments">
-        <div><Icon name="pin" /><span><b>Destination coffeehouse</b> dine in or order ahead</span></div>
+        <div><Icon name="pin" /><span><b>A place for coffee people</b> explore our coffeehouse concept</span></div>
         <div><Icon name="leaf" /><span><b>18 origin profiles</b> verification status shown</span></div>
         <div><Icon name="spark" /><span><b>30+ product families</b> coffee, objects and apparel</span></div>
-        <div><Icon name="clock" /><span><b>One shared Passport</b> in-store and online</span></div>
+        <div><Icon name="clock" /><span><b>A ritual that’s yours</b> preferences saved on this device</span></div>
       </section>
 
-      <section className="home-gateway" aria-labelledby="home-gateway-title">
-        <div className="home-gateway-heading">
-          <div><p className="eyebrow">Explore without the endless scroll</p><h2 id="home-gateway-title">Every experience.<br/><em>Its own destination.</em></h2></div>
-          <p>Go straight to the part of Deldiet you need. Each destination now has its own focused page, while your bag and Passport stay connected.</p>
-        </div>
-        <div className="home-gateway-grid">
-          <a href="/coffeehouse"><span>01 / Visit</span><h3>Coffeehouse</h3><p>Menu, service modes and visit planning.</p><b>Open page <Icon name="arrow" size={16}/></b></a>
-          <a href="/origin-bar"><span>02 / Craft</span><h3>Origin Bar</h3><p>Build a cup from a real coffee origin.</p><b>Open experience <Icon name="arrow" size={16}/></b></a>
-          <a href="/coffee-at-home"><span>03 / Brew</span><h3>Coffee at home</h3><p>Formats and Machine Match for your ritual.</p><b>Open page <Icon name="arrow" size={16}/></b></a>
-          <a href="/origin-exchange"><span>04 / Source</span><h3>Origin Exchange</h3><p>Retail discovery and separate trade enquiries.</p><b>Open exchange <Icon name="arrow" size={16}/></b></a>
-        </div>
-        <nav className="home-gateway-more" aria-label="More Deldiet destinations">
-          <a href="/origins">Origins</a><a href="/build-a-cup">Build a cup</a><a href="/tasteprint">Tasteprint</a><a href="/shop">Shop</a><a href="/events">Events</a><a href="/passport">Passport</a><a href="/trace">Trace a lot</a><a href="/business">Business</a>
-        </nav>
-      </section>
+      <HomeCollection />
       </>}
 
+      {view === "brew-lab" && <BrewStudioContent />}
+      {view === "collection" && <CollectionContent products={retailProducts} productImages={retailImages} onOpenProduct={(id) => { const product = retailProducts.find(p => p.id === id); if (product) openProduct(product); }} />}
       {view === "discover" && <section className="journey-planner" id="journey" aria-labelledby="journey-title">
         <div className="journey-planner-copy">
           <p className="eyebrow light">Your way into Deldiet</p>
@@ -1073,7 +1082,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           <div className="section-intro"><p>Every coffee is a living record of altitude, variety, climate, processing and people. Explore the current harvest by origin—not by vague flavour labels.</p><button className="text-link" onClick={() => setTraceOpen(true)}>How sourcing works <Icon name="arrow" /></button></div>
         </div>
         <div className="filter-row" role="group" aria-label="Filter coffee origins">
-          {["All origins", "Africa", "Americas", "Asia Pacific"].map((item) => <button key={item} className={region === item ? "filter-pill active" : "filter-pill"} onClick={() => setRegion(item)}>{item}</button>)}
+          {["All origins", "Africa", "Americas", "Asia Pacific"].map((item) => <button key={item} className={region === item ? "filter-pill active" : "filter-pill"} onClick={() => { setRegion(item); const first = origins.find(origin => item === "All origins" || origin.continent === item); if (first) setActiveOrigin(first); }}>{item}</button>)}
         </div>
         <div className="origin-layout">
           <div className="origin-list">
@@ -1098,16 +1107,18 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
               <div><dt>Producer</dt><dd>{activeOrigin.producer}</dd></div>
               <div><dt>Profile roast</dt><dd>{activeOrigin.roast}</dd></div>
             </dl>
+            <button className="dd-compare-toggle" aria-pressed={compareOrigins.includes(activeOrigin.id)} disabled={compareOrigins.length >= 3 && !compareOrigins.includes(activeOrigin.id)} onClick={() => setCompareOrigins(current => current.includes(activeOrigin.id) ? current.filter(id => id !== activeOrigin.id) : [...current, activeOrigin.id])}>{compareOrigins.includes(activeOrigin.id) ? "Remove from comparison" : "Compare this origin"} · {compareOrigins.length}/3</button>
             <button className="button button-dark" onClick={() => addToCart({ id: activeOrigin.id, name: `${activeOrigin.country} · ${activeOrigin.region.split(" · ")[0]}`, detail: "Whole bean · 340 g", price: activeOrigin.price, image: "/products/format-whole-bean.webp" })}>Add 340 g · ${activeOrigin.price} <Icon name="plus" /></button>
           </aside>
         </div>
+        {compareOrigins.length > 0 && <section className="dd-origin-comparison" aria-labelledby="compare-title"><div><h3 id="compare-title">A little side-by-side discovery.</h3><button onClick={() => setCompareOrigins([])}>Clear comparison</button></div><p>Select up to three origins to compare their profiles. These catalogue details are illustrative.</p><div className="dd-comparison-scroll"><table><thead><tr><th scope="col">In the cup</th>{compareOrigins.map(id => <th scope="col" key={id}>{origins.find(o => o.id === id)?.country}</th>)}</tr></thead><tbody>{["region", "notes", "process", "elevation", "roast", "price"].map(key => <tr key={key}><th scope="row">{({ region: "Region", notes: "Flavour notes", process: "Process", elevation: "Elevation", roast: "Roast profile", price: "Illustrative CAD / 340 g" } as Record<string,string>)[key]}</th>{compareOrigins.map(id => { const origin = origins.find(o => o.id === id)!; const value = origin[key as keyof Origin]; return <td key={id}>{Array.isArray(value) ? value.join(" · ") : key === "price" ? `$${value}` : value}</td>; })}</tr>)}</tbody></table></div></section>}
       </section>}
 
       {view === "build" && <section className="build-section" id="build">
         <div className="build-intro">
           <p className="eyebrow light">02 / The Deldiet experience</p>
           <h2>Your coffee.<br /><em>Precisely yours.</em></h2>
-          <p>Start with a real origin, then make every decision—from extraction to finish. Your recipe is saved as a Brewprint you can order in-store, online or from a Deldiet self-order station.</p>
+          <p>Start with a real origin, then make every decision—from extraction to finish. Save your recipe as a Brewprint, keep it in My collection, and return whenever you want to make it again.</p>
           <div className="build-meta"><span>Estimated build time</span><strong>45 sec</strong></div>
         </div>
         <div className="cup-builder">
@@ -1121,13 +1132,13 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
               <div className="temperature-toggle" role="group" aria-label="Temperature"><span>05 · Temperature</span>{["Hot", "Iced"].map((item) => <button key={item} className={cup.temperature === item ? "active" : ""} onClick={() => setCup({ ...cup, temperature: item })}>{item}</button>)}</div>
             </div>
             <aside className="cup-receipt">
-              <div className={cup.temperature === "Iced" ? "cup-visual iced" : "cup-visual"} aria-hidden="true"><span className="cup-steam one"/><span className="cup-steam two"/><div className="cup-liquid"/><DeldietMark className="deldiet-product-mark-cup" /></div>
+              <div className="dd-real-cup"><Image src={cup.temperature === "Iced" ? "/menu/deldiet-cold-cup.webp" : "/menu/deldiet-hot-cup.webp"} alt={`${cup.temperature} Deldiet cup`} fill unoptimized sizes="240px"/></div>
               <p className="micro-label">Your Brewprint</p>
               <h3>{cup.style}</h3>
               <ul><li><span>Origin</span><b>{cup.origin}</b></li><li><span>Milk</span><b>{cup.milk}</b></li><li><span>Finish</span><b>{cup.finish}</b></li><li><span>Serve</span><b>{cup.temperature}</b></li></ul>
               <div className="cup-confidence"><span>Illustrative caffeine range</span><b>{cup.style === "Espresso" ? "60–90 mg" : cup.style === "Cold brew" ? "120–180 mg" : "80–140 mg"}</b><span>Selected milk</span><b>{cup.milk === "No milk" ? "None selected · shared equipment" : cup.milk}</b><span>Preparation time</span><b>Confirmed by the bar</b></div>
               <button className="button button-lime" onClick={() => addToCart({ id: `cup-${Object.values(cup).join("-")}`, name: `Custom ${cup.style}`, detail: `${serviceMode} · ${cup.origin} · ${cup.milk} · ${cup.temperature}`, price: cupPrice, channel: "cafe", image: "/products/cafe-order.webp" })}>Add to coffeehouse order · ${cupPrice.toFixed(2)} <Icon name="plus" /></button>
-              <button className="save-recipe" onClick={() => setToast("Brewprint saved on this device")}><Icon name="spark" size={17}/> Save this Brewprint</button>
+              <button className="save-recipe" onClick={saveBrewprint}><Icon name="spark" size={17}/> Save this Brewprint</button>
             </aside>
           </div>
         </div>
@@ -1135,13 +1146,13 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
 
       {view === "tasteprint" && <section className="section taste-section" id="tasteprint">
         <div className="taste-card">
-          <div className="taste-copy"><p className="eyebrow">Tasteprint™</p><h2>Not sure where<br />to begin?</h2><p>Three choices create a starting profile. We&apos;ll keep learning as you rate each cup.</p></div>
+          <div className="taste-copy"><p className="eyebrow">Tasteprint™</p><h2>Not sure where<br />to begin?</h2><p>Three choices create a useful starting point. Save your preferences, then explore the fuller Taste Graph in your Passport.</p></div>
           <div className="taste-quiz">
             <Choice label="I want something" options={["Bright", "Balanced", "Bold"]} value={taste.mood} onChange={(value) => setTaste({ ...taste, mood: value })}/>
             <Choice label="I usually enjoy" options={["Fruit-forward", "Chocolate & nuts", "Floral & tea-like"]} value={taste.note} onChange={(value) => setTaste({ ...taste, note: value })}/>
             <Choice label="I brew with" options={["Pour-over", "Espresso", "French press"]} value={taste.brew} onChange={(value) => setTaste({ ...taste, brew: value })}/>
             <button className="button button-dark" onClick={calculateTasteprint}>Find my coffee <Icon name="arrow" /></button>
-            {tasteResult && <div className="taste-result"><span>Your first match</span><strong>{tasteResult}</strong><button onClick={() => { window.location.href = "/origins"; }}>View the origin library</button></div>}
+            {tasteResult && <div className="taste-result"><span>Your first match</span><strong>{tasteResult}</strong><button onClick={() => { window.location.href = "/passport?tab=finder"; }}>Explore my Taste Graph</button></div>}
           </div>
         </div>
       </section>}
@@ -1170,7 +1181,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
         <div className="compatibility-lab">
           <div className="compatibility-copy"><p className="eyebrow light">Machine Match™</p><h3>Tell us what you brew with.</h3><p>Deldiet automatically shows the formats, grind and recipes that work—so the wrong capsule or grind never reaches your bag.</p></div>
           <div className="machine-picker" role="group" aria-label="Choose your brewing equipment">{Object.keys(machineMatches).map((item) => <button key={item} className={machine === item ? "active" : ""} onClick={() => setMachine(item)}>{item}<Icon name="arrow" size={16}/></button>)}</div>
-          <div className="machine-results"><span className="micro-label">Your compatible formats</span>{machineMatches[machine].map((item, index) => <div key={item}><i>{index + 1}</i><b>{item}</b><span>Compatible</span></div>)}<button onClick={() => updateLocalPassport({ brewer: machine }, `${machine} saved to this device’s Passport preview`)}>Save my brewer <Icon name="plus"/></button></div>
+          <div className="machine-results"><span className="micro-label">Your compatible formats</span>{machineMatches[machine].map((item, index) => <div key={item}><i>{index + 1}</i><b>{item}</b><span>Compatible</span></div>)}<button onClick={() => updateLocalPassport({ brewer: canonicalBrewer(machine) }, `${machine} saved to this device’s Passport preview`)}>Save my brewer <Icon name="plus"/></button></div>
         </div>
       </section>}
 
@@ -1192,12 +1203,13 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
         </div>
 
         <div className="shop-catalogue" id="shop-catalogue">
+          <div className="dd-catalogue-options"><span>Considered objects. Everyday rituals.</span><div><button aria-pressed={savedOnly} onClick={() => setSavedOnly(!savedOnly)}>{savedOnly ? "Showing favourites" : "My favourites"} · {savedProductIds.length}</button><label>Sort by <select value={shopSort} onChange={event => setShopSort(event.target.value)}><option value="featured">Featured</option><option value="price-low">Price: low to high</option><option value="price-high">Price: high to low</option><option value="name">Name: A–Z</option></select></label></div></div>
           <div className="shop-toolbar">
             <div className="catalogue-title"><span className="micro-label">All merchandise</span><h3>{visibleShopProducts.length} products</h3></div>
             <label className="shop-search"><Icon name="search" size={18}/><input type="search" value={shopSearch} onChange={(event) => setShopSearch(event.target.value)} placeholder="Search coffee, gear, apparel…" aria-label="Search Deldiet shop"/>{shopSearch && <button aria-label="Clear search" onClick={() => setShopSearch("")}><Icon name="close" size={15}/></button>}</label>
           </div>
           <div className="filter-row shop-filters" role="group" aria-label="Filter Deldiet merchandise">{shopCategories.map((item) => <button key={item} className={shopCategory === item ? "filter-pill active" : "filter-pill"} onClick={() => setShopCategory(item)}>{item}</button>)}</div>
-          {visibleShopProducts.length === 0 ? <div className="no-results"><span className="brand-seed"/><h3>No objects found.</h3><p>Try a broader term or reset the shop filters.</p><button className="button button-dark" onClick={() => { setShopSearch(""); setShopCategory("All"); }}>Show everything</button></div> : <div className="merch-grid">
+          {visibleShopProducts.length === 0 ? <div className="no-results"><span className="brand-seed"/><h3>No objects found.</h3><p>Try a broader term or reset the shop filters.</p><button className="button button-dark" onClick={() => { setShopSearch(""); setShopCategory("All"); setSavedOnly(false); }}>Show everything</button></div> : <div className="merch-grid">
             {visibleShopProducts.map((product) => <article className={`merch-card merch-tone-${product.tone}`} key={product.id}>
               <button className="merch-visual" onClick={() => openProduct(product)} aria-label={`View ${product.name}`}>
                 <Image className="catalogue-photo" src={retailImages[product.id]} alt="" fill unoptimized sizes="(max-width: 540px) 100vw, (max-width: 820px) 50vw, 25vw" />
@@ -1206,7 +1218,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
                 <DeldietMark className="deldiet-product-mark-merch" />
                 <span className="merch-view">View object <Icon name="arrow" size={15}/></span>
               </button>
-              <div className="merch-info"><div><span>{product.category}</span><h4>{product.name}</h4><p>{product.description}</p></div><div className="merch-card-actions"><button onClick={() => openProduct(product)}>Details</button><button aria-label={`Quick add ${product.name}`} onClick={() => addToCart({ id: `shop-${product.id}-${product.variants[0]}`, name: product.name, detail: product.variants[0], price: product.price, channel: "shop", image: retailImages[product.id] })}><b>${product.price}</b><Icon name="plus" size={18}/></button></div></div>
+              <div className="merch-info"><div><span>{product.category}</span><h4>{product.name}</h4><p>{product.description}</p></div><div className="merch-card-actions"><button aria-label={`Save ${product.name}`} onClick={() => saveProductToPassport(product)}>{savedProductIds.includes(product.id) ? "Saved ✓" : "Save"}</button><button aria-label={`Quick add ${product.name}`} onClick={() => addToCart({ id: `shop-${product.id}-${product.variants[0]}`, name: product.name, detail: product.variants[0], price: product.price, channel: "shop", image: retailImages[product.id] })}><b>${product.price}</b><Icon name="plus" size={18}/></button></div></div>
             </article>)}
           </div>}
         </div>
@@ -1221,7 +1233,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           <span><Icon name="clock"/><b>Freshness promise</b><small>Roast and ship dates confirmed during order review</small></span>
           <span><Icon name="pin"/><b>Flexible fulfilment</b><small>Ship, local delivery or coffeehouse pickup</small></span>
           <span><Icon name="leaf"/><b>Return &amp; recycle</b><small>Compatibility and local recovery guidance</small></span>
-          <span><Icon name="spark"/><b>Passport connected</b><small>Points, lot stamps and one-tap reorders</small></span>
+          <span><Icon name="spark"/><b>Passport connected</b><small>Taste preferences and saved favourites on this device</small></span>
         </div>
       </section>}
 
@@ -1275,19 +1287,20 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       {view === "business" && <section className="section ecosystem-section" id="business">
         <div className="section-heading split-heading"><div><p className="eyebrow">07 / Beyond the cup</p><h2>Deldiet for<br /><em>every table.</em></h2></div><p className="section-intro">A connected coffee system for homes, workplaces, hospitality teams, retailers and producers.</p></div>
         <div className="ecosystem-grid">
-          <article><span>01</span><h3>Wholesale studio</h3><p>Curated menus, equipment planning, training, service and live inventory for cafés and hotels.</p><button onClick={() => setToast("Wholesale enquiry opened")}>For hospitality <Icon name="arrow" /></button></article>
+          <article><span>01</span><h3>Wholesale studio</h3><p>Curated menus, equipment planning, training, service and live inventory for cafés and hotels.</p><button onClick={() => { window.location.href = "/passport?tab=teams"; }}>For hospitality <Icon name="arrow" /></button></article>
           <article><span>02</span><h3>Office coffee</h3><p>Flexible coffee plans by headcount, brewer and team taste—scoped in one structured programme brief.</p><button onClick={() => { window.location.href = "/passport?tab=teams"; }}>Plan your workplace <Icon name="arrow" /></button></article>
-          <article><span>03</span><h3>Private label</h3><p>Create an origin-led coffee, functional line or gifting programme with Deldiet sourcing and production.</p><button onClick={() => setToast("Private-label brief opened")}>Build a product <Icon name="arrow" /></button></article>
+          <article><span>03</span><h3>Private label</h3><p>Create an origin-led coffee, functional line or gifting programme with Deldiet sourcing and production.</p><button onClick={() => { window.location.href = "/origin-exchange"; }}>Build a product <Icon name="arrow" /></button></article>
           <article><span>04</span><h3>Cupping room</h3><p>Book guided origin flights, sensory workshops and producer conversations at the Deldiet café.</p><button onClick={() => { window.location.href = "/events"; }}>Book an experience <Icon name="arrow" /></button></article>
         </div>
       </section>}
 
-      {view === "journal" && <section className="journal-banner" id="journal"><div><p className="eyebrow light">The field journal · No. 08</p><h2>Why altitude<br/>changes everything.</h2><p className="journal-summary">Altitude changes temperature, ripening speed and density. The result is not a guarantee of quality—but it is a useful clue when read beside variety, climate, process and producer practice.</p><a className="button button-light" href="/origins">Explore the origin library <Icon name="arrow" /></a></div><div className="journal-rings" aria-hidden="true"><i/><i/><i/><i/></div></section>}
+      {view === "journal" && <JournalContent />}
 
       <footer>
+        <div className="dd-footer-invitation"><h2>Good things<br/><em>are brewing.</em></h2><a href="/tasteprint">Find your flavour <Icon name="arrow"/></a></div>
         <div className="footer-top">
           <div><Link className="footer-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} unoptimized/></Link><p>The world in your cup.<br/>St. John&apos;s · Newfoundland</p></div>
-          <div><span>Explore</span><a href="/coffeehouse">Coffeehouse</a><a href="/origins">Coffee origins</a><a href="/origin-bar">Origin Bar</a><a href="/build-a-cup">Build a cup</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop Deldiet</a><a href="/origin-exchange">Origin Exchange</a><a href="/passport">Deldiet Passport</a></div>
+          <div><span>Explore</span><a href="/coffeehouse">Coffeehouse</a><a href="/origins">Coffee origins</a><a href="/origin-bar">Origin Bar</a><a href="/build-a-cup">Build a cup</a><a href="/brew-lab">Brew Studio</a><a href="/my-collection">My collection</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop Deldiet</a><a href="/origin-exchange">Origin Exchange</a><a href="/passport">Deldiet Passport</a></div>
           <div><span>Deldiet</span><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Platform standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/journal">Field Journal</a></div>
           <div className="newsletter">
             <span>From origin to inbox</span>
@@ -1299,6 +1312,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
             {requestErrorScope === "home-newsletter" && <small className="request-error" role="alert">{requestError}</small>}
           </div>
         </div>
+        <div className="dd-footer-wordmark" aria-hidden="true">deldiet.</div>
         <div className="footer-bottom"><span>© 2026 Deldiet Coffee Company</span><span>Canada / CAD</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/accessibility">Accessibility</a></span></div>
       </footer>
 
@@ -1372,7 +1386,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           </div>
           <form className="reservation-form" onSubmit={submitReservation}>
             <label><span>Visit type</span><select name="visitType" defaultValue="Table reservation"><option>Table reservation</option><option>East Africa cupping table</option><option>Home espresso clinic</option><option>The producer room</option><option>Private tasting</option></select></label>
-            <div><label><span>Preferred date</span><input name="preferredDate" type="date" required/></label><label><span>Party</span><select name="party" defaultValue="2 people"><option>1 person</option><option>2 people</option><option>3 people</option><option>4 people</option><option>5–8 people</option></select></label></div>
+            <div><label><span>Preferred date</span><input name="preferredDate" type="date" min={new Date().toLocaleDateString("en-CA", { timeZone: "America/St_Johns" })} required/></label><label><span>Party</span><select name="party" defaultValue="2 people"><option>1 person</option><option>2 people</option><option>3 people</option><option>4 people</option><option>5–8 people</option></select></label></div>
             <label><span>Preferred time</span><div className="reservation-times" role="radiogroup" aria-label="Preferred time">{["Morning", "Midday", "Afternoon", "Evening"].map((time) => <button type="button" role="radio" aria-checked={reservationTime === time} key={time} className={reservationTime === time ? "active" : ""} onClick={() => setReservationTime(time)}>{time}</button>)}</div></label>
             <label><span>Name</span><input name="name" autoComplete="name" maxLength={120} required placeholder="Your name"/></label>
             <label><span>Email</span><input name="email" autoComplete="email" type="email" required placeholder="you@example.com"/></label>

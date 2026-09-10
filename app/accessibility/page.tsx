@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function AccessibilityPage() {
   return (
-    <main style={{ minHeight: "100vh", background: "#F7F4EE", color: "#221611", padding: "48px 20px", fontFamily: "Albert Sans, system-ui, sans-serif" }}>
+    <main className="dd-legal" style={{ minHeight: "100vh", background: "#F7F4EE", color: "#221611", padding: "48px 20px", fontFamily: "Albert Sans, system-ui, sans-serif" }}>
       <article style={{ maxWidth: 760, margin: "0 auto", background: "#fff", border: "1px solid #E6DFD3", padding: "clamp(28px,6vw,64px)" }}>
         <Link href="/" style={{ color: "#6F3E1E", fontWeight: 700, textDecoration: "none" }}>← Deldiet home</Link>
         <p style={{ marginTop: 42, color: "#8F5E20", fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Accessibility</p>

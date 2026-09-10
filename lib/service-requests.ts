@@ -240,6 +240,12 @@ function validateByType(type: ServiceRequestType, customer: RequestCustomer, pay
   }
 
   if (type === "reservation") {
+    const date = typeof payload.preferredDate === "string" ? payload.preferredDate : "";
+    const parsedDate = new Date(`${date}T12:00:00Z`);
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "America/St_Johns" });
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(parsedDate.getTime()) || parsedDate.toISOString().slice(0, 10) !== date || date < today) {
+      return { ok: false, error: "Choose a valid date today or later in St. John’s.", field: "payload.preferredDate" };
+    }
     if (!customer.name) return { ok: false, error: "Your name is required.", field: "customer.name" };
     if (!customer.email) return { ok: false, error: "A valid email address is required.", field: "customer.email" };
     return (

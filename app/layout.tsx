@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./revamp.css";
+import "./collection-content.css";
+import PlatformTools from "./platform-tools";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,9 +19,7 @@ export const metadata: Metadata = {
   title: "Deldiet — The World in Your Cup",
   description:
     "Explore traceable coffee origins, build your exact cup, and bring the same coffee home in every format you brew.",
-  other: {
-    "codex-preview": "development",
-  },
+  metadataBase: new URL("https://deldiet.vercel.app"),
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
@@ -43,6 +44,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {children}
+        <PlatformTools />
       </body>
     </html>
   );

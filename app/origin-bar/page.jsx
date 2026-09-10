@@ -23,34 +23,34 @@ const FONTS = `
 .origin-bar-app { width: 100%; max-width: 100vw; min-height: 100svh; overflow: hidden; }
 .ob-scroll-region { min-height: 0; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 .ob-utility { min-height: calc(44px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left)); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #17100C; border-bottom: 1px solid #4A372B; }
-.ob-utility a { min-height:44px; display: inline-flex; align-items: center; gap: 6px; color: #D8C4A8; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 600; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; }
+.ob-utility a { min-height:44px; display: inline-flex; align-items: center; gap: 6px; color: #D8C4A8; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; }
 .ob-utility a:last-child { justify-self: end; color: #D9FF66; }
-.ob-utility > span { display: inline-flex; align-items: center; gap: 6px; color: #8F7D69; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
+.ob-utility > span { display: inline-flex; align-items: center; gap: 6px; color: #8F7D69; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
 .ob-label-short { display: none; }
 .ob-welcome { background-image: linear-gradient(90deg, rgba(20,12,8,.96) 0%, rgba(20,12,8,.88) 42%, rgba(20,12,8,.40) 100%), url('/deldiet-cafe-interior.png'); background-size: cover; background-position: center; }
 .ob-welcome-panel { width: min(620px, 100%); min-width: 0; margin-right: auto; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
 .ob-welcome { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(310px,420px); gap:clamp(28px,6vw,90px); }
 .ob-welcome-dossier { min-width:0; align-self:center; min-height:500px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,.2); background:rgba(26,17,12,.74); color:#F5EDE2; backdrop-filter:blur(18px); box-shadow:0 28px 80px rgba(0,0,0,.28); }
-.ob-welcome-dossier > div:first-child { display:flex; justify-content:space-between; gap:18px; color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; }
+.ob-welcome-dossier > div:first-child { display:flex; justify-content:space-between; gap:18px; color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; letter-spacing:.12em; text-transform:uppercase; }
 .ob-welcome-dossier h2 { margin:42px 0 12px; font-family:'Young Serif',Georgia,serif; font-size:clamp(38px,4vw,58px); font-weight:400; line-height:.98; }
-.ob-welcome-dossier > p { margin:0; color:#CDBEAE; font-size:16px; line-height:1.65; }
+.ob-welcome-dossier > p { margin:0; color:#CDBEAE; font-size: 16px; line-height:1.65; }
 .ob-welcome-steps { margin-top:36px; border-top:1px solid rgba(255,255,255,.18); }
-.ob-welcome-steps span { min-height:58px; padding:11px 0; display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,.14); font-size:14px; }
-.ob-welcome-steps b { color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; }.ob-welcome-steps small{color:#9F8D7C;font-size:12px;}
+.ob-welcome-steps span { min-height:58px; padding:11px 0; display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,.14); font-size: 14px; }
+.ob-welcome-steps b { color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; }.ob-welcome-steps small{color:#9F8D7C;font-size: 13px;}
 .ob-welcome-actions { margin-top:30px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-.ob-welcome-actions button { min-height:52px; padding:0 24px; border-radius:999px; font-size:15px; font-weight:700; cursor:pointer; }
+.ob-welcome-actions button { min-height:52px; padding:0 24px; border-radius:999px; font-size: 15px; font-weight:700; cursor:pointer; }
 .ob-welcome-actions .ob-secondary { border:1px solid #8B735F; background:rgba(20,12,8,.28); color:#F5EDE2; }
 .ob-workspace-grid { display:grid; grid-template-columns:190px minmax(0,1fr) 270px; gap:22px; align-items:start; }
 .ob-journey-rail,.ob-cup-stage { position:sticky; top:0; padding:16px; border:1.5px solid #E7DFD3; background:#fff; box-shadow:0 18px 45px rgba(46,30,20,.06); }
-.ob-journey-rail > span,.ob-cup-stage > span { display:block; margin-bottom:12px; color:#8A7A6C; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:12px; letter-spacing:.13em; text-transform:uppercase; }
-.ob-journey-rail button { width:100%; min-height:52px; padding:10px 8px; display:grid; grid-template-columns:28px 1fr; gap:8px; align-items:center; border:0; border-top:1px solid #E7DFD3; background:none; color:#8A7A6C; text-align:left; font-size:14px; cursor:pointer; }
-.ob-journey-rail button b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:#F3E9DA; color:#6F3E1E; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:11px; }
+.ob-journey-rail > span,.ob-cup-stage > span { display:block; margin-bottom:12px; color:#8A7A6C; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; letter-spacing:.13em; text-transform:uppercase; }
+.ob-journey-rail button { width:100%; min-height:52px; padding:10px 8px; display:grid; grid-template-columns:28px 1fr; gap:8px; align-items:center; border:0; border-top:1px solid #E7DFD3; background:none; color:#8A7A6C; text-align:left; font-size: 14px; cursor:pointer; }
+.ob-journey-rail button b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:#F3E9DA; color:#6F3E1E; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; }
 .ob-journey-rail button.active { color:#2A1F18; font-weight:700; }.ob-journey-rail button.active b{background:var(--ob-accent,#9C5F2E);color:#fff;}
 .ob-cup-stage { text-align:center; }
 .ob-safety-rail { margin-top:14px; padding:12px; border:1px solid #E7DFD3; background:#F7F4EE; text-align:left; }
-.ob-safety-rail b { display:block; margin-bottom:4px; color:#2A1F18; font-size:13px; }.ob-safety-rail p{margin:0;color:#6E5F53;font-size:12px;line-height:1.5;}
-.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size:28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size:14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size:13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size:14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:22px;height:22px;min-height:22px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
-.ob-truth-note { margin:0 0 18px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; border:1px solid #D8CBB9; background:#FFF9EE; color:#5E4B3D; font-size:13px; line-height:1.5; }
+.ob-safety-rail b { display:block; margin-bottom:4px; color:#2A1F18; font-size: 13px; }.ob-safety-rail p{margin:0;color:#6E5F53;font-size: 13px;line-height:1.5;}
+.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size: 28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size: 14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size: 13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 13px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size: 14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:22px;height:22px;min-height:22px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
+.ob-truth-note { margin:0 0 18px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; border:1px solid #D8CBB9; background:#FFF9EE; color:#5E4B3D; font-size: 13px; line-height:1.5; }
 .ob-truth-extra { display:inline; }
 .ob-horizontal-scroll { scrollbar-width:none; -ms-overflow-style:none; overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
 .ob-horizontal-scroll::-webkit-scrollbar { display:none; }
@@ -73,41 +73,41 @@ const FONTS = `
 .ob-idle-actions { display:flex; gap:12px; }
 .origin-bar-app button,.origin-bar-app input,.origin-bar-app select { min-height:44px; }
 .origin-bar-app button { touch-action:manipulation; }
-.origin-bar-app input,.origin-bar-app select { font-size:16px !important; }
+.origin-bar-app input,.origin-bar-app select { font-size: 16px !important; }
 @media (prefers-reduced-motion: reduce) { .origin-bar-app * { animation: none !important; transition: none !important; } }
 @media (max-width: 640px) {
   .ob-utility { min-height:calc(44px + env(safe-area-inset-top)); grid-template-columns: minmax(0,1fr) minmax(0,1fr); padding:env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left)); gap:8px; }
   .ob-utility > span { display: none; }
-  .ob-utility a { min-width:0; font-size: 11px; letter-spacing: .08em; white-space:nowrap; }
+  .ob-utility a { min-width:0; font-size: 13px; letter-spacing: .08em; white-space:nowrap; }
   .ob-label-wide { display: none; }
   .ob-label-short { display: inline; }
   .ob-welcome { background-image: linear-gradient(0deg, rgba(20,12,8,.98) 0%, rgba(20,12,8,.78) 64%, rgba(20,12,8,.32) 100%), url('/deldiet-cafe-interior.png'); background-position: 55% center; }
   .ob-welcome-panel { align-items: center; text-align: center; }
-  .ob-welcome { grid-template-columns:minmax(0,1fr); gap:24px; padding:28px 18px !important; }.ob-welcome-panel,.ob-welcome-dossier{min-width:0;width:100%;}.ob-welcome-dossier{min-height:auto;margin-top:0;padding:20px;text-align:left;}.ob-welcome-dossier h2{margin:24px 0 10px;font-size:34px}.ob-welcome-dossier>p{font-size:15px}.ob-welcome-steps{margin-top:20px}.ob-welcome-steps span{min-height:50px;grid-template-columns:30px minmax(0,1fr);}.ob-welcome-steps small{display:none}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
+  .ob-welcome { grid-template-columns:minmax(0,1fr); gap:24px; padding:28px 18px !important; }.ob-welcome-panel,.ob-welcome-dossier{min-width:0;width:100%;}.ob-welcome-dossier{min-height:auto;margin-top:0;padding:20px;text-align:left;}.ob-welcome-dossier h2{margin:24px 0 10px;font-size: 34px}.ob-welcome-dossier>p{font-size: 15px}.ob-welcome-steps{margin-top:20px}.ob-welcome-steps span{min-height:50px;grid-template-columns:30px minmax(0,1fr);}.ob-welcome-steps small{display:none}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
 }
 @media (max-width: 1199px) { .ob-workspace-grid{grid-template-columns:minmax(0,1fr) 250px}.ob-journey-rail{display:none} }
 @media (max-width: 899px) { .ob-workspace-grid{display:block}.ob-cup-stage{display:none} }
-@media (max-width: 899px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{display:block;flex:none;border-top:1px solid #5A4435;background:linear-gradient(90deg,#21140f,#342018);color:#F5EDE2}.ob-mobile-passport summary{min-height:62px;padding:9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none}.ob-mobile-passport summary::-webkit-details-marker{display:none}.ob-mobile-passport b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size:12px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:16px}.ob-mobile-passport-panel{padding:12px max(14px,env(safe-area-inset-right)) 14px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr 1fr;gap:1px;border-top:1px solid #4A372B;background:#291912}.ob-mobile-passport-panel div{padding:9px;background:#342219}.ob-mobile-passport-panel small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase}.ob-mobile-passport-panel p{margin:0;color:#D8C4A8;font-size:12px;line-height:1.45} }
+@media (max-width: 899px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{display:block;flex:none;border-top:1px solid #5A4435;background:linear-gradient(90deg,#21140f,#342018);color:#F5EDE2}.ob-mobile-passport summary{min-height:62px;padding:9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none}.ob-mobile-passport summary::-webkit-details-marker{display:none}.ob-mobile-passport b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size: 13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size: 13px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 16px}.ob-mobile-passport-panel{padding:12px max(14px,env(safe-area-inset-right)) 14px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr 1fr;gap:1px;border-top:1px solid #4A372B;background:#291912}.ob-mobile-passport-panel div{padding:9px;background:#342219}.ob-mobile-passport-panel small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 13px;letter-spacing:.08em;text-transform:uppercase}.ob-mobile-passport-panel p{margin:0;color:#D8C4A8;font-size: 13px;line-height:1.45} }
 @media (max-width: 720px) {
   .ob-kiosk-header { min-height:86px; padding:9px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"brand reset" "progress progress"; gap:7px 10px; }
   .ob-kiosk-brand { grid-area:brand; }.ob-reset-button{grid-area:reset}.ob-kiosk-progress { grid-area:progress; width:100%; margin:0; justify-content:space-between; }
-  .ob-progress-copy { display:inline !important; font-size:12px !important; }
+  .ob-progress-copy { display:inline !important; font-size: 13px !important; }
   .ob-flow-footer { min-height:calc(68px + env(safe-area-inset-bottom)); padding:9px max(14px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:auto minmax(0,1fr); gap:10px !important; }
   .ob-footer-subtotal { display:none !important; }
   .ob-next { width:100%; justify-content:center; padding:12px 16px !important; }
-  .ob-truth-note { margin-bottom:14px; padding:10px 12px; font-size:12px; }
+  .ob-truth-note { margin-bottom:14px; padding:10px 12px; font-size: 13px; }
   .ob-truth-extra { display:none; }
   .ob-choice-tabs { display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important; }
   .ob-choice-tabs button { width:100%; padding:8px 9px !important; white-space:normal !important; line-height:1.25; }
   .ob-tab-wide { display:none; }.ob-tab-short{display:inline;}
   .ob-review-row { grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; align-items:start; }
-  .ob-review-label { grid-column:1; font-size:12px !important; }
-  .ob-review-value { grid-column:1/-1; grid-row:2; text-align:left; font-size:14px !important; }
-  .ob-review-price { grid-column:2; grid-row:1; font-size:13px !important; }
+  .ob-review-label { grid-column:1; font-size: 13px !important; }
+  .ob-review-value { grid-column:1/-1; grid-row:2; text-align:left; font-size: 14px !important; }
+  .ob-review-price { grid-column:2; grid-row:1; font-size: 13px !important; }
 }
 @media (max-width: 360px) {
   .ob-kiosk-header { padding-left:max(12px,env(safe-area-inset-left)) !important; padding-right:max(12px,env(safe-area-inset-right)) !important; }
-  .ob-kiosk-brand span { font-size:16px !important; }
+  .ob-kiosk-brand span { font-size: 16px !important; }
   .ob-reset-wide { display:none; }.ob-reset-short{display:inline;}
   .ob-progress-dots { gap:4px; }
   .ob-narrow-stack { grid-template-columns:1fr !important; }
@@ -349,7 +349,7 @@ const readableAccent = (color) => color === ROASTS[0].color ? "#754019" : color;
 
 function Tag({ children, color = C.faint, bg = "transparent", border = C.line, wrap = false }) {
   return (
-    <span style={{ maxWidth: wrap ? "100%" : undefined, fontFamily: F.mono, fontSize: 12, lineHeight: wrap ? 1.35 : undefined, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: wrap ? "normal" : "nowrap", overflowWrap: wrap ? "anywhere" : undefined }}>
+    <span style={{ maxWidth: wrap ? "100%" : undefined, fontFamily: F.mono, fontSize: 13, lineHeight: wrap ? 1.35 : undefined, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: wrap ? "normal" : "nowrap", overflowWrap: wrap ? "anywhere" : undefined }}>
       {children}
     </span>
   );
@@ -508,7 +508,7 @@ function Welcome({ onBegin, onTasteMatch }) {
         <div className="rise-1" style={{ margin: "26px 0 16px", padding: "12px 22px", borderRadius: 999, background: "rgba(247,244,238,.94)", boxShadow: "0 18px 50px rgba(0,0,0,.24)" }}>
           <CupSVG uid="hero" roast={ROASTS[1]} hasMilk foam sizeIdx={2} width={116} />
         </div>
-        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 12, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · in-store atelier</div>
+        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 13, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · in-store atelier</div>
         <h1 className="rise-1" style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: "clamp(42px, 7vw, 72px)", lineHeight: 1.02, margin: 0 }}>
           Craft a cup<br/>from somewhere real.
         </h1>
@@ -519,7 +519,7 @@ function Welcome({ onBegin, onTasteMatch }) {
           <button onClick={onBegin} style={{ fontFamily: F.body, color: "#241405", background: "#D9FF66", border: "none", boxShadow: "0 8px 24px rgba(217,255,102,.20)" }}>Build my cup →</button>
           <button className="ob-secondary" onClick={onTasteMatch}>Match my taste</button>
         </div>
-        <div className="rise-2" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#A9957E", marginTop: 26, textTransform: "uppercase" }}>
+        <div className="rise-2" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: "#A9957E", marginTop: 26, textTransform: "uppercase" }}>
           Demonstration catalogue · live cup preview · staff confirmation required
         </div>
       </div>
@@ -535,7 +535,7 @@ function Welcome({ onBegin, onTasteMatch }) {
             <span><b>04</b>Confirm with staff<small>demo request</small></span>
           </div>
         </div>
-        <small style={{ color: "#9F8D7C", fontFamily: F.mono, fontSize: 12, lineHeight: 1.55 }}>Origin and availability records are illustrative until Deldiet connects verified supplier, inventory and point-of-sale data.</small>
+        <small style={{ color: "#9F8D7C", fontFamily: F.mono, fontSize: 13, lineHeight: 1.55 }}>Origin and availability records are illustrative until Deldiet connects verified supplier, inventory and point-of-sale data.</small>
       </aside>
     </div>
   );
@@ -556,7 +556,7 @@ function TasteMatch({ onBack, onApply }) {
         <button onClick={onBack} className="inline-flex items-center gap-1.5" style={{ border: 0, background: "none", color: "#BBA890", fontSize: 14, cursor: "pointer" }}><ChevronLeft size={16}/> Back to Origin Bar</button>
         <div className="grid lg:grid-cols-2 gap-10 items-start" style={{ marginTop: 32 }}>
           <div>
-            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 12, letterSpacing: ".16em", textTransform: "uppercase" }}>Transparent Taste Match</div>
+            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 13, letterSpacing: ".16em", textTransform: "uppercase" }}>Transparent Taste Match</div>
             <h1 style={{ margin: "15px 0 18px", fontFamily: F.disp, fontSize: "clamp(42px,6vw,72px)", lineHeight: .98, fontWeight: 400 }}>What should your coffee feel like?</h1>
             <p style={{ maxWidth: 540, margin: 0, color: "#CDBEAE", fontSize: 16, lineHeight: 1.7 }}>Choose the profile that sounds closest. Deldiet recommends an editable origin, roast and drink—and shows the reason instead of hiding it behind a score.</p>
             <div className="grid sm:grid-cols-2 gap-3" style={{ marginTop: 30 }}>
@@ -564,7 +564,7 @@ function TasteMatch({ onBack, onApply }) {
             </div>
           </div>
           <aside style={{ padding: 26, border: "1px solid #5A4435", background: "#2B1D16" }}>
-            <span style={{ fontFamily: F.mono, color: "#A9957E", fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Editable recommendation</span>
+            <span style={{ fontFamily: F.mono, color: "#A9957E", fontSize: 13, letterSpacing: ".14em", textTransform: "uppercase" }}>Editable recommendation</span>
             <div style={{ margin: "28px 0", padding: 24, background: "#F7F4EE", color: C.ink }}>
               <div style={{ fontSize: 40 }}>{Object.values(ORIGINS).flat().find((o) => o.n === selected.country)?.f}</div>
               <h2 style={{ margin: "12px 0 4px", fontFamily: F.disp, fontSize: 38, fontWeight: 400 }}>{selected.country}</h2>
@@ -572,7 +572,7 @@ function TasteMatch({ onBack, onApply }) {
             </div>
             <div style={{ paddingTop: 18, borderTop: "1px solid #5A4435" }}><b style={{ color: "#D9FF66", fontSize: 14 }}>Why this match</b><p style={{ margin: "8px 0 0", color: "#CDBEAE", fontSize: 14, lineHeight: 1.65 }}>{selected.why}</p></div>
             <button onClick={() => onApply(selected)} style={{ width: "100%", minHeight: 54, marginTop: 28, border: 0, borderRadius: 999, background: "#D9FF66", color: "#241405", fontWeight: 750, fontSize: 15, cursor: "pointer" }}>Use this as my starting cup →</button>
-            <small style={{ display: "block", marginTop: 12, color: "#8F7D69", fontSize: 12, lineHeight: 1.5 }}>This is a preference match, not a health or dietary recommendation. Every choice remains editable.</small>
+            <small style={{ display: "block", marginTop: 12, color: "#8F7D69", fontSize: 13, lineHeight: 1.5 }}>This is a preference match, not a health or dietary recommendation. Every choice remains editable.</small>
           </aside>
         </div>
       </div>
@@ -630,7 +630,7 @@ function OriginStep({ sel, set, accent }) {
       {sel.origin && lot && (
         <article className="ob-lot-passport rise-1" aria-label={`Demonstration lot passport for ${sel.origin.n}`}>
           <div>
-            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 11, letterSpacing: ".13em", textTransform: "uppercase" }}>Selected origin · field-level verification</div>
+            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 13, letterSpacing: ".13em", textTransform: "uppercase" }}>Selected origin · field-level verification</div>
             <h3>{sel.origin.f} {sel.origin.n} dossier</h3>
             <p>{sel.origin.t}. These fields demonstrate the future lot passport; they do not verify a producer, crop, process, certification or current inventory.</p>
             <div className="flex flex-wrap gap-2" style={{ marginTop: 14 }}><Tag color="#D9FF66" border="#6B5C39">Illustrative record</Tag><Tag color="#F5EDE2" border="#6D5849">Source not supplied</Tag><Tag color="#F5EDE2" border="#6D5849">Availability not connected</Tag></div>
@@ -885,8 +885,8 @@ function ReviewGroup({ g, children, accent, onJump }) {
   return (
     <div style={{ marginBottom: 18 }}>
       <div className="flex items-center justify-between" style={{ marginBottom: 4 }}>
-        <span style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: readableAccent(accent), textTransform: "uppercase" }}>{g.t}</span>
-        <button onClick={() => onJump(g.step)} style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1, color: C.faint, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>EDIT</button>
+        <span style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.3, color: readableAccent(accent), textTransform: "uppercase" }}>{g.t}</span>
+        <button onClick={() => onJump(g.step)} style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1, color: C.faint, background: "none", border: "none", cursor: "pointer", textDecoration: "underline", textUnderlineOffset: 3 }}>EDIT</button>
       </div>
       {children}
     </div>
@@ -947,7 +947,7 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
             {tags.map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
           </div>
           <div style={{ marginTop: 18, textAlign: "left" }}>
-            <label htmlFor="ob-cup-name" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.3, color: C.faint, textTransform: "uppercase" }}>A name for your cup</label>
+            <label htmlFor="ob-cup-name" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.3, color: C.faint, textTransform: "uppercase" }}>A name for your cup</label>
             <input id="ob-cup-name" value={sel.name} maxLength={80} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Amara"
               style={{ width: "100%", marginTop: 6, fontFamily: F.body, fontSize: 15, padding: "10px 12px", borderRadius: 10, border: `1.5px solid ${C.line}`, outline: "none", background: C.paper, color: C.ink, boxSizing: "border-box" }} />
             <p style={{ fontFamily: F.body, fontSize: 14, color: C.faint, marginTop: 10 }}>
@@ -988,7 +988,7 @@ function DoneScreen({ sel, accent, cupProps, receipt, onReset }) {
       <p className="rise-1" style={{ fontFamily: F.body, color: C.faint, fontSize: 15, marginTop: 10, maxWidth: 420 }}>
         {sel.drink.n} · {sizeObj.n} ({sizeObj.oz} oz) · {sel.origin.n} beans, {ROASTS.find((r) => r.id === sel.roast).name.toLowerCase()} roast. Keep this reference and show it to Deldiet staff. A barista still confirms ingredients, availability, final price and preparation time before making anything.
       </p>
-      <p className="rise-1" style={{ fontFamily: F.mono, color: C.faint, fontSize: 12, margin: "8px 0 0", maxWidth: 420, lineHeight: 1.5 }}>
+      <p className="rise-1" style={{ fontFamily: F.mono, color: C.faint, fontSize: 13, margin: "8px 0 0", maxWidth: 420, lineHeight: 1.5 }}>
         For kiosk privacy, this receipt clears from this device after 10 minutes. Copy or share the reference now.
       </p>
       <div className="rise-2" style={{ marginTop: 20 }}>
@@ -1009,7 +1009,7 @@ function DoneScreen({ sel, accent, cupProps, receipt, onReset }) {
           Open Brew Lab
         </Link>
       </div>
-      <div className="rise-2 flex items-center gap-1.5" style={{ marginTop: 22, fontFamily: F.mono, fontSize: 12, letterSpacing: 1.2, color: C.faint, textTransform: "uppercase" }}>
+      <div className="rise-2 flex items-center gap-1.5" style={{ marginTop: 22, fontFamily: F.mono, fontSize: 13, letterSpacing: 1.2, color: C.faint, textTransform: "uppercase" }}>
         <Heart size={11} /> crafted at Deldiet Origin Bar
       </div>
     </div>
@@ -1247,7 +1247,8 @@ export default function OriginBarKiosk() {
         setRequestState("idle");
         setRequestError("");
         setRequestKey("");
-        setReceipt(null);
+        window.dispatchEvent(new Event("deldiet:clear-private"));
+      setReceipt(null);
       }, 300000);
     };
     ["pointerdown", "keydown", "touchstart"].forEach((event) => window.addEventListener(event, arm, { passive: true }));
@@ -1262,6 +1263,7 @@ export default function OriginBarKiosk() {
       setSel(FRESH);
       setMatchReason("");
       setTasteMatchOpen(false);
+      window.dispatchEvent(new Event("deldiet:clear-private"));
       setReceipt(null);
       setStep(0);
       setRequestState("idle");
@@ -1361,6 +1363,7 @@ export default function OriginBarKiosk() {
     }
   };
   const reset = () => {
+    window.dispatchEvent(new Event("deldiet:clear-private"));
     if (submitting) return;
     setSel(FRESH);
     setMatchReason("");
@@ -1420,11 +1423,11 @@ export default function OriginBarKiosk() {
             <div className="ob-kiosk-brand flex items-center gap-2">
               <Coffee size={16} color="#D8C4A8" />
               <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 18 }}>Origin Atelier</span>
-              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 11, letterSpacing: ".1em", textTransform: "uppercase" }}>staff-review requests</span>
+              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 13, letterSpacing: ".1em", textTransform: "uppercase" }}>staff-review requests</span>
             </div>
             {step <= 6 && (
               <div className="ob-kiosk-progress">
-                <span className="ob-progress-copy hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.4, color: "#D8C4A8", textTransform: "uppercase" }}>
+                <span className="ob-progress-copy hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: "#D8C4A8", textTransform: "uppercase" }}>
                   {step}/6 · {STEP_LABELS[step - 1]}
                 </span>
                 <div className="ob-progress-dots" role="progressbar" aria-label="Origin Bar progress" aria-valuemin={1} aria-valuemax={6} aria-valuenow={step} aria-valuetext={`${step} of 6 · ${STEP_LABELS[step - 1]}`}>
@@ -1434,7 +1437,7 @@ export default function OriginBarKiosk() {
                 </div>
               </div>
             )}
-            {step <= 6 && <button type="button" className="ob-reset-button" aria-label="Start over and clear this cup" onClick={reset} disabled={submitting} style={{ border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 12, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}><span className="ob-reset-wide">Start over</span><span className="ob-reset-short">Reset</span></button>}
+            {step <= 6 && <button type="button" className="ob-reset-button" aria-label="Start over and clear this cup" onClick={reset} disabled={submitting} style={{ border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 13, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}><span className="ob-reset-wide">Start over</span><span className="ob-reset-short">Reset</span></button>}
           </header>
           <main id="ob-scroll" className="ob-scroll-region flex-1 overflow-y-auto ok-scroll">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
@@ -1454,14 +1457,14 @@ export default function OriginBarKiosk() {
                       <div style={{ marginTop: 10, fontFamily: F.body, fontSize: 14, color: C.ink, fontWeight: 600 }}>
                         {sel.drink ? sel.drink.n : "—"}
                       </div>
-                      <div style={{ fontFamily: F.mono, fontSize: 12, color: C.faint, marginTop: 2 }}>
+                      <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint, marginTop: 2 }}>
                         {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}
                       </div>
                       <div className="flex flex-wrap justify-center gap-1" style={{ marginTop: 10 }}>
                         {tags.map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
                       </div>
                       <div style={{ borderTop: `1px dashed ${C.line}`, marginTop: 12, paddingTop: 10, fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: readableAccent(accent) }}>
-                        {money(parts.total)} <small style={{ display: "block", marginTop: 3, color: C.faint, fontSize: 10 }}>illustrative subtotal</small>
+                        {money(parts.total)} <small style={{ display: "block", marginTop: 3, color: C.faint, fontSize: 13 }}>illustrative subtotal</small>
                       </div>
                       <div className="ob-safety-rail"><b>Cup Passport</b><p>{safety.caffeine}<br/>{safety.allergens.length ? `Signals: ${safety.allergens.join(", ")}` : "No selected allergen signals · shared equipment"}</p></div>
                   </aside>
@@ -1489,7 +1492,7 @@ export default function OriginBarKiosk() {
               <div className="ob-footer-subtotal flex items-center gap-3">
                 <div className="sm:block hidden"><CupSVG uid="foot" {...cupProps.svg} width={34} /></div>
                 <div className="text-right">
-                  <div style={{ fontFamily: F.mono, fontSize: 12, letterSpacing: 1.6, color: "#BBA890", textTransform: "uppercase" }}>Subtotal · CAD</div>
+                  <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.6, color: "#BBA890", textTransform: "uppercase" }}>Subtotal · CAD</div>
                   <div style={{ fontFamily: F.mono, fontSize: 19, fontWeight: 600, color: "#F5EDE2" }}>{money(parts.total)}</div>
                 </div>
               </div>
@@ -1504,7 +1507,7 @@ export default function OriginBarKiosk() {
           )}
         </>
       )}
-      {idleWarning && <div role="alertdialog" aria-modal="true" aria-labelledby="idle-title" style={{ position: "fixed", zIndex: 100, inset: 0, display: "grid", placeItems: "center", padding: "max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))", background: "rgba(22,14,10,.78)" }}><div ref={idleDialogRef} onKeyDown={handleIdleKeyDown} style={{ width: "min(460px,100%)", padding: 28, background: C.card, border: `2px solid ${accent}`, boxShadow: "0 30px 80px rgba(0,0,0,.35)" }}><div style={{ fontFamily: F.mono, color: readableAccent(accent), fontSize: 12, letterSpacing: ".14em", textTransform: "uppercase" }}>Kiosk privacy reset</div><h2 id="idle-title" style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 36, fontWeight: 400 }}>Still building this cup?</h2><p style={{ margin: 0, color: C.faint, fontSize: 15, lineHeight: 1.6 }}>This local session clears automatically after inactivity so the next guest cannot see your selections.</p><div className="ob-idle-actions" style={{ marginTop: 22 }}><button ref={idleContinueRef} type="button" onClick={continueSession} style={{ flex: 1, border: 0, borderRadius: 999, background: accent, color: onAccent, fontWeight: 700, cursor: "pointer" }}>Continue</button><button type="button" onClick={reset} style={{ flex: 1, border: `1px solid ${C.line}`, borderRadius: 999, background: C.paper, color: C.ink, fontWeight: 700, cursor: "pointer" }}>Clear session</button></div></div></div>}
+      {idleWarning && <div role="alertdialog" aria-modal="true" aria-labelledby="idle-title" style={{ position: "fixed", zIndex: 100, inset: 0, display: "grid", placeItems: "center", padding: "max(20px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))", background: "rgba(22,14,10,.78)" }}><div ref={idleDialogRef} onKeyDown={handleIdleKeyDown} style={{ width: "min(460px,100%)", padding: 28, background: C.card, border: `2px solid ${accent}`, boxShadow: "0 30px 80px rgba(0,0,0,.35)" }}><div style={{ fontFamily: F.mono, color: readableAccent(accent), fontSize: 13, letterSpacing: ".14em", textTransform: "uppercase" }}>Kiosk privacy reset</div><h2 id="idle-title" style={{ margin: "12px 0 8px", fontFamily: F.disp, fontSize: 36, fontWeight: 400 }}>Still building this cup?</h2><p style={{ margin: 0, color: C.faint, fontSize: 15, lineHeight: 1.6 }}>This local session clears automatically after inactivity so the next guest cannot see your selections.</p><div className="ob-idle-actions" style={{ marginTop: 22 }}><button ref={idleContinueRef} type="button" onClick={continueSession} style={{ flex: 1, border: 0, borderRadius: 999, background: accent, color: onAccent, fontWeight: 700, cursor: "pointer" }}>Continue</button><button type="button" onClick={reset} style={{ flex: 1, border: `1px solid ${C.line}`, borderRadius: 999, background: C.paper, color: C.ink, fontWeight: 700, cursor: "pointer" }}>Clear session</button></div></div></div>}
     </div>
   );
 }
