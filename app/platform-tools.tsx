@@ -8,7 +8,6 @@ import { downloadJson } from "@/lib/local-state";
 
 const destinations = [
   ["Coffeehouse", "Menu, drinks, food and visit planning", "/coffeehouse", "Visit"],
-  ["Origin atlas", "18 coffee origins, flavour notes and processes", "/origins", "Discover"],
   ["Tasteprint", "Find coffee that matches what you love", "/tasteprint", "Discover"],
   ["Origin Bar", "Build your cup, from bean to finishing touch", "/origin-bar", "Create"],
   ["Build a cup", "Quick custom recipe and saved Brewprints", "/build-a-cup", "Create"],

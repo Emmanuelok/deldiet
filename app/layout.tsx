@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "./revamp.css";
+import "./editorial.css";
 import "./collection-content.css";
 import PlatformTools from "./platform-tools";
 

@@ -61,7 +61,7 @@ export const JOURNAL_ARTICLES: Article[] = [
     summary: "Washed, natural and honey: understand what happens between a coffee cherry and a green bean.",
     image: "/origin-exchange-green-lots.png", imageAlt: "Sacks of green coffee with quality-control equipment in an airy coffee warehouse",
     takeaway: "On your next bag, look for the process beside the producer and origin. Treat all three as part of the story.",
-    nextLabel: "Meet the origin library", nextHref: "/origins",
+    nextLabel: "Explore the coffee collection", nextHref: "/shop",
     sections: [
       { title: "A coffee bean begins inside a cherry", paragraphs: ["What we call a coffee bean is a seed. Before roasting, the fruit around that seed must be removed and the coffee dried. Processing describes that part of the journey. The choices made at this stage can shape the cup, alongside variety, growing conditions and roasting.", "Process names are useful starting points, but they cannot tell you everything about a producer’s work. Drying conditions, sorting and careful handling matter within every method."] },
       { title: "Washed: remove the fruit before drying", paragraphs: ["In a washed process, the skin and much of the fruit are removed, and the remaining sticky mucilage is removed before the parchment-covered coffee is dried. Producers may use fermentation, mechanical equipment or a combination of steps.", "Washed coffees are often described as clear or crisp in the cup. That description is an expectation to explore, not a guarantee of a particular flavour or an automatic quality ranking."] },

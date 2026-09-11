@@ -1,0 +1,294 @@
+/* Deldiet / The everyday edit. Shared chrome and a coffee-first landing experience. */
+:root { --edit-cream: #f6f2e8; --edit-ink: #252d26; --edit-orange: #c85332; --edit-butter: #f0dc9c; }
+.site-header { height: 78px; border-bottom: 1px solid #282d2418; }
+.announcement { background: var(--edit-orange); min-height: 32px; color: #fff9ee; letter-spacing: .025em; }
+.announcement-copy { font-size: 11px; opacity: .9; }
+.main-nav a { font-size: 13px; padding-block: 26px; }
+.main-nav a:hover, .main-nav a[aria-current=page] { color: var(--edit-orange); }
+.brand-logo-image { width: 137px; }
+.button { border-radius: 2px; transition: background .2s, color .2s, transform .2s; }
+.button:hover { transform: translateY(-2px); }
+:is(a, button, input, select, textarea):focus-visible { outline: 3px solid #c85332; outline-offset: 5px; }
+.view-home { background: var(--edit-cream); color: var(--edit-ink); }
+.view-home .hero { height: calc(100svh - 110px); min-height: 680px; max-height: 930px; border-radius: 0; margin: 0; align-items: center; }
+.view-home .hero-video { filter: saturate(.85) contrast(1.05); object-position: 70% center; }
+.view-home .hero-shade { background: linear-gradient(90deg, #151914cc 0%, #15191466 48%, #15191408 78%), linear-gradient(0deg, #11191099, transparent 45%); }
+.view-home .hero-content { width: 96%; padding: 45px clamp(24px, 5.5vw, 100px) 85px; margin: 0; }
+.view-home .hero .eyebrow { display: flex; gap: 12px; align-items: center; font-size: 11px !important; color: #f4e8cb; letter-spacing: .19em; margin-bottom: 30px; }
+.hero-overline-dot { height: 7px; width: 7px; border-radius: 50%; background: #e88c54; flex-shrink: 0; }
+.view-home .hero h1 { font-size: clamp(70px, 8.5vw, 140px); font-weight: 600; letter-spacing: -.072em; line-height: .93; }
+.view-home .hero h1 em { display: inline-block; font-size: 1.43em; color: #f3deac; font-weight: 400; letter-spacing: -.075em; line-height: 1.1; }
+.view-home .hero-copy { max-width: 415px; font-size: 16px; line-height: 1.65; color: #f2efe4; margin: 22px 0 25px; }
+.view-home .hero .button-light { background: #f2dda1; color: #252d26; border-color: #f2dda1; }
+.view-home .hero .button-light:hover { background: #fff2c6; }
+.view-home .hero-actions { gap: 28px; }
+.hero-film-caption { position: absolute; right: 5.5vw; bottom: 38px; z-index: 2; display: flex; flex-direction: column; gap: 9px; text-align: right; }
+.hero-film-caption>span:first-child { font-size: 10px; letter-spacing: .19em; color: #efddb1; }
+.hero-film-caption>span:last-child { font-family: var(--serif); font-style: italic; font-size: 22px; }
+.hero-scroll-link { position: absolute; left: 5.5vw; bottom: 40px; z-index: 2; display: flex; align-items: center; gap: 24px; text-decoration: none; color: #f4eee1; font-size: 10px; letter-spacing: .18em; }
+.hero-scroll-link svg { transform: rotate(90deg); }
+.view-home .hero-mobile-motion { display: flex; position: absolute; z-index: 4; top: 27px; right: 29px; left: auto; bottom: auto; align-items: center; gap: 8px; border: 1px solid #ffffff5c; background: #1d241e66; backdrop-filter: blur(10px); border-radius: 50px; color: #fff7e7; min-height: 44px; padding: 5px 13px 5px 7px; font-size: 11px; cursor: pointer; }
+.view-home .hero-mobile-motion .play-dot { width: 27px; height: 27px; border: 0; background: transparent; display: grid; place-items: center; }
+.view-home .hero-mobile-motion svg { width: 13px; height: 13px; }
+.edit-shortcuts { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid #252d2630; }
+.edit-shortcuts a { padding: 31px clamp(20px, 4vw, 65px); color: inherit; text-decoration: none; border-right: 1px solid #252d2625; transition: background .2s; }
+.edit-shortcuts a:last-child { border: 0; }
+.edit-shortcuts a:hover { background: #e9e2d0; }
+.edit-shortcuts a>span { font-size: 10px; letter-spacing: .13em; color: #727667; }
+.edit-shortcuts b { display: flex; justify-content: space-between; gap: 10px; align-items: center; font-size: clamp(18px, 1.9vw, 27px); font-weight: 500; letter-spacing: -.04em; margin-top: 10px; }
+.edit-shortcuts svg { width: 22px; flex-shrink: 0; }
+.edit-kicker { font-size: 10px; font-weight: 500; letter-spacing: .17em; line-height: 1.5; margin: 0 0 24px; display: block; }
+.edit-introduction { text-align: center; padding: 105px 24px 100px; }
+.edit-introduction .edit-kicker { display: flex; flex-direction: column; gap: 25px; align-items: center; }
+.edit-asterisk { color: var(--edit-orange); font-size: 54px; font-weight: 400; line-height: .8; }
+.edit-introduction h2 { font-size: clamp(46px, 5vw, 76px); font-weight: 500; line-height: 1.07; letter-spacing: -.058em; margin: 0 0 22px; }
+.edit-introduction h2 em { color: var(--edit-orange); }
+.edit-introduction>p { max-width: 490px; margin: 0 auto; font-size: 15px; color: #697064; line-height: 1.75; }
+.edit-ritual { scroll-margin-top: 95px; margin: 0 3vw; background: #eae4d5; padding: 30px 4vw 16px; transition: background .35s; }
+.edit-ritual-curious { background: #ead5bf; }
+.edit-ritual-slow { background: #e0e3d2; }
+.edit-ritual-top { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid #252d2630; padding-bottom: 25px; }
+.edit-ritual-top .edit-kicker { margin: 0; }
+.edit-ritual-choices { display: flex; gap: 5px; }
+.edit-ritual-choices button { border: 1px solid transparent; padding: 11px 17px; min-height: 44px; background: transparent; color: #484e41; font-size: 12px; border-radius: 50px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+.edit-ritual-choices button[aria-pressed=true] { color: #fff7e7; background: #293329; border-color: #293329; }
+.edit-ritual-choices button:hover:not([aria-pressed=true]) { border-color: #7a806f; }
+.edit-ritual-stage { display: grid; grid-template-columns: 1fr 1fr; gap: 5vw; align-items: center; min-height: 590px; }
+.edit-ritual-copy { padding: 40px 0 35px; }
+.edit-edition { font-size: 10px; letter-spacing: .16em; color: #68705d; }
+.edit-ritual-copy h2 { font-size: clamp(40px, 4.5vw, 70px); line-height: 1.08; font-weight: 500; letter-spacing: -.065em; margin: 23px 0; }
+.edit-ritual-copy h2>span { display: block; }
+.edit-ritual-copy>p { color: #626856; max-width: 365px; font-size: 15px; }
+.edit-flavours { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 30px; }
+.edit-flavours>span { font-size: 11px; border: 1px solid #7c806a50; border-radius: 3px; padding: 7px 12px; }
+.edit-button-dark { background: #293329; color: #fff8e9; border: 1px solid #293329; }
+.edit-button-dark:hover { background: #444d3b; }
+.edit-button-light { background: #f1dda4; color: #273326; border: 1px solid #f1dda4; }
+.edit-button-light:hover { background: #fff0c5; }
+.edit-text-link { font-size: 13px; color: inherit; display: inline-flex; align-items: center; gap: 16px; text-decoration: none; padding: 9px 0; border-bottom: 1px solid #252d265c; }
+.edit-text-link:hover { color: var(--edit-orange); }
+.edit-ritual-copy>.edit-text-link { display: flex; width: fit-content; font-size: 11px; margin-top: 18px; border: 0; }
+.edit-ritual-product { align-self: stretch; position: relative; padding: 28px 0; display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+.edit-product-number { position: absolute; top: 0; right: 0; z-index: 0; color: #25342210; font-size: clamp(230px, 31vw, 480px); line-height: 1; font-weight: 500; letter-spacing: -.1em; }
+.edit-product-frame { position: relative; aspect-ratio: 1; width: 90%; max-width: 465px; align-self: center; overflow: hidden; border-radius: 50% 50% 3px 3px; box-shadow: 0 22px 50px #2933290a; animation: edit-product-enter .35s ease-out; }
+.edit-product-frame img { object-fit: cover; }
+@keyframes edit-product-enter { from { opacity: .3; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.edit-coffee-label { z-index: 1; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #252d2630; margin-top: 25px; padding-top: 20px; gap: 15px; }
+.edit-coffee-label b { font-size: 19px; font-weight: 500; letter-spacing: -.03em; }
+.edit-coffee-label small { font-size: 11px; display: block; margin-top: 5px; color: #69705e; }
+.edit-coffee-label button { border: 0; background: transparent; display: flex; align-items: center; gap: 18px; min-height: 44px; font-size: 13px; color: inherit; cursor: pointer; white-space: nowrap; }
+.edit-coffee-label button svg { box-sizing: content-box; background: #f6f1e5; padding: 10px; border-radius: 50%; }
+.edit-catalogue-note { font-size: 10px; color: #606958; text-align: center; border-top: 1px solid #252d261a; padding-top: 14px; margin: 0; }
+.edit-essentials { padding: 100px 3vw 95px; }
+.edit-section-heading { display: flex; justify-content: space-between; align-items: end; gap: 35px; margin: 0 1vw 38px; }
+.edit-section-heading .edit-kicker { margin-bottom: 18px; }
+.edit-section-heading h2 { font-size: clamp(40px, 4.1vw, 65px); font-weight: 500; letter-spacing: -.06em; line-height: 1.05; margin: 0; }
+.edit-products { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.edit-products article { min-width: 0; }
+.edit-object-image { display: block; width: 100%; aspect-ratio: .87; border: 0; padding: 0; background: #eae3d3; position: relative; overflow: hidden; cursor: pointer; }
+.edit-object-image img { object-fit: cover; transition: transform .5s; }
+.edit-object-image:hover img { transform: scale(1.04); }
+.edit-object-image>span { position: absolute; bottom: 15px; right: 15px; border-radius: 50%; background: #fff8e9; width: 42px; height: 42px; display: grid; place-items: center; transition: background .2s; }
+.edit-object-image:hover>span { background: #f1dda4; }
+.edit-object-info { position: relative; padding: 18px 2px; }
+.edit-object-info>span { color: #6f7567; text-transform: uppercase; font-size: 9px; letter-spacing: .1em; }
+.edit-object-info h3 { font-size: 19px; font-weight: 500; margin: 6px 0 10px; letter-spacing: -.03em; }
+.edit-object-info h3 button { min-height: 44px; font: inherit; background: transparent; border: 0; padding: 4px 0; color: inherit; text-align: left; cursor: pointer; }
+.edit-object-info>p { margin: 0; font-size: 13px; }
+.edit-object-info small { font-size: 10px; color: #6f7567; }
+.edit-craft { display: grid; grid-template-columns: 1.05fr 1fr; background: #27392d; color: #f4efdd; }
+.edit-craft-photo { min-height: 690px; position: relative; }
+.edit-craft-photo>img { object-fit: cover; }
+.edit-photo-caption { position: absolute; top: 30px; left: 30px; background: #f5efdfeb; color: #293329; padding: 9px 13px; font-size: 10px; letter-spacing: .12em; }
+.edit-recipe-note { background: #f3df9f; color: #263b2c; position: absolute; bottom: 40px; right: 34px; padding: 25px; width: 250px; transform: rotate(-5deg); box-shadow: 0 12px 40px #10241330; }
+.edit-recipe-note>svg { display: block; margin-bottom: 12px; }
+.edit-recipe-note>span { font-size: 9px; letter-spacing: .15em; }
+.edit-recipe-note b { font-size: 31px; font-weight: 500; display: block; margin: 13px 0 5px; letter-spacing: -.05em; }
+.edit-recipe-note i { color: #a75934; font-weight: 400; }
+.edit-recipe-note small { display: block; font-size: 11px; }
+.edit-recipe-note>a { border-top: 1px solid #29332944; margin-top: 20px; padding-top: 13px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; text-decoration: none; color: inherit; }
+.edit-craft-copy { padding: 70px 5.5vw; align-self: center; }
+.edit-craft-copy .edit-kicker { color: #d6c798; }
+.edit-craft-copy h2 { font-size: clamp(54px, 5.3vw, 86px); font-weight: 500; letter-spacing: -.06em; line-height: 1; margin: 0 0 28px; }
+.edit-craft-copy h2 em { color: #edd69e; }
+.edit-craft-copy>p:not(.edit-kicker) { font-size: 15px; line-height: 1.8; color: #c2caba; max-width: 350px; margin: 25px 0 30px; }
+.edit-craft-features { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #f3df9f35; padding-top: 20px; margin-top: 40px; gap: 15px; }
+.edit-craft-features>span { font-size: 10px; color: #d9c996; }
+.edit-craft-features>span>span { display: block; font-size: 10px; color: #d2d8c6; margin-top: 9px; }
+.edit-house { padding: 105px 4vw; display: grid; grid-template-columns: .8fr 1.2fr; gap: 8vw; align-items: center; }
+.edit-house-heading h2 { font-size: clamp(50px, 5.5vw, 90px); font-weight: 500; letter-spacing: -.07em; line-height: 1.02; margin: 0 0 25px; }
+.edit-house-heading h2 em { color: var(--edit-orange); }
+.edit-house-heading>p:not(.edit-kicker) { font-size: 15px; color: #65705f; max-width: 350px; }
+.edit-house-heading>.edit-text-link { margin-top: 14px; }
+.edit-location { display: block; font-size: 10px; letter-spacing: .08em; margin-top: 52px; }
+.edit-location small { display: block; font-size: 10px; letter-spacing: 0; color: #6d7566; margin-top: 7px; }
+.edit-house-image { height: 610px; position: relative; overflow: hidden; border-radius: 48% 48% 0 0; }
+.edit-house-image img { object-fit: cover; }
+.edit-house-image>span { position: absolute; bottom: 30px; left: 0; right: 0; font-size: 11px; letter-spacing: .17em; color: #fff8e7; text-align: center; text-shadow: 0 1px 8px #000; }
+.edit-final-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; padding: 0 3vw 80px; }
+.edit-final-grid>a { position: relative; overflow: hidden; padding: 45px 35px; text-decoration: none; color: inherit; }
+.edit-final-grid h2 { font-size: clamp(40px, 3.5vw, 54px); font-weight: 500; letter-spacing: -.06em; line-height: 1.05; margin: 24px 0; }
+.edit-final-grid p { font-size: 14px; max-width: 290px; line-height: 1.7; color: #59624d; }
+.edit-passport { background: #e8ddbb; min-height: 460px; }
+.edit-passport>h2, .edit-passport>p { max-width: 52%; }
+.edit-card-link { display: flex; align-items: center; gap: 25px; font-size: 12px; margin-top: 30px; }
+.edit-final-grid>a:hover .edit-card-link svg { transform: translate(3px, -3px); }
+.edit-card-link svg { transition: transform .2s; }
+.edit-passport-card { position: absolute; right: -12px; top: 90px; width: 220px; height: 310px; padding: 25px 20px; border-radius: 9px; background: #304432; color: #f1dfa8; box-shadow: -15px 15px 45px #2933291f; transform: rotate(10deg); display: flex; flex-direction: column; justify-content: space-between; }
+.edit-passport-card>span { font-size: 8px; letter-spacing: .1em; }
+.edit-passport-card b { font-size: 35px; font-weight: 500; letter-spacing: -.05em; line-height: 1.1; }
+.edit-passport-card b em { font-family: var(--serif); font-weight: 400; }
+.edit-passport-card>span:last-child { padding-top: 20px; border-top: 1px solid #e2d49355; display: flex; align-items: center; justify-content: space-between; }
+.edit-passport-card>span:last-child>span { font-size: 22px; }
+.edit-journal { background: #d7dfc5; }
+.edit-journal>svg { margin-bottom: 25px; }
+.edit-journal .edit-kicker { margin-bottom: 10px; }
+/* Shared page introductions read as destinations, with a restrained photo treatment. */
+.section-page-hero { min-height: 390px; background: #263a2d; }
+.section-page-copy { padding-block: 55px; }
+.section-page-copy h1 { font-size: clamp(48px, 5.4vw, 84px); letter-spacing: -.065em; }
+.section-page-copy h1 em { color: #f1dba3; }
+.section-page-copy>p:not(.eyebrow) { max-width: 560px; line-height: 1.7; }
+.section-page-copy .button-light { background: #f0dba3; color: #253829; }
+.dd-page-photo { inset: 0 0 0 42%; opacity: .85; }
+.dd-page-photo:after { background: linear-gradient(90deg, #263a2d 0%, #263a2d45 75%); }
+footer { background: #1f3025; }
+.dd-footer-invitation { padding-block: 60px; }
+.dd-footer-invitation h2 { font-size: clamp(44px, 5.5vw, 80px); }
+.dd-footer-invitation h2 em { color: #f1dca5; }
+.dd-footer-invitation>a { color: #f1dca5; }
+.dd-footer-wordmark { margin: 25px -1vw 0; padding: 0; line-height: 0; }
+.dd-footer-wordmark img { width: 100%; height: auto; opacity: .9; filter: brightness(0) saturate(100%) invert(90%) sepia(13%) saturate(775%) hue-rotate(347deg) brightness(102%) contrast(90%); }
+@media (min-width: 1650px) {
+  .edit-ritual-stage { min-height: 660px; }
+  .edit-product-frame { max-width: 530px; }
+  .edit-passport-card { right: 25px; width: 260px; }
+}
+@media (max-width: 1100px) {
+  .edit-ritual { padding-inline: 3vw; }
+  .edit-ritual-stage { min-height: 540px; gap: 3vw; }
+  .edit-craft-photo { min-height: 650px; }
+  .edit-products { gap: 12px; }
+  .edit-passport-card { width: 180px; right: -30px; }
+  .edit-final-grid>a { padding: 35px 25px; }
+  .edit-passport>h2, .edit-passport>p { max-width: 60%; }
+}
+@media (max-width: 960px) {
+  .main-nav.open { position: absolute; top: 100%; max-height: calc(100svh - 130px); }
+}
+@media (max-width: 900px) {
+  .site-header { height: 72px; }
+  .main-nav.open a { font-size: 20px; padding-block: 15px; }
+  .view-home .hero { min-height: 640px; height: 740px; }
+  .view-home .hero-content { padding-inline: 5vw; }
+  .edit-ritual-top { align-items: flex-start; flex-direction: column; gap: 15px; }
+  .edit-ritual-copy h2 { font-size: 43px; }
+  .edit-ritual-stage { gap: 24px; }
+  .edit-ritual-choices { width: 100%; }
+  .edit-craft-copy { padding: 50px 4vw; }
+  .edit-craft-copy h2 { font-size: 57px; }
+  .edit-final-grid { grid-template-columns: 1fr 1fr; }
+  .edit-passport-card { display: none; }
+  .edit-passport>h2, .edit-passport>p { max-width: 100%; }
+  .edit-house { gap: 5vw; }
+  .edit-house-image { height: 530px; }
+}
+@media (max-width: 760px) {
+  .announcement { min-height: 31px; padding-inline: 20px; }
+  .announcement-mobile { font-size: 10px; letter-spacing: .06em; }
+  .announcement>a { font-size: 10px; }
+  .view-home .hero { height: min(790px, calc(100svh - 103px)); min-height: 610px; max-height: none; align-items: center; }
+  .view-home .hero-video { object-position: 68% center; }
+  .view-home .hero-shade { background: linear-gradient(90deg, #152018bd, #15201833), linear-gradient(0deg, #111d17a6, transparent 65%); }
+  .view-home .hero-content { padding: 55px 24px 65px; width: 100%; }
+  .view-home .hero h1 { font-size: 10.8vw; line-height: 1; }
+  .view-home .hero h1 em { font-size: 1.7em; line-height: 1.13; }
+  .view-home .hero .eyebrow { font-size: 9px !important; letter-spacing: .12em; margin-bottom: 23px; }
+  .view-home .hero-copy { font-size: 14px; max-width: 325px; line-height: 1.75; margin: 22px 0 26px; }
+  .view-home .hero-actions { gap: 20px; flex-direction: row; align-items: center; }
+  .view-home .hero-actions>.button { min-height: 50px; font-size: 12px; padding: 0 19px; gap: 20px; }
+  .view-home .hero-actions>.text-link { font-size: 12px; padding-block: 8px; }
+  .hero-film-caption { display: none; }
+  .hero-scroll-link { left: 24px; bottom: 28px; font-size: 9px; }
+  .view-home .hero-mobile-motion { top: 20px; right: 18px; }
+  .edit-shortcuts { grid-template-columns: 1fr; }
+  .edit-shortcuts a { padding: 19px 24px; border-right: 0; border-bottom: 1px solid #252d2625; display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .edit-shortcuts a>span { font-size: 8px; max-width: 93px; line-height: 1.6; }
+  .edit-shortcuts b { margin: 0; font-size: 19px; min-width: 200px; }
+  .edit-shortcuts svg { width: 20px; }
+  .edit-introduction { padding: 70px 25px 65px; }
+  .edit-introduction h2 { font-size: 45px; }
+  .edit-introduction>p { font-size: 14px; }
+  .edit-kicker { font-size: 9px; }
+  .edit-ritual { margin: 0 12px; padding: 23px 20px 17px; }
+  .edit-ritual-top { padding-bottom: 18px; }
+  .edit-ritual-choices { gap: 3px; }
+  .edit-ritual-choices button { flex: 1; padding: 10px 7px; font-size: 10px; gap: 5px; }
+  .edit-ritual-choices svg { width: 13px; }
+  .edit-ritual-stage { grid-template-columns: 1fr; gap: 0; }
+  .edit-ritual-copy { padding: 32px 0 8px; }
+  .edit-ritual-copy h2 { font-size: clamp(38px, 10.5vw, 65px); margin: 18px 0; }
+  .edit-ritual-copy>p { max-width: 100%; font-size: 14px; }
+  .edit-flavours { margin: 20px 0 24px; }
+  .edit-ritual-copy>.edit-text-link { font-size: 10px; gap: 8px; }
+  .edit-ritual-product { padding: 22px 0; }
+  .edit-product-number { font-size: 80vw; right: 6px; top: 0; }
+  .edit-product-frame { width: 94%; max-width: 410px; }
+  .edit-coffee-label { margin-top: 20px; padding-top: 18px; }
+  .edit-catalogue-note { font-size: 9px; }
+  .edit-essentials { padding: 65px 20px 45px; }
+  .edit-section-heading { flex-direction: column; align-items: start; gap: 18px; margin-bottom: 26px; }
+  .edit-section-heading h2 { font-size: 40px; }
+  .edit-section-heading .edit-text-link { font-size: 12px; }
+  .edit-products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 25px 14px; }
+  .edit-object-info h3 { font-size: 16px; }
+  .edit-object-image { aspect-ratio: .82; }
+  .edit-object-image>span { width: 34px; height: 34px; right: 10px; bottom: 10px; }
+  .edit-craft { grid-template-columns: 1fr; }
+  .edit-craft-photo { min-height: 420px; }
+  .edit-photo-caption { top: 20px; left: 20px; font-size: 9px; }
+  .edit-recipe-note { width: 210px; bottom: 26px; right: 24px; padding: 20px; }
+  .edit-recipe-note b { font-size: 28px; }
+  .edit-craft-copy { padding: 50px 28px; }
+  .edit-craft-copy h2 { font-size: 63px; }
+  .edit-craft-copy>p:not(.edit-kicker) { max-width: 100%; font-size: 14px; }
+  .edit-craft-features { gap: 12px; }
+  .edit-house { padding: 65px 24px; grid-template-columns: 1fr; gap: 36px; }
+  .edit-house-heading h2 { font-size: 62px; }
+  .edit-house-heading>p:not(.edit-kicker) { max-width: 100%; }
+  .edit-location { margin-top: 30px; }
+  .edit-house-image { height: 490px; }
+  .edit-final-grid { grid-template-columns: 1fr; padding: 0 16px 50px; gap: 15px; }
+  .edit-final-grid>a { padding: 35px 25px; }
+  .edit-final-grid h2 { font-size: 44px; }
+  .edit-passport { min-height: 0; }
+  .edit-final-grid p { max-width: 100%; }
+  .edit-journal>svg { margin-bottom: 20px; }
+  .section-page-hero { min-height: 400px; }
+  .section-page-copy { width: 100%; padding: 38px 24px; }
+  .section-page-copy h1 { font-size: 46px; }
+  .section-page-copy>p:not(.eyebrow) { font-size: 14px; }
+  .dd-page-photo { inset: 0; opacity: .2; }
+  .dd-page-photo:after { background: linear-gradient(90deg, #263a2d 5%, #263a2d55 100%); }
+  .dd-footer-invitation { padding-block: 40px; }
+  .dd-footer-invitation h2 { font-size: 45px; }
+  .dd-footer-wordmark { margin: 28px 0 14px; }
+}
+@media (max-width: 380px) {
+  .view-home .hero { min-height: 630px; }
+  .view-home .hero-content { padding-inline: 20px; }
+  .view-home .hero h1 { font-size: 10.4vw; }
+  .view-home .hero-actions { gap: 17px; }
+  .edit-shortcuts a { padding-inline: 20px; }
+  .edit-shortcuts b { min-width: 180px; font-size: 17px; }
+  .edit-ritual { padding-inline: 15px; }
+  .edit-ritual-choices button { font-size: 9px; }
+  .edit-ritual-choices svg { display: none; }
+  .edit-introduction h2 { font-size: 40px; }
+  .edit-craft-copy h2 { font-size: 56px; }
+  .edit-house-image { height: 390px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .edit-product-frame { animation: none; }
+  .button:hover, .edit-object-image:hover img, .edit-final-grid>a:hover .edit-card-link svg { transform: none; }
+}

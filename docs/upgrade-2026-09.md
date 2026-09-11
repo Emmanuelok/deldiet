@@ -2,12 +2,12 @@
 
 ## Delivered
 
-- Coffee-led editorial homepage with the existing cinematic desktop/mobile film, product photography, origin story, Brew Studio introduction, coffeehouse and Passport sections.
+- Coffee-led editorial homepage with the existing cinematic desktop/mobile film, product photography, interactive coffee moods, Brew Studio introduction, coffeehouse and Passport sections.
 - Shared forest/cream/copper visual system, readable typography, responsive navigation, touch controls and reduced-motion support across the main destinations, Origin Bar, Origin Exchange, Passport and policy pages.
 - Searchable tool directory on every route, with category filters and keyboard shortcut.
 - Brew Studio with five method calculators, per-extraction handling, deadline-based persistent timer, guided steps, taste adjustments, ratings, saved brew history, repeat/delete and CSV export. The Passport Brew tab uses the same implementation.
 - Personal collection with saved catalogue products, editable Brewprints, origin records, public request references, exports and manual private status lookup.
-- Shop sorting and favourites filtering; three-origin comparison; Tasteprint preferences connected to Passport.
+- Shop sorting and favourites filtering; homepage product quick views; Tasteprint preferences connected to Passport.
 - Six full Field Journal articles with category filtering, reading panels, bookmarks, learning tables and source links.
 - Designed recovery and missing-page screens.
 
@@ -18,7 +18,6 @@
 - Machine Match labels map to recognized Passport equipment.
 - Brewprint save action persists a real recipe instead of only displaying a toast.
 - Business action buttons open functional tools.
-- Origin region filtering reconciles the selected origin.
 - Reservation validation rejects impossible and past dates in the St. John's timezone.
 - Exchange quantities align with request validation; restored image/category keys cannot resolve inherited object properties.
 - Request receipts preserve public history and offer explicit private receipt download. Lookup tokens are sent in a header by the UI.
@@ -40,4 +39,14 @@ The Vercel request database is not configured or verified live in this turn. See
 
 Payment processing, account authentication/sync, automated email, staff request management, actual stock, confirmed event schedules and commercial fulfilment remain unconnected. This upgrade does not mark those concept services as production operations. Local collections and brew notes remain device-local, with export controls.
 
-Existing assets and the original Sites metadata are preserved. The intended publication target is the user's existing GitHub main branch and deldiet.vercel.app Vercel project.
+Existing assets and the original Sites metadata are preserved. Changes are published to the feature branch and Vercel preview through PR #5; production remains pending review.
+
+## 11 September design revision
+
+- Deleted the `/origins` route, its data and view state, and every link in navigation, footer, search, discovery and the journal. Origin Bar and Origin Exchange remain available.
+- Rebuilt the homepage around a full-bleed coffee film, oversized headline, warm cream/copper/butter palette, asymmetrical photography, and the original Deldiet logo.
+- Added a three-mood Daily Edit that changes the coffee, flavour notes and imagery; product actions open the existing variant picker and shared bag.
+- Added a four-product everyday essentials collection with quick views, a Brew Studio feature, arched coffeehouse imagery, Passport and Journal destinations.
+- Refined shared navigation, destination introductions and footer; provided responsive layouts and reduced-motion behaviour.
+- Updated the optional Sites route expectations for the removed page and new homepage.
+- Revision verification: production build and TypeScript passed with `/origins` absent from the route manifest; all 16 existing tests passed. Browser interaction testing has not been performed.
