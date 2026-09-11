@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+const BrewStudioContent = dynamic(() => import("../brew-studio"));
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import {
   ArrowLeft, ArrowRight, Award, Building2, Check, ChevronRight, Coffee,
@@ -10,6 +12,7 @@ import {
 } from "lucide-react";
 import { createIdempotencyKey, submitServiceRequest, type ServiceRequestInput } from "@/lib/request-client";
 import styles from "./passport.module.css";
+import { mergePassport, canonicalBrewer, validCartItems, readLocal } from "@/lib/local-state";
 
 type Tab = "overview" | "finder" | "rhythm" | "brew" | "gifts" | "teams";
 type TasteProfile = { note: string; roast: string; brew: string; adventure: string };
@@ -35,14 +38,6 @@ const COFFEES = [
   { id: "panama", name: "Panama Discovery", origin: "Panama · Boquete", note: "Fruit-forward", roast: "Light", methods: ["Pour-over", "AeroPress"], adventure: 5, notes: "Tropical fruit · honey · florals", why: "A limited-style discovery profile for curious, aroma-led drinkers.", price: 29, image: "/products/world-flight.webp" },
 ] as const;
 
-const BREW_METHODS = {
-  "Pour-over": { ratio: 16, dose: 20, temp: 94, seconds: 180, grind: "Medium-fine", steps: ["Rinse filter and warm the brewer", "Bloom with 2× the coffee weight", "Pour in slow, even pulses", "Finish when the bed drains flat"] },
-  "French press": { ratio: 15, dose: 30, temp: 94, seconds: 240, grind: "Coarse", steps: ["Add coffee, then all the water", "Stir gently at the surface", "Steep without plunging", "Break crust, skim, then press slowly"] },
-  "AeroPress": { ratio: 13, dose: 16, temp: 88, seconds: 105, grind: "Medium-fine", steps: ["Rinse the paper filter", "Add coffee and water", "Stir for ten seconds", "Cap, wait, then press gently"] },
-  "Espresso": { ratio: 2.2, dose: 18, temp: 93, seconds: 30, grind: "Fine", steps: ["Purge and dry the basket", "Distribute and tamp level", "Start extraction immediately", "Stop at the target beverage weight"] },
-  "Cold brew": { ratio: 8, dose: 80, temp: 20, seconds: 43200, grind: "Very coarse", steps: ["Combine coffee and cool water", "Stir until every ground is wet", "Cover and steep for 12 hours", "Filter, chill and dilute to taste"] },
-} as const;
-
 const ORIGIN_STAMPS = [
   ["ET", "Ethiopia", "Floral altitude"], ["CO", "Colombia", "Balanced sweetness"],
   ["BR", "Brazil", "Cacao structure"], ["KE", "Kenya", "Juicy acidity"],
@@ -53,6 +48,7 @@ function fingerprint(value: unknown) {
 }
 
 export default function PassportPage() {
+  const [hydrated, setHydrated] = useState(false);
   const [tab, setTab] = useState<Tab>("overview");
   const [taste, setTaste] = useState<TasteProfile>({ note: "Chocolate & nuts", roast: "Medium", brew: "Espresso machine", adventure: "2" });
   const [brewer, setBrewer] = useState("Espresso machine");
@@ -60,11 +56,6 @@ export default function PassportPage() {
   const [plan, setPlan] = useState({ plan: "Explorer", format: "Whole bean", cadence: "Every 4 weeks", brewMethod: "Espresso machine", quantity: "2", selectionMode: "Taste Graph chooses" });
   const [gift, setGift] = useState({ giftType: "Origin journey", occasion: "Birthday", deliveryWindow: "Within 2 weeks", recipientMode: "Let recipient take the Taste Graph", budget: "75", message: "" });
   const [team, setTeam] = useState({ programme: "Office coffee", serviceCadence: "Every 2 weeks", brewSetup: "We need equipment", headcount: "25", city: "St. John’s", notes: "" });
-  const [brewMethod, setBrewMethod] = useState<keyof typeof BREW_METHODS>("Pour-over");
-  const [servings, setServings] = useState(1);
-  const [strength, setStrength] = useState(2);
-  const [secondsLeft, setSecondsLeft] = useState<number>(BREW_METHODS["Pour-over"].seconds);
-  const [timerRunning, setTimerRunning] = useState(false);
   const [pending, setPending] = useState("");
   const [notice, setNotice] = useState<{ tone: "success" | "error"; text: string } | null>(null);
   const keys = useRef<Record<string, { key: string; signature: string }>>({});
@@ -78,38 +69,22 @@ export default function PassportPage() {
         const stored = JSON.parse(window.localStorage.getItem("deldiet-passport-v1") || "null") as { taste?: TasteProfile; brewer?: string } | null;
         const savedTaste = stored?.taste;
         if (savedTaste && ["Chocolate & nuts", "Caramel & sweet", "Floral & citrus", "Fruit-forward", "Deep & earthy"].includes(savedTaste.note) && ["Light", "Medium", "Medium-dark"].includes(savedTaste.roast) && ["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine"].includes(savedTaste.brew) && ["1", "2", "3", "4", "5"].includes(savedTaste.adventure)) setTaste(savedTaste);
-        if (stored?.brewer && ["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine", "Single-serve brewer"].includes(stored.brewer)) setBrewer(stored.brewer);
+        if (stored?.brewer && ["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine", "Single-serve brewer"].includes(canonicalBrewer(stored.brewer))) setBrewer(canonicalBrewer(stored.brewer));
       } catch { /* local preview may be empty */ }
+      setHydrated(true);
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("deldiet-passport-v1", JSON.stringify({ taste, brewer }));
-  }, [taste, brewer]);
-
-  useEffect(() => {
-    if (!timerRunning || secondsLeft <= 0) return;
-    const id = window.setInterval(() => setSecondsLeft((value) => {
-      if (value <= 1) { setTimerRunning(false); return 0; }
-      return value - 1;
-    }), 1000);
-    return () => window.clearInterval(id);
-  }, [timerRunning, secondsLeft]);
+    if (hydrated) mergePassport({ taste, brewer });
+  }, [taste, brewer, hydrated]);
 
   const matches = useMemo(() => COFFEES.map((coffee) => {
     const method = taste.brew === "Capsule machine" ? "Espresso machine" : taste.brew;
     const score = (coffee.note === taste.note ? 4 : 0) + (coffee.roast === taste.roast ? 3 : 0) + (coffee.methods.includes(method as never) ? 3 : 0) + Math.max(0, 3 - Math.abs(coffee.adventure - Number(taste.adventure)));
     return { ...coffee, score };
   }).sort((a, b) => b.score - a.score), [taste]);
-
-  const recipe = BREW_METHODS[brewMethod];
-  const ratioAdjust = strength === 1 ? 1.1 : strength === 3 ? 0.9 : 1;
-  const dose = Math.round(recipe.dose * servings);
-  const water = Math.round(dose * recipe.ratio * ratioAdjust);
-  const timeLabel = secondsLeft >= 3600
-    ? `${Math.floor(secondsLeft / 3600)}:${String(Math.floor((secondsLeft % 3600) / 60)).padStart(2, "0")}:${String(secondsLeft % 60).padStart(2, "0")}`
-    : `${Math.floor(secondsLeft / 60)}:${String(secondsLeft % 60).padStart(2, "0")}`;
 
   function chooseTab(next: Tab) {
     setTab(next);
@@ -119,12 +94,6 @@ export default function PassportPage() {
 
   function updateTaste(key: keyof TasteProfile, value: string) {
     setTaste((current) => ({ ...current, [key]: value }));
-  }
-
-  function setMethod(method: keyof typeof BREW_METHODS) {
-    setBrewMethod(method);
-    setSecondsLeft(BREW_METHODS[method].seconds);
-    setTimerRunning(false);
   }
 
   async function save(scope: string, input: ServiceRequestInput) {
@@ -147,7 +116,7 @@ export default function PassportPage() {
   function addMatchToBag() {
     const top = matches[0];
     try {
-      const raw = JSON.parse(window.localStorage.getItem("deldiet-cart") || "[]") as Array<Record<string, unknown>>;
+      const raw = validCartItems(readLocal("deldiet-cart", []));
       const id = `passport-${top.id}-whole`;
       const existing = raw.find((item) => item.id === id);
       if (existing) existing.quantity = Math.min(20, Number(existing.quantity || 0) + 1);
@@ -177,7 +146,7 @@ export default function PassportPage() {
   return (
     <main className={styles.shell}>
       <header className={styles.header}>
-        <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
+        <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark-ink.svg" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
         <div className={styles.headerTitle}><span>Deldiet Passport</span><small>Your coffee, connected</small></div>
         <nav aria-label="Deldiet experiences"><Link href="/origin-bar">Origin Bar</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
       </header>
@@ -197,7 +166,7 @@ export default function PassportPage() {
           {tab === "overview" && <Overview taste={taste} brewer={brewer} setBrewer={setBrewer} onNavigate={chooseTab} onReorder={addMatchToBag} topMatch={matches[0]} />}
           {tab === "finder" && <TasteGraph taste={taste} updateTaste={updateTaste} matches={matches} onAdd={addMatchToBag} onContinue={() => { setPlan((current) => ({ ...current, brewMethod: taste.brew })); chooseTab("rhythm"); }} />}
           {tab === "rhythm" && <RhythmForm plan={plan} setPlan={setPlan} contact={contact} setContact={setContact} pending={pending} onSubmit={submitPlan} />}
-          {tab === "brew" && <BrewLab method={brewMethod} setMethod={setMethod} recipe={recipe} servings={servings} setServings={setServings} strength={strength} setStrength={setStrength} dose={dose} water={water} timeLabel={timeLabel} running={timerRunning} secondsLeft={secondsLeft} setRunning={setTimerRunning} reset={() => { setSecondsLeft(recipe.seconds); setTimerRunning(false); }} />}
+          {tab === "brew" && <BrewStudioContent />}
           {tab === "gifts" && <GiftForm gift={gift} setGift={setGift} contact={contact} setContact={setContact} pending={pending} onSubmit={submitGift} />}
           {tab === "teams" && <TeamForm team={team} setTeam={setTeam} contact={contact} setContact={setContact} pending={pending} onSubmit={submitTeam} />}
         </section>
@@ -285,18 +254,6 @@ function RhythmForm({ plan, setPlan, contact, setContact, pending, onSubmit }: {
   </>;
 }
 
-function BrewLab({ method, setMethod, recipe, servings, setServings, strength, setStrength, dose, water, timeLabel, running, secondsLeft, setRunning, reset }: { method: keyof typeof BREW_METHODS; setMethod: (value: keyof typeof BREW_METHODS) => void; recipe: typeof BREW_METHODS[keyof typeof BREW_METHODS]; servings: number; setServings: (value: number) => void; strength: number; setStrength: (value: number) => void; dose: number; water: number; timeLabel: string; running: boolean; secondsLeft: number; setRunning: (value: boolean) => void; reset: () => void }) {
-  return <>
-    <PageIntro eyebrow="Interactive recipe studio" title="Brew with fewer guesses." copy="Scale a Deldiet starting recipe, follow the sequence and use the built-in timer. Grinder, water and coffee age can change the result—adjust by taste." />
-    <div className={styles.methodTabs} role="group" aria-label="Choose brew method">{Object.keys(BREW_METHODS).map((item) => <button key={item} className={method === item ? styles.selected : ""} onClick={() => setMethod(item as keyof typeof BREW_METHODS)} aria-pressed={method === item}>{item}</button>)}</div>
-    <div className={styles.brewGrid}>
-      <article className={styles.brewControls}><p className={styles.kicker}>Recipe controls</p><div className={styles.stepper}><span>Servings</span><button aria-label="Decrease servings" onClick={() => setServings(Math.max(1, servings - 1))}>−</button><b>{servings}</b><button aria-label="Increase servings" onClick={() => setServings(Math.min(8, servings + 1))}>+</button></div><fieldset><legend>Strength</legend><div className={styles.threeWay}>{[[1, "Gentle"], [2, "Balanced"], [3, "Bold"]].map(([value, label]) => <button key={value} onClick={() => setStrength(Number(value))} className={strength === value ? styles.selected : ""} aria-pressed={strength === value}>{label}</button>)}</div></fieldset><div className={styles.recipeMetrics}><span><small>Coffee</small><b>{dose} g</b></span><span><small>{method === "Espresso" ? "Beverage" : "Water"}</small><b>{water} g</b></span><span><small>Temperature</small><b>{recipe.temp}°C</b></span><span><small>Grind</small><b>{recipe.grind}</b></span></div></article>
-      <article className={styles.timerCard}><p className={styles.kicker}>Guided timer</p><div className={styles.timerFace}><span>{timeLabel}</span><small>{secondsLeft === 0 ? "Recipe complete" : running ? "Timer running" : "Ready when you are"}</small></div><div className={styles.timerButtons}><button className={styles.primary} onClick={() => setRunning(!running)} disabled={secondsLeft === 0}>{running ? <Pause size={17}/> : <Play size={17}/>} {running ? "Pause" : "Start"}</button><button className={styles.secondary} onClick={reset}><RotateCcw size={17}/> Reset</button></div></article>
-    </div>
-    <ol className={styles.brewSteps}>{recipe.steps.map((step, index) => <li key={step}><span>{String(index + 1).padStart(2, "0")}</span><p>{step}</p></li>)}</ol>
-    <div className={styles.labNote}><Coffee size={18}/><p><b>Dial-in note:</b> if the cup tastes sharp or thin, grind slightly finer; if it tastes dry or harsh, grind slightly coarser. Espresso equipment should be used according to its manufacturer instructions.</p></div>
-  </>;
-}
 
 function GiftForm({ gift, setGift, contact, setContact, pending, onSubmit }: { gift: GiftState; setGift: (value: GiftState) => void; contact: Contact; setContact: (value: Contact) => void; pending: string; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
   return <>

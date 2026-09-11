@@ -60,7 +60,7 @@ function routeError(error: unknown): string {
   if (message.includes("no such table") || message.includes("service_requests")) {
     return "The request service is being initialized. Please try again shortly.";
   }
-  return "Deldiet could not save this request. Please try again.";
+  return "The request service is currently unavailable. We could not confirm the request status. Please try again later.";
 }
 
 function storedRequestMeta(payloadJson: string): { requestHash: string; customerPhone: string | null } | null {
@@ -195,8 +195,8 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const reference = url.searchParams.get("reference")?.trim().toUpperCase() ?? "";
-  const token = url.searchParams.get("token")?.trim() ?? "";
-  if (!/^DL-[A-Z]+-[A-F0-9]{20}$/.test(reference) || token.length < 24 || token.length > 128) {
+  const token = request.headers.get("x-request-token")?.trim() || url.searchParams.get("token")?.trim() || "";
+  if (!/^DL-[A-Z]+-[A-F0-9]{20}$/.test(reference) || token.length < 16 || token.length > 128) {
     return Response.json({ error: "A valid reference and tracking token are required." }, { status: 400 });
   }
 

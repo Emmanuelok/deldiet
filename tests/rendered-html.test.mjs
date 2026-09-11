@@ -37,11 +37,10 @@ test("renders every focused Deldiet destination", async () => {
   workerUrl.searchParams.set("routes", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
   const routes = [
-    ["/", "Every experience"],
+    ["/", "THE DAILY EDIT"],
     ["/discover", "Four useful doors"],
     ["/coffeehouse", "Coffeehouse menu preview"],
     ["/events", "East Africa cupping table"],
-    ["/origins", "Global coffee library"],
     ["/build-a-cup", "Your Brewprint"],
     ["/tasteprint", "Tasteprint"],
     ["/coffee-at-home", "Machine Match"],

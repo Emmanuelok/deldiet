@@ -1,4 +1,7 @@
-import { drizzle } from "drizzle-orm/d1";
+import { drizzle as drizzleD1 } from "drizzle-orm/d1";
+import { drizzle as drizzleHttp } from "drizzle-orm/sqlite-proxy";
+import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
+import { createD1HttpCallback, readD1HttpConfig, RequestDatabaseUnavailableError } from "./d1-http";
 import * as schema from "./schema";
 
 type CloudflareRuntime = { env?: { DB?: D1Database } };
@@ -13,13 +16,13 @@ async function getCloudflareDb(): Promise<D1Database | null> {
   }
 }
 
-export async function getDb() {
-  const database = await getCloudflareDb();
-  if (!database) {
-    throw new Error(
-      "Cloudflare D1 binding `DB` is unavailable. Set the `d1` field in .openai/hosting.json to `DB` or let your control plane inject the real binding values before using the database."
-    );
-  }
+export async function getDb(): Promise<BaseSQLiteDatabase<"async", unknown, typeof schema>> {
+  const binding = await getCloudflareDb();
+  if (binding) return drizzleD1(binding, { schema });
 
-  return drizzle(database, { schema });
+  const config = readD1HttpConfig(typeof process !== "undefined" ? process.env : {});
+  if (config) return drizzleHttp(createD1HttpCallback(config), { schema });
+
+  // Never fall back to serverless disk or acknowledge unsaved customer requests.
+  throw new RequestDatabaseUnavailableError();
 }

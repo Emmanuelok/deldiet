@@ -46,40 +46,40 @@ const STYLES = `
 .oex-product-photo { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
 .oex-card:hover .oex-product-photo { transform: scale(1.035); }
 .oex-deldiet-mark { position:absolute; z-index:3; right:12px; bottom:12px; width:94px; min-height:28px; padding:5px 8px; display:grid; place-items:center; border:1px solid rgba(34,22,17,.14); border-radius:999px; background:rgba(255,253,246,.9); box-shadow:0 6px 18px rgba(34,22,17,.14); backdrop-filter:blur(8px); pointer-events:none; user-select:none; }
-.oex-deldiet-mark img { position:static!important; display:block; width:100%; height:auto; mix-blend-mode:multiply; }
+.oex-deldiet-mark img { position:static!important; display:block; width:100%; height:auto; mix-blend-mode:normal; }
 .oex-deldiet-mark-detail { width:132px; min-height:38px; padding:8px 11px; }
 .oex-deldiet-mark-lot { right:12px; bottom:10px; width:88px; min-height:26px; }
 .oex-deldiet-mark-compact { right:4px; bottom:4px; width:38px; min-height:13px; padding:2px 3px; border-radius:6px; box-shadow:0 2px 7px rgba(34,22,17,.14); }
 .oex-shell-header { padding-top: env(safe-area-inset-top); }
-.oex-back-deldiet { min-height:44px; display: inline-flex; align-items: center; gap: 8px; color: #D9FF66; text-decoration: none; font-family: ${F.mono}; font-size: 12px; letter-spacing: .15em; font-weight: 600; }
+.oex-back-deldiet { min-height:44px; display: inline-flex; align-items: center; gap: 8px; color: #D9FF66; text-decoration: none; font-family: ${F.mono}; font-size: 13px; letter-spacing: .15em; font-weight: 600; }
 .oex-back-deldiet:hover { color: #FFFFFF; }
 .oex-label-short { display: none; }
 .oex-app button,.oex-app input,.oex-app select { min-height:44px; }
 .oex-app { max-width:100vw; overflow-x:hidden; }
-.oex-app input,.oex-app select { font-size:16px !important; }
-.oex-truth-banner { padding:11px 16px; display:flex; justify-content:center; gap:10px; background:#FFF1CF; border-bottom:1px solid #D9C28D; color:#5D431E; font-family:${F.body}; font-size:13px; line-height:1.45; text-align:center; }
+.oex-app input,.oex-app select { font-size: 16px !important; }
+.oex-truth-banner { padding:11px 16px; display:flex; justify-content:center; gap:10px; background:#FFF1CF; border-bottom:1px solid #D9C28D; color:#5D431E; font-family:${F.body}; font-size: 13px; line-height:1.45; text-align:center; }
 .oex-exchange-hero { min-height:610px; padding:clamp(34px,6vw,76px); position:relative; overflow:hidden; display:grid; grid-template-columns:minmax(0,1.2fr) minmax(300px,.8fr); gap:clamp(28px,6vw,90px); align-items:end; color:#fff; background-image:linear-gradient(90deg,rgba(19,11,7,.95) 0%,rgba(19,11,7,.76) 48%,rgba(19,11,7,.25) 100%),url('/origin-exchange-hero.png'); background-size:cover; background-position:center; box-shadow:0 28px 80px rgba(34,22,17,.12); }
 .oex-exchange-hero h1 { max-width:780px; margin:14px 0 20px; font-family:${F.disp}; font-size:clamp(52px,7vw,96px); font-weight:400; line-height:.92; letter-spacing:-.045em; }
-.oex-exchange-hero p { max-width:680px; margin:0; color:#D7C8B7; font-size:17px; line-height:1.7; }
+.oex-exchange-hero p { max-width:680px; margin:0; color:#D7C8B7; font-size: 17px; line-height:1.7; }
 .oex-mode-switch { margin-top:34px; display:grid; grid-template-columns:1fr 1fr; max-width:680px; border:1px solid rgba(255,255,255,.22); }
 .oex-mode-switch button { min-height:92px; padding:17px; display:flex; flex-direction:column; justify-content:center; align-items:flex-start; gap:6px; border:0; border-right:1px solid rgba(255,255,255,.22); background:rgba(20,12,8,.48); color:#fff; text-align:left; cursor:pointer; }
-.oex-mode-switch button:last-child { border-right:0; }.oex-mode-switch button:hover{background:#C98B43;color:#241405}.oex-mode-switch b{font-size:15px}.oex-mode-switch small{font-size:12px;opacity:.72;line-height:1.4}
+.oex-mode-switch button:last-child { border-right:0; }.oex-mode-switch button:hover{background:#C98B43;color:#241405}.oex-mode-switch b{font-size: 15px}.oex-mode-switch small{font-size: 13px;opacity:.72;line-height:1.4}
 .oex-verification-ledger { padding:24px; border:1px solid rgba(255,255,255,.22); background:rgba(28,17,12,.78); backdrop-filter:blur(18px); }
-.oex-verification-ledger > span { color:#C98B43; font-family:${F.mono}; font-size:12px; letter-spacing:.13em; text-transform:uppercase; }
-.oex-verification-ledger h2 { margin:18px 0 20px; font-family:${F.disp}; font-size:38px; font-weight:400; }
-.oex-verification-ledger div { min-height:58px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; border-top:1px solid rgba(255,255,255,.16); font-size:14px; }.oex-verification-ledger small{color:#BBA890;font-size:12px;text-align:right}
-.oex-status-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px; }.oex-status-grid article{min-height:130px;padding:18px;background:#fff;border:1px solid #E6DFD3}.oex-status-grid b{display:block;margin:12px 0 5px;font-size:15px}.oex-status-grid span{color:#7A6A5C;font-family:${F.mono};font-size:12px;line-height:1.45}
-.oex-inquiry-view { display:grid; grid-template-columns:minmax(0,1fr) minmax(290px,360px); gap:24px; align-items:start; }.oex-inquiry-panel{padding:22px;background:#fff;border:1px solid #E6DFD3}.oex-inquiry-item{padding:16px 0;display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;border-bottom:1px solid #E6DFD3}.oex-inquiry-item:first-child{border-top:1px solid #E6DFD3}.oex-document-grid{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.oex-document-grid span{min-height:54px;padding:10px;display:flex;flex-direction:column;justify-content:center;border:1px solid #E6DFD3;background:#F7F4EE;font-size:13px}.oex-document-grid small{margin-top:3px;color:#9A6C2B;font-size:11px}
+.oex-verification-ledger > span { color:#C98B43; font-family:${F.mono}; font-size: 13px; letter-spacing:.13em; text-transform:uppercase; }
+.oex-verification-ledger h2 { margin:18px 0 20px; font-family:${F.disp}; font-size: 38px; font-weight:400; }
+.oex-verification-ledger div { min-height:58px; display:grid; grid-template-columns:1fr auto; gap:12px; align-items:center; border-top:1px solid rgba(255,255,255,.16); font-size: 14px; }.oex-verification-ledger small{color:#BBA890;font-size: 13px;text-align:right}
+.oex-status-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-top:18px; }.oex-status-grid article{min-height:130px;padding:18px;background:#fff;border:1px solid #E6DFD3}.oex-status-grid b{display:block;margin:12px 0 5px;font-size: 15px}.oex-status-grid span{color:#7A6A5C;font-family:${F.mono};font-size: 13px;line-height:1.45}
+.oex-inquiry-view { display:grid; grid-template-columns:minmax(0,1fr) minmax(290px,360px); gap:24px; align-items:start; }.oex-inquiry-panel{padding:22px;background:#fff;border:1px solid #E6DFD3}.oex-inquiry-item{padding:16px 0;display:grid;grid-template-columns:1fr auto auto;gap:14px;align-items:center;border-bottom:1px solid #E6DFD3}.oex-inquiry-item:first-child{border-top:1px solid #E6DFD3}.oex-document-grid{margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}.oex-document-grid span{min-height:54px;padding:10px;display:flex;flex-direction:column;justify-content:center;border:1px solid #E6DFD3;background:#F7F4EE;font-size: 13px}.oex-document-grid small{margin-top:3px;color:#9A6C2B;font-size: 13px}
 .oex-app button:focus-visible,.oex-app a:focus-visible,.oex-app input:focus-visible,.oex-app select:focus-visible,.oex-app textarea:focus-visible{outline:3px solid #D9FF66;outline-offset:3px}.oex-product-grid{display:grid}.oex-cart-item{display:flex;align-items:center;gap:12px}.oex-main-header{display:flex;align-items:center;gap:12px}.oex-brand-button{min-width:0}.oex-brand-button>span:last-child{min-width:0}.oex-search{min-width:0}.oex-inquiry-sticky{position:sticky;top:18px}.oex-cart-remove{flex:none}.oex-head-inquiry,.oex-head-cart,.oex-cart-remove,.oex-stepper button{min-width:44px}
 @media (max-width: 640px) {
-  .oex-back-deldiet { gap: 5px; font-size: 12px; letter-spacing: .08em; }
+  .oex-back-deldiet { gap: 5px; font-size: 13px; letter-spacing: .08em; }
   .oex-label-wide { display: none; }
   .oex-label-short { display: inline; }
   .oex-main-header{padding:10px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left))!important;display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"brand inquiry cart" "search search search";gap:9px}.oex-brand-button{grid-area:brand;justify-self:start}.oex-brand-button>span:last-child span:first-child{max-width:175px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.oex-search{grid-area:search!important;width:100%;max-width:none!important;margin:0!important}.oex-head-inquiry{grid-area:inquiry}.oex-head-cart{grid-area:cart}
-  .oex-exchange-hero{min-height:760px;padding:50px 22px;grid-template-columns:1fr;align-items:end;background-image:linear-gradient(0deg,rgba(19,11,7,.97) 0%,rgba(19,11,7,.78) 62%,rgba(19,11,7,.22) 100%),url('/origin-exchange-hero.png')}.oex-exchange-hero h1{font-size:56px}.oex-exchange-hero p{font-size:15px}.oex-mode-switch{grid-template-columns:1fr}.oex-mode-switch button{border-right:0;border-bottom:1px solid rgba(255,255,255,.22)}.oex-mode-switch button:last-child{border-bottom:0}.oex-status-grid{grid-template-columns:1fr 1fr}.oex-inquiry-view{grid-template-columns:1fr}.oex-inquiry-sticky{position:static}.oex-inquiry-item{grid-template-columns:1fr auto}.oex-inquiry-item>div:first-child{grid-column:1/-1}.oex-document-grid{grid-template-columns:1fr}.oex-truth-banner{text-align:left}
+  .oex-exchange-hero{min-height:760px;padding:50px 22px;grid-template-columns:1fr;align-items:end;background-image:linear-gradient(0deg,rgba(19,11,7,.97) 0%,rgba(19,11,7,.78) 62%,rgba(19,11,7,.22) 100%),url('/origin-exchange-hero.png')}.oex-exchange-hero h1{font-size: 56px}.oex-exchange-hero p{font-size: 15px}.oex-mode-switch{grid-template-columns:1fr}.oex-mode-switch button{border-right:0;border-bottom:1px solid rgba(255,255,255,.22)}.oex-mode-switch button:last-child{border-bottom:0}.oex-status-grid{grid-template-columns:1fr 1fr}.oex-inquiry-view{grid-template-columns:1fr}.oex-inquiry-sticky{position:static}.oex-inquiry-item{grid-template-columns:1fr auto}.oex-inquiry-item>div:first-child{grid-column:1/-1}.oex-document-grid{grid-template-columns:1fr}.oex-truth-banner{text-align:left}
 }
 @media (max-width: 480px) {
-  .oex-product-grid{grid-template-columns:1fr!important}.oex-cart-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto;grid-template-areas:"thumb copy remove" "thumb qty price";align-items:center}.oex-cart-thumb{grid-area:thumb}.oex-cart-item .oex-cart-copy{grid-area:copy}.oex-cart-item .oex-stepper{grid-area:qty;justify-self:start}.oex-cart-item .oex-cart-price{grid-area:price;min-width:0!important;justify-self:end}.oex-cart-remove{grid-area:remove}.oex-status-grid{grid-template-columns:1fr}.oex-exchange-hero h1{font-size:48px}
+  .oex-product-grid{grid-template-columns:1fr!important}.oex-cart-item{display:grid;grid-template-columns:54px minmax(0,1fr) auto;grid-template-areas:"thumb copy remove" "thumb qty price";align-items:center}.oex-cart-thumb{grid-area:thumb}.oex-cart-item .oex-cart-copy{grid-area:copy}.oex-cart-item .oex-stepper{grid-area:qty;justify-self:start}.oex-cart-item .oex-cart-price{grid-area:price;min-width:0!important;justify-self:end}.oex-cart-remove{grid-area:remove}.oex-status-grid{grid-template-columns:1fr}.oex-exchange-hero h1{font-size: 48px}
   .oex-deldiet-mark{width:80px;min-height:24px;padding:4px 7px}.oex-deldiet-mark-detail{width:112px;min-height:34px}.oex-deldiet-mark-compact{width:38px;min-height:13px;padding:2px 3px}
 }
 @media (prefers-reduced-motion: reduce) {
@@ -224,22 +224,22 @@ function Ticker({ market, paused, onToggle, feed }) {
       <div className="flex items-center">
         <div className="hidden sm:flex items-center gap-2 px-4 py-2" style={{ background: "#241710", borderRight: "1px solid #2A1D12", flexShrink: 0 }}>
           <span style={{ width: 7, height: 7, borderRadius: 99, background: C.brass }} />
-          <span style={{ color: "#C8B69B", fontFamily: F.mono, fontSize: 12, letterSpacing: ".12em" }}>{market.length ? modeLabel : "MARKET DATA STATUS"}</span>
+          <span style={{ color: "#C8B69B", fontFamily: F.mono, fontSize: 13, letterSpacing: ".12em" }}>{market.length ? modeLabel : "MARKET DATA STATUS"}</span>
         </div>
         <div style={{ overflow: "hidden", flex: 1 }}>
           {market.length ? <div style={{ display: "inline-flex", whiteSpace: "nowrap", width: "max-content", animation: "oexTape 48s linear infinite", animationPlayState: paused ? "paused" : "running", padding: "8px 0" }}>
             {renderRow("a")}{renderRow("b")}
-          </div> : <div style={{ padding: "8px 18px", color: "#C8B69B", fontFamily: F.mono, fontSize: 12 }}>{feed.message}</div>}
+          </div> : <div style={{ padding: "8px 18px", color: "#C8B69B", fontFamily: F.mono, fontSize: 13 }}>{feed.message}</div>}
         </div>
-        {market.length > 0 && <a href={feed.sourceUrl} target="_blank" rel="noreferrer" className="hidden lg:block" style={{ padding: "0 14px", color: "#A99279", fontFamily: F.mono, fontSize: 10, whiteSpace: "nowrap", textDecoration: "none" }}>{feed.providerName} · as of {asOf}</a>}
-        {market.length > 0 && <button onClick={onToggle} aria-pressed={paused} style={{ minWidth: 74, border: 0, borderLeft: "1px solid #2A1D12", background: "#241710", color: "#C8B69B", fontFamily: F.mono, fontSize: 12, cursor: "pointer" }}>{paused ? "Play" : "Pause"}</button>}
+        {market.length > 0 && <a href={feed.sourceUrl} target="_blank" rel="noreferrer" className="hidden lg:block" style={{ padding: "0 14px", color: "#A99279", fontFamily: F.mono, fontSize: 13, whiteSpace: "nowrap", textDecoration: "none" }}>{feed.providerName} · as of {asOf}</a>}
+        {market.length > 0 && <button onClick={onToggle} aria-pressed={paused} style={{ minWidth: 74, border: 0, borderLeft: "1px solid #2A1D12", background: "#241710", color: "#C8B69B", fontFamily: F.mono, fontSize: 13, cursor: "pointer" }}>{paused ? "Play" : "Pause"}</button>}
       </div>
     </div>
   );
 }
 
 function Sparkline({ data }) {
-  if (!Array.isArray(data) || data.length < 2) return <span style={{ width: 88, color: C.sub, fontFamily: F.mono, fontSize: 10, textAlign: "right" }}>No verified history</span>;
+  if (!Array.isArray(data) || data.length < 2) return <span style={{ width: 88, color: C.sub, fontFamily: F.mono, fontSize: 13, textAlign: "right" }}>No verified history</span>;
   const w = 88, h = 26;
   const min = Math.min(...data), max = Math.max(...data);
   const span = max - min || 1;
@@ -263,7 +263,7 @@ const PRODUCT_VISUALS = {
 
 function DeldietProductMark({ detail = false, compact = false, lot = false }) {
   const className = ["oex-deldiet-mark", detail && "oex-deldiet-mark-detail", compact && "oex-deldiet-mark-compact", lot && "oex-deldiet-mark-lot"].filter(Boolean).join(" ");
-  return <span className={className} aria-hidden="true"><Image src="/brand/deldiet-wordmark.png" alt="" width={432} height={129} unoptimized /></span>;
+  return <span className={className} aria-hidden="true"><Image src="/brand/deldiet-wordmark-ink.svg" alt="" width={432} height={129} unoptimized /></span>;
 }
 
 function ProductArt({ p, detail = false }) {
@@ -281,7 +281,7 @@ function ProductArt({ p, detail = false }) {
   return (
     <div style={{ position: "relative", width: "100%", height: detail ? 430 : 220, overflow: "hidden", background: C.cream }}>
       <Image className="oex-product-photo" src={PRODUCT_VISUALS[p.cat] || PRODUCT_VISUALS.beans} alt={`${p.name} product photograph`} fill unoptimized sizes={detail ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"} style={{ objectPosition: focus }} />
-      <div style={{ position: "absolute", left: 12, bottom: 12, padding: "6px 9px", borderRadius: 999, background: "rgba(23,16,8,.78)", color: "#FFFFFF", fontFamily: F.mono, fontSize: 12, letterSpacing: ".11em", textTransform: "uppercase", backdropFilter: "blur(8px)" }}>
+      <div style={{ position: "absolute", left: 12, bottom: 12, padding: "6px 9px", borderRadius: 999, background: "rgba(23,16,8,.78)", color: "#FFFFFF", fontFamily: F.mono, fontSize: 13, letterSpacing: ".11em", textTransform: "uppercase", backdropFilter: "blur(8px)" }}>
         {p.origin || p.roaster}
       </div>
       <DeldietProductMark detail={detail} />
@@ -305,7 +305,7 @@ function Stars() {
 function Tag({ children, leaf }) {
   return (
     <span className="rounded-full px-2.5 py-1" style={{
-      fontFamily: F.mono, fontSize: 12, fontWeight: 500, letterSpacing: ".03em",
+      fontFamily: F.mono, fontSize: 13, fontWeight: 500, letterSpacing: ".03em",
       background: leaf ? C.leafBg : "#F3EEE4", color: leaf ? C.leaf : C.sub,
       border: `1px solid ${leaf ? "#CFE2D4" : C.line}`
     }}>{children}</span>
@@ -341,7 +341,7 @@ function ProductCard({ p, onOpen, onQuickAdd }) {
       </div>
       <div className="p-4">
         <div className="mb-1.5" style={{ minHeight: 18 }}>
-          {p.badge && <span className="rounded-full px-2 py-0.5" style={{ background: C.leafBg, color: C.leaf, fontFamily: F.mono, fontSize: 12, fontWeight: 600, letterSpacing: ".08em" }}>CONCEPT · {p.badge.toUpperCase()}</span>}
+          {p.badge && <span className="rounded-full px-2 py-0.5" style={{ background: C.leafBg, color: C.leaf, fontFamily: F.mono, fontSize: 13, fontWeight: 600, letterSpacing: ".08em" }}>CONCEPT · {p.badge.toUpperCase()}</span>}
         </div>
         <div style={{ fontFamily: F.body, fontWeight: 700, fontSize: 15, color: C.ink, lineHeight: 1.25 }}>{p.name}</div>
         <div style={{ fontFamily: F.body, fontSize: 14, color: C.sub, marginTop: 2 }}>{p.roaster}{p.origin ? ` · ${p.origin}` : ""}</div>
@@ -400,7 +400,7 @@ function ProductDetail({ p, onBack, onAdd }) {
           <ProductArt p={p} detail />
         </div>
         <div>
-          {p.badge && <span className="rounded-full px-2.5 py-1" style={{ background: C.leafBg, color: C.leaf, fontFamily: F.mono, fontSize: 12, fontWeight: 600, letterSpacing: ".08em" }}>CONCEPT · {p.badge.toUpperCase()}</span>}
+          {p.badge && <span className="rounded-full px-2.5 py-1" style={{ background: C.leafBg, color: C.leaf, fontFamily: F.mono, fontSize: 13, fontWeight: 600, letterSpacing: ".08em" }}>CONCEPT · {p.badge.toUpperCase()}</span>}
           <h1 style={{ fontFamily: F.disp, fontSize: 30, color: C.ink, margin: "10px 0 2px", lineHeight: 1.15 }}>{p.name}</h1>
           <div style={{ fontFamily: F.body, fontSize: 14, color: C.sub }}>
             {p.roaster}{p.origin ? ` · ${p.flag} ${p.origin}` : ""}{regionName ? ` · ${regionName}` : ""}
@@ -451,7 +451,7 @@ function LotCard({ lot, onAdd }) {
       <div role="img" aria-label={`Green coffee lot from ${lot.origin}`} style={{ position: "relative", height: 130, margin: "-16px -16px 15px", backgroundImage: "linear-gradient(0deg, rgba(24,15,10,.36), transparent 66%), url('/origin-exchange-green-lots.png')", backgroundSize: "cover", backgroundPosition: crop }}><DeldietProductMark lot /></div>
       <div className="flex items-center justify-between">
         <span style={{ fontFamily: F.mono, fontSize: 13, fontWeight: 600, color: C.brassDeep, letterSpacing: ".08em" }}>{lot.no}</span>
-        <span className="rounded-full px-2 py-0.5" style={{ background: "#F3EEE4", color: C.sub, fontFamily: F.mono, fontSize: 12, fontWeight: 600 }}>ILLUSTRATIVE LOT</span>
+        <span className="rounded-full px-2 py-0.5" style={{ background: "#F3EEE4", color: C.sub, fontFamily: F.mono, fontSize: 13, fontWeight: 600 }}>ILLUSTRATIVE LOT</span>
       </div>
       <div className="mt-1.5" style={{ fontFamily: F.body, fontWeight: 700, fontSize: 15.5, color: C.ink }}>{lot.flag} {lot.origin} — {lot.grade}</div>
       <div className="flex flex-wrap gap-1.5 mt-2">
@@ -511,10 +511,10 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit, submiss
       <button onClick={onBack} className="inline-flex items-center gap-1 mb-4" style={{ border: 0, background: "none", color: C.sub, fontSize: 14, fontWeight: 700, cursor: "pointer" }}><ChevronLeft size={15}/> Trade Desk</button>
       <div className="oex-inquiry-view">
         <section className="oex-inquiry-panel">
-          <div style={{ fontFamily: F.mono, color: C.brassDeep, fontSize: 12, letterSpacing: ".13em", textTransform: "uppercase" }}>Trade workflow · no checkout</div>
+          <div style={{ fontFamily: F.mono, color: C.brassDeep, fontSize: 13, letterSpacing: ".13em", textTransform: "uppercase" }}>Trade workflow · no checkout</div>
           <h1 style={{ margin: "10px 0 8px", fontFamily: F.disp, fontSize: 40, fontWeight: 400 }}>Build a sourcing enquiry</h1>
           <p style={{ margin: "0 0 22px", color: C.sub, fontSize: 15, lineHeight: 1.65 }}>Compare sample lots, choose the kind of response you need, and request verification. This does not reserve inventory or create a purchase.</p>
-          {items.map((item) => <article key={item.key} className="oex-inquiry-item"><div><b style={{ display: "block", fontSize: 15 }}>{item.name}</b><span style={{ display: "block", marginTop: 4, color: C.sub, fontFamily: F.mono, fontSize: 12 }}>{item.sub}</span></div>{requestType === "sample" ? <span style={{ color: C.brassDeep, fontFamily: F.mono, fontSize: 12, fontWeight: 700 }}>1 SAMPLE SET</span> : <Stepper qty={item.qty} setQty={(qty) => setQty(item.key, qty)}/>}<button onClick={() => removeItem(item.key)} aria-label={`Remove ${item.name}`} style={{ border: 0, background: "none", color: C.sub, cursor: "pointer" }}><X size={16}/></button></article>)}
+          {items.map((item) => <article key={item.key} className="oex-inquiry-item"><div><b style={{ display: "block", fontSize: 15 }}>{item.name}</b><span style={{ display: "block", marginTop: 4, color: C.sub, fontFamily: F.mono, fontSize: 13 }}>{item.sub}</span></div>{requestType === "sample" ? <span style={{ color: C.brassDeep, fontFamily: F.mono, fontSize: 13, fontWeight: 700 }}>1 SAMPLE SET</span> : <Stepper qty={item.qty} setQty={(qty) => setQty(item.key, qty)}/>}<button onClick={() => removeItem(item.key)} aria-label={`Remove ${item.name}`} style={{ border: 0, background: "none", color: C.sub, cursor: "pointer" }}><X size={16}/></button></article>)}
           <h2 style={{ margin: "28px 0 8px", fontFamily: F.disp, fontSize: 28, fontWeight: 400 }}>Required due-diligence record</h2>
           <p style={{ margin: 0, color: C.sub, fontSize: 14, lineHeight: 1.6 }}>Every field stays pending until a named supplier or authorized source provides evidence.</p>
           <div className="oex-document-grid">{[["Lot identity","Pending verification"],["Cupping report","Not supplied"],["Certification evidence","Not supplied"],["Inventory / crop","Pending verification"],["Export & logistics","Quote required"],["Producer consent","Pending verification"]].map(([name,status]) => <span key={name}><b>{name}</b><small>{status}</small></span>)}</div>
@@ -522,11 +522,11 @@ function TradeInquiryView({ items, setQty, removeItem, onBack, onSubmit, submiss
         <aside className="oex-inquiry-panel oex-inquiry-sticky">
           <h2 style={{ margin: 0, fontFamily: F.disp, fontSize: 30, fontWeight: 400 }}>What should Deldiet prepare?</h2>
           <div className="grid grid-cols-2 gap-2" style={{ marginTop: 16 }}>{[["sample","Sample request"],["quote","Verified quote"]].map(([id,label]) => <button key={id} aria-pressed={requestType === id} onClick={() => setRequestType(id)} style={{ border: `2px solid ${requestType === id ? C.brass : C.line}`, background: requestType === id ? "#FDF6EB" : "#fff", color: C.ink, padding: 10, fontWeight: 700, cursor: "pointer" }}>{label}</button>)}</div>
-          {["company","name","email","destination"].map((key) => <label key={key} style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 12, textTransform: "uppercase" }}>{key === "destination" ? "Destination country / city" : key}</span><input value={profile[key]} type={key === "email" ? "email" : "text"} onChange={(event) => set(key)(event.target.value)} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink }}/></label>)}
-          <label style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 12, textTransform: "uppercase" }}>Sourcing notes</span><textarea value={profile.notes} onChange={(event) => set("notes")(event.target.value)} rows={3} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink, font: "inherit", resize: "vertical" }}/></label>
+          {["company","name","email","destination"].map((key) => <label key={key} style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 13, textTransform: "uppercase" }}>{key === "destination" ? "Destination country / city" : key}</span><input value={profile[key]} type={key === "email" ? "email" : "text"} onChange={(event) => set(key)(event.target.value)} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink }}/></label>)}
+          <label style={{ display: "block", marginTop: 14 }}><span style={{ display: "block", color: C.sub, fontFamily: F.mono, fontSize: 13, textTransform: "uppercase" }}>Sourcing notes</span><textarea value={profile.notes} onChange={(event) => set("notes")(event.target.value)} rows={3} style={{ width: "100%", marginTop: 5, border: `1.5px solid ${C.line}`, background: C.paper, padding: "10px 12px", color: C.ink, font: "inherit", resize: "vertical" }}/></label>
           {submission.error && <div role="alert" style={{ marginTop: 16, padding: 12, border: "1px solid #D9A18E", background: "#FFF3EF", color: "#6E2E24", fontSize: 13, lineHeight: 1.5 }}>{submission.error}</div>}
           <button disabled={!canSubmit} aria-busy={saving} onClick={() => onSubmit({ requestType, profile })} style={{ width: "100%", minHeight: 52, marginTop: 20, border: 0, borderRadius: 999, background: canSubmit ? C.brass : "#DDD2C1", color: "#241405", fontWeight: 750, cursor: canSubmit ? "pointer" : "not-allowed" }}>{saving ? "Saving enquiry…" : "Send sourcing enquiry"}</button>
-          <small style={{ display: "block", marginTop: 10, color: C.sub, fontSize: 12, lineHeight: 1.5 }}>This saves a sourcing request only. It does not reserve stock, create a quote or promise price, freight or payment terms.</small>
+          <small style={{ display: "block", marginTop: 10, color: C.sub, fontSize: 13, lineHeight: 1.5 }}>This saves a sourcing request only. It does not reserve stock, create a quote or promise price, freight or payment terms.</small>
         </aside>
       </div>
     </div>
@@ -611,7 +611,7 @@ function CartView({ cart, setQty, removeItem, ship, setShip, totals, onCheckout,
         <button onClick={onCheckout} className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 mt-4" style={{ background: C.brass, color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 14, border: "none", cursor: "pointer" }}>
           Continue to order review <ArrowRight size={15} />
         </button>
-        <div className="mt-2 text-center" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>No payment is collected. Availability, delivery, tax and final price are confirmed before purchase.</div>
+        <div className="mt-2 text-center" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>No payment is collected. Availability, delivery, tax and final price are confirmed before purchase.</div>
       </div>
     </div>
   );
@@ -666,7 +666,7 @@ function ReviewStep({ cart, totals, ship, contact, onBack, onPlace, submission }
       <div className="grid sm:grid-cols-3 gap-3 mt-4">
         {[["DESTINATION", `${contact.name} · ${contact.addr}, ${contact.city} ${contact.prov} ${contact.postal}`], ["DELIVERY PREFERENCE", shipName], ["PAYMENT", "Not collected"]].map(([k, v]) => (
           <div key={k} className="rounded-xl p-3" style={{ background: C.paper, border: `1px solid ${C.line}` }}>
-            <div style={{ fontFamily: F.mono, fontSize: 12, color: C.sub, letterSpacing: ".12em" }}>{k}</div>
+            <div style={{ fontFamily: F.mono, fontSize: 13, color: C.sub, letterSpacing: ".12em" }}>{k}</div>
             <div className="mt-1" style={{ fontFamily: F.body, fontSize: 13, fontWeight: 600, color: C.ink }}>{v}</div>
           </div>
         ))}
@@ -688,7 +688,7 @@ function ReviewStep({ cart, totals, ship, contact, onBack, onPlace, submission }
           <button onClick={onPlace} disabled={saving} aria-busy={saving} className="inline-flex items-center gap-2 rounded-xl px-6 py-3" style={{ background: saving ? "#DDD2C1" : C.brass, color: "#241405", fontFamily: F.body, fontWeight: 700, fontSize: 15, border: "none", cursor: saving ? "not-allowed" : "pointer" }}>
             <Check size={16} /> {saving ? "Saving request…" : "Send for availability review"}
           </button>
-          <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub }}>This saves a review request only. Nothing is charged or reserved.</div>
+          <div className="mt-2" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub }}>This saves a review request only. Nothing is charged or reserved.</div>
         </div>
       </div>
       <div className="mt-4">
@@ -755,7 +755,7 @@ export default function OriginExchangeHub() {
     } catch { /* ignore malformed local catalogue data */ }
     const frame = window.requestAnimationFrame(() => {
       syncMotion();
-      if (savedCart) setCart(savedCart);
+      if (Array.isArray(savedCart)) setCart(savedCart.filter(item => item && typeof item.key === "string" && typeof item.name === "string" && typeof item.id === "string" && typeof item.sub === "string" && typeof item.cat === "string" && Object.hasOwn(PRODUCT_VISUALS, item.cat) && Number.isFinite(item.unit) && item.unit >= 0 && Number.isInteger(item.qty) && item.qty > 0 && item.qty <= 500));
       setCartReady(true);
     });
     return () => { window.cancelAnimationFrame(frame); reduceMotion.removeEventListener?.("change", syncMotion); };
@@ -839,7 +839,7 @@ export default function OriginExchangeHub() {
     const key = `${p.id}|${v.l}`;
     setCart((c) => {
       const ex = c.find((it) => it.key === key);
-      if (ex) return c.map((it) => (it.key === key ? { ...it, qty: it.qty + qty } : it));
+      if (ex) return c.map((it) => (it.key === key ? { ...it, qty: Math.min(500, it.qty + qty) } : it));
       return [...c, { key, kind: "item", id: p.id, cat: p.cat, name: p.name, sub: v.l, flag: p.flag, unit: v.p, qty }];
     });
   };
@@ -852,9 +852,9 @@ export default function OriginExchangeHub() {
       return [...c, { key, id: lot.id, name: `${lot.flag} ${lot.origin} ${lot.grade} · ${lot.no}`, sub: `60 kg jute · sample price field ${lot.price.toFixed(2)} C$/kg · verification pending`, qty: bags }];
     });
   };
-  const setQty = (key, q) => setCart((c) => (q <= 0 ? c.filter((it) => it.key !== key) : c.map((it) => (it.key === key ? { ...it, qty: Math.min(999, q) } : it))));
+  const setQty = (key, q) => setCart((c) => (q <= 0 ? c.filter((it) => it.key !== key) : c.map((it) => (it.key === key ? { ...it, qty: Math.min(500, q) } : it))));
   const removeItem = (key) => setCart((c) => c.filter((it) => it.key !== key));
-  const setTradeQty = (key, q) => setTradeItems((items) => (q <= 0 ? items.filter((it) => it.key !== key) : items.map((it) => (it.key === key ? { ...it, qty: Math.min(999, q) } : it))));
+  const setTradeQty = (key, q) => setTradeItems((items) => (q <= 0 ? items.filter((it) => it.key !== key) : items.map((it) => (it.key === key ? { ...it, qty: Math.min(500, q) } : it))));
   const removeTradeItem = (key) => setTradeItems((items) => items.filter((it) => it.key !== key));
   const goCheckout = () => {
     if (!cart.length) return;
@@ -944,7 +944,7 @@ export default function OriginExchangeHub() {
             </span>
             <span className="text-left">
               <span style={{ display: "block", fontFamily: F.disp, fontSize: 17, color: C.cream, lineHeight: 1 }}>Deldiet Origin Exchange</span>
-              <span className="hidden sm:block" style={{ fontFamily: F.mono, fontSize: 12, color: "#C8B69B", letterSpacing: ".18em", marginTop: 3 }}>DISCOVER SENSORY · SOURCE WITH EVIDENCE</span>
+              <span className="hidden sm:block" style={{ fontFamily: F.mono, fontSize: 13, color: "#C8B69B", letterSpacing: ".18em", marginTop: 3 }}>DISCOVER SENSORY · SOURCE WITH EVIDENCE</span>
             </span>
           </button>
           <div className="oex-search flex-1 relative" style={{ maxWidth: 460, marginLeft: "auto" }}>
@@ -962,12 +962,12 @@ export default function OriginExchangeHub() {
           </button>
           <button onClick={() => goView("inquiry")} className="oex-head-inquiry relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open sourcing enquiry">
             <BadgeCheck size={17} color={C.brass} />
-            {tradeCount > 0 && <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: "#D9FF66", color: "#241405", fontFamily: F.mono, fontSize: 12, fontWeight: 700, padding: "0 4px" }}>{tradeCount}</span>}
+            {tradeCount > 0 && <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: "#D9FF66", color: "#241405", fontFamily: F.mono, fontSize: 13, fontWeight: 700, padding: "0 4px" }}>{tradeCount}</span>}
           </button>
           <button onClick={() => goView("cart")} className="oex-head-cart relative rounded-full p-2.5" style={{ background: "#2C1D12", border: "1.5px solid #3A2818", cursor: "pointer", flexShrink: 0 }} aria-label="Open cart">
             <ShoppingCart size={17} color={C.cream} />
             {count > 0 && (
-              <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: C.brass, color: "#241405", fontFamily: F.mono, fontSize: 12, fontWeight: 700, padding: "0 4px" }}>{count}</span>
+              <span className="absolute flex items-center justify-center rounded-full" style={{ top: -4, right: -4, minWidth: 18, height: 18, background: C.brass, color: "#241405", fontFamily: F.mono, fontSize: 13, fontWeight: 700, padding: "0 4px" }}>{count}</span>
             )}
           </button>
         </div>
@@ -1014,7 +1014,7 @@ export default function OriginExchangeHub() {
                   <button key={c.id} onClick={() => goBrowse(c.id)} className="oex-card rounded-2xl p-4 text-left" style={{ background: "#FFFFFF", border: `1px solid ${C.line}`, cursor: "pointer" }}>
                     <Icon size={18} color={C.brassDeep} />
                     <div className="mt-2" style={{ fontFamily: F.body, fontWeight: 700, fontSize: 14, color: C.ink }}>{c.name}</div>
-                    <div style={{ fontFamily: F.mono, fontSize: 12, color: C.sub, marginTop: 2 }}>{n} listings</div>
+                    <div style={{ fontFamily: F.mono, fontSize: 13, color: C.sub, marginTop: 2 }}>{n} listings</div>
                   </button>
                 );
               })}
@@ -1084,7 +1084,7 @@ export default function OriginExchangeHub() {
       </main>
 
       <footer className="py-8 text-center" style={{ borderTop: `1px solid ${C.line}` }}>
-        <div className="px-4" style={{ fontFamily: F.mono, fontSize: 12, color: C.sub, letterSpacing: ".06em" }}>
+        <div className="px-4" style={{ fontFamily: F.mono, fontSize: 13, color: C.sub, letterSpacing: ".06em" }}>
           DELDIET ORIGIN EXCHANGE — interactive concept · retail review and trade sourcing are separate · prices, reviews, claims, lots and fulfilment are illustrative unless a field shows its licensed source and timestamp
         </div>
       </footer>
