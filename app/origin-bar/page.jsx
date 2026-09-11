@@ -3,6 +3,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Young_Serif, Albert_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./origin-bar.css";
 import { canVisitOriginBarStep, getDrinkDefaults } from "@/lib/origin-bar-flow.mjs";
 import { createIdempotencyKey, submitServiceRequest } from "@/lib/request-client";
@@ -16,6 +17,10 @@ import {
    Flow: Welcome → Origin → Drink → Craft → Enhance → Finish → Review → Done
    ============================================================ */
 
+
+const coverSerif = Young_Serif({ weight: "400", subsets: ["latin"], variable: "--ob-cover-serif", display: "swap" });
+const coverBody = Albert_Sans({ weight: ["400", "500", "600", "700"], subsets: ["latin"], variable: "--ob-cover-body", display: "swap" });
+const coverMono = IBM_Plex_Mono({ weight: ["400", "500", "600"], subsets: ["latin"], variable: "--ob-cover-mono", display: "swap" });
 
 const C = {
   espresso: "#203A2C",
@@ -434,11 +439,45 @@ function CupSVG({ uid, roast, hasMilk, foam, whip, iced, blended, drizzle, boost
 /* ============================ SCREENS ============================ */
 
 function Welcome({ onBegin, onTasteMatch }) {
-  return <section className="ob-entry" aria-labelledby="ob-welcome-title">
-    <div className="ob-entry-copy"><span className="ob-eyebrow">WELCOME TO THE ORIGIN BAR</span><h1 id="ob-welcome-title">Good coffee.<br/><em>Your signature.</em></h1><p>From the first bean to the finishing touch. Create a cup that feels completely, wonderfully yours.</p><div className="ob-entry-actions"><button type="button" className="ob-primary-action" onClick={onBegin}>Let’s build your cup<ArrowRight size={20}/></button><button type="button" className="ob-text-action" onClick={onTasteMatch}><Sparkles size={17}/>Help me find my flavour</button></div><div className="ob-entry-path"><span><b>01</b>Pick your origin</span><span><b>02</b>Make it yours</span><span><b>03</b>Review every detail</span></div><p className="ob-entry-note">Explore the demonstration menu. Staff confirm availability, ingredients and final pricing before preparation.</p></div>
-    <div className="ob-entry-visual"><Image src="/menu/deldiet-hot-cup.webp" alt="Deldiet coffee cup on a warm stone surface" fill unoptimized sizes="(max-width: 760px) 100vw, 50vw" priority/><span className="ob-entry-photo-label">THE EVERYDAY, MADE PERSONAL.</span><div className="ob-entry-stamp">Made<br/><em>by you.</em><Sparkles size={25}/></div><div className="ob-entry-photo-footer"><span>ORIGIN. ROAST. RITUAL.</span><span>One cup. Endless possibility.</span></div></div>
-    <div className="ob-entry-bottom"><span><Globe2 size={20}/>Coffee from five growing regions</span><span><SlidersHorizontal size={20}/>Every detail, in your hands</span><span><Coffee size={20}/>A cup that updates as you create</span></div>
-  </section>;
+  const F = { disp: "var(--ob-cover-serif)", body: "var(--ob-cover-body)", mono: "var(--ob-cover-mono)" };
+  return (
+    <section aria-labelledby="ob-welcome-title" className={`ob-welcome flex items-center px-6 sm:px-10 lg:px-16 ${coverSerif.variable} ${coverBody.variable} ${coverMono.variable}`} style={{ minHeight: "100%", paddingTop: 48, paddingBottom: 48 }}>
+      <div className="ob-welcome-panel">
+        <div className="rise"><Tag wrap color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Origin-led · compatibility-aware · barista confirmed</Tag></div>
+        <div className="rise-1" style={{ margin: "26px 0 16px", padding: "12px 22px", borderRadius: 999, background: "rgba(247,244,238,.94)", boxShadow: "0 18px 50px rgba(0,0,0,.24)" }}>
+          <CupSVG uid="hero" roast={ROASTS[1]} hasMilk foam sizeIdx={2} width={116} />
+        </div>
+        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 13, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · in-store atelier</div>
+        <h1 id="ob-welcome-title" className="rise-1" style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: "clamp(42px, 7vw, 72px)", lineHeight: 1.02, margin: 0 }}>
+          Craft a cup<br/>from somewhere real.
+        </h1>
+        <p className="rise-2" style={{ fontFamily: F.body, color: "#D6C6B2", fontSize: 16, maxWidth: 510, marginTop: 14, lineHeight: 1.65 }}>
+          Build your cup from the bean upward. Choose the origin, roast, drink, milk, extraction and finishing details while your cup and price update live.
+        </p>
+        <div className="ob-welcome-actions rise-2">
+          <button type="button" onClick={onBegin} style={{ fontFamily: F.body, color: "#241405", background: "#D9FF66", border: "none", boxShadow: "0 8px 24px rgba(217,255,102,.20)" }}>Build my cup →</button>
+          <button type="button" className="ob-secondary" onClick={onTasteMatch}>Match my taste</button>
+        </div>
+        <div className="rise-2" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: "#A9957E", marginTop: 26, textTransform: "uppercase" }}>
+          Demonstration catalogue · live cup preview · staff confirmation required
+        </div>
+      </div>
+      <aside className="ob-welcome-dossier rise-2" aria-label="What the Origin Bar creates">
+        <div><span>THE ORIGIN ATELIER</span><span>01—06</span></div>
+        <div>
+          <h2>One Cup Passport</h2>
+          <p>Your selected origin, roast, method, ingredients, allergen signals, illustrative caffeine range and subtotal stay visible from first choice to counter handoff.</p>
+          <div className="ob-welcome-steps">
+            <span><b>01</b>Choose a coffee origin<small>place + flavour</small></span>
+            <span><b>02</b>Match the drink<small>method + milk</small></span>
+            <span><b>03</b>Check the cup<small>safety + subtotal</small></span>
+            <span><b>04</b>Confirm with staff<small>demo request</small></span>
+          </div>
+        </div>
+        <small style={{ color: "#9F8D7C", fontFamily: F.mono, fontSize: 13, lineHeight: 1.55 }}>Origin and availability records are illustrative until Deldiet connects verified supplier, inventory and point-of-sale data.</small>
+      </aside>
+    </section>
+  );
 }
 
 const TASTE_MATCHES = [

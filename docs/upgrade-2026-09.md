@@ -61,3 +61,10 @@ Existing assets and the original Sites metadata are preserved. Changes are publi
 - Moved global Explore into the Origin Bar header so it no longer covers Back. Added compact landscape controls and safe-area spacing.
 - Preserved all catalogue arrays/prices/options, dynamic cup rendering, pricing calculations, recipe controls, safety acknowledgement, session drafts, receipt sharing/expiry, idle resets and submission/retry safeguards.
 - Verification: 20 automated checks pass, including four new navigation/recipe-default regressions. Production build passes. No interactive browser testing was performed; the existing staff-review database setup requirement remains unchanged.
+
+## Origin Bar cover restoration
+
+- Restored the previous dark coffeehouse welcome, “Craft a cup from somewhere real” headline, live cup illustration, lime actions and One Cup Passport panel at the user's request.
+- Restored Young Serif, Albert Sans and IBM Plex Mono only within the cover, served through Next.js font assets. The newer builder typography, top navigation, Taste Match, search, six-step flow and safeguards remain intact.
+- Removed the replaced split-cover styles and widened the original cover's stacking breakpoint to keep tablet text readable.
+- Verification: production build and all 20 existing automated checks pass. Source comparison confirms all code outside cover markup/font declarations is unchanged; no interactive browser QA was performed.
