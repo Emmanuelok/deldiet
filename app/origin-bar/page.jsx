@@ -2,10 +2,13 @@
 
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import "./origin-bar.css";
+import { canVisitOriginBarStep, getDrinkDefaults } from "@/lib/origin-bar-flow.mjs";
 import { createIdempotencyKey, submitServiceRequest } from "@/lib/request-client";
 import {
   Coffee, Leaf, ChevronLeft, ChevronRight, Check, Plus, Minus,
-  Snowflake, MapPin, Heart
+  Snowflake, MapPin, Heart, ArrowUpRight, ArrowRight, Search, X, RotateCcw, SlidersHorizontal, Sparkles, ChevronDown, ClipboardCheck, Globe2, Layers, CheckCircle2
 } from "lucide-react";
 
 /* ============================================================
@@ -13,126 +16,23 @@ import {
    Flow: Welcome → Origin → Drink → Craft → Enhance → Finish → Review → Done
    ============================================================ */
 
-const FONTS = `
-@import url('https://fonts.googleapis.com/css2?family=Young+Serif&family=Albert+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
-@keyframes riseIn { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:translateY(0);} }
-@keyframes pour { from { transform:scaleY(0);} to { transform:scaleY(1);} }
-.rise { animation: riseIn .45s ease both; }
-.rise-1 { animation: riseIn .45s .08s ease both; }
-.rise-2 { animation: riseIn .45s .16s ease both; }
-.origin-bar-app { width: 100%; max-width: 100vw; min-height: 100svh; overflow: hidden; }
-.ob-scroll-region { min-height: 0; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
-.ob-utility { min-height: calc(44px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(18px, env(safe-area-inset-right)) 0 max(18px, env(safe-area-inset-left)); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; background: #17100C; border-bottom: 1px solid #4A372B; }
-.ob-utility a { min-height:44px; display: inline-flex; align-items: center; gap: 6px; color: #D8C4A8; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; }
-.ob-utility a:last-child { justify-self: end; color: #D9FF66; }
-.ob-utility > span { display: inline-flex; align-items: center; gap: 6px; color: #8F7D69; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; }
-.ob-label-short { display: none; }
-.ob-welcome { background-image: linear-gradient(90deg, rgba(20,12,8,.96) 0%, rgba(20,12,8,.88) 42%, rgba(20,12,8,.40) 100%), url('/deldiet-cafe-interior.png'); background-size: cover; background-position: center; }
-.ob-welcome-panel { width: min(620px, 100%); min-width: 0; margin-right: auto; display: flex; flex-direction: column; align-items: flex-start; text-align: left; }
-.ob-welcome { display:grid !important; grid-template-columns:minmax(0,1fr) minmax(310px,420px); gap:clamp(28px,6vw,90px); }
-.ob-welcome-dossier { min-width:0; align-self:center; min-height:500px; padding:26px; display:flex; flex-direction:column; justify-content:space-between; border:1px solid rgba(255,255,255,.2); background:rgba(26,17,12,.74); color:#F5EDE2; backdrop-filter:blur(18px); box-shadow:0 28px 80px rgba(0,0,0,.28); }
-.ob-welcome-dossier > div:first-child { display:flex; justify-content:space-between; gap:18px; color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; letter-spacing:.12em; text-transform:uppercase; }
-.ob-welcome-dossier h2 { margin:42px 0 12px; font-family:'Young Serif',Georgia,serif; font-size:clamp(38px,4vw,58px); font-weight:400; line-height:.98; }
-.ob-welcome-dossier > p { margin:0; color:#CDBEAE; font-size: 16px; line-height:1.65; }
-.ob-welcome-steps { margin-top:36px; border-top:1px solid rgba(255,255,255,.18); }
-.ob-welcome-steps span { min-height:58px; padding:11px 0; display:grid; grid-template-columns:34px 1fr auto; gap:12px; align-items:center; border-bottom:1px solid rgba(255,255,255,.14); font-size: 14px; }
-.ob-welcome-steps b { color:#D9FF66; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; }.ob-welcome-steps small{color:#9F8D7C;font-size: 13px;}
-.ob-welcome-actions { margin-top:30px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
-.ob-welcome-actions button { min-height:52px; padding:0 24px; border-radius:999px; font-size: 15px; font-weight:700; cursor:pointer; }
-.ob-welcome-actions .ob-secondary { border:1px solid #8B735F; background:rgba(20,12,8,.28); color:#F5EDE2; }
-.ob-workspace-grid { display:grid; grid-template-columns:190px minmax(0,1fr) 270px; gap:22px; align-items:start; }
-.ob-journey-rail,.ob-cup-stage { position:sticky; top:0; padding:16px; border:1.5px solid #E7DFD3; background:#fff; box-shadow:0 18px 45px rgba(46,30,20,.06); }
-.ob-journey-rail > span,.ob-cup-stage > span { display:block; margin-bottom:12px; color:#8A7A6C; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; letter-spacing:.13em; text-transform:uppercase; }
-.ob-journey-rail button { width:100%; min-height:52px; padding:10px 8px; display:grid; grid-template-columns:28px 1fr; gap:8px; align-items:center; border:0; border-top:1px solid #E7DFD3; background:none; color:#8A7A6C; text-align:left; font-size: 14px; cursor:pointer; }
-.ob-journey-rail button b { width:24px; height:24px; display:grid; place-items:center; border-radius:50%; background:#F3E9DA; color:#6F3E1E; font-family:'IBM Plex Mono',ui-monospace,monospace; font-size: 13px; }
-.ob-journey-rail button.active { color:#2A1F18; font-weight:700; }.ob-journey-rail button.active b{background:var(--ob-accent,#9C5F2E);color:#fff;}
-.ob-cup-stage { text-align:center; }
-.ob-safety-rail { margin-top:14px; padding:12px; border:1px solid #E7DFD3; background:#F7F4EE; text-align:left; }
-.ob-safety-rail b { display:block; margin-bottom:4px; color:#2A1F18; font-size: 13px; }.ob-safety-rail p{margin:0;color:#6E5F53;font-size: 13px;line-height:1.5;}
-.ob-lot-passport { margin-top:16px; padding:18px; display:grid; grid-template-columns:minmax(0,1.1fr) minmax(230px,.9fr); gap:20px; border:1.5px solid #D8CBB9; background:linear-gradient(135deg,#2A1A12,#46301F); color:#F5EDE2; box-shadow:0 20px 45px rgba(46,30,20,.12); }.ob-lot-passport h3{margin:7px 0 6px;font-family:'Young Serif',Georgia,serif;font-size: 28px;font-weight:400}.ob-lot-passport p{margin:0;color:#CDBEAE;font-size: 14px;line-height:1.55}.ob-lot-passport .ob-lot-fields{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#5A4435}.ob-lot-passport .ob-lot-fields span{min-height:66px;padding:10px;background:#342219;font-size: 13px}.ob-lot-passport .ob-lot-fields small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 13px;letter-spacing:.1em;text-transform:uppercase}.ob-safety-ack{margin-top:12px;padding:12px;display:flex;align-items:flex-start;gap:10px;border:2px solid #D8CBB9;background:#FFF9EE;color:#49382D;font-size: 14px;line-height:1.5;cursor:pointer}.ob-safety-ack input{width:22px;height:22px;min-height:22px;margin:1px 0 0;accent-color:var(--ob-accent,#9C5F2E)}.ob-mobile-passport{display:none}
-.ob-truth-note { margin:0 0 18px; padding:12px 14px; display:flex; align-items:flex-start; gap:10px; border:1px solid #D8CBB9; background:#FFF9EE; color:#5E4B3D; font-size: 13px; line-height:1.5; }
-.ob-truth-extra { display:inline; }
-.ob-horizontal-scroll { scrollbar-width:none; -ms-overflow-style:none; overscroll-behavior-x:contain; scroll-snap-type:x proximity; }
-.ob-horizontal-scroll::-webkit-scrollbar { display:none; }
-.ob-horizontal-scroll > * { scroll-snap-align:start; }
-.ob-extraction-status { display:inline-flex; max-width:100%; white-space:normal !important; line-height:1.35; }
-.ob-choice-tabs button { min-width:0; }
-.ob-tab-short { display:none; }
-.ob-review-row { padding:8px 0; display:grid; grid-template-columns:minmax(90px,.45fr) minmax(0,1fr) auto; gap:12px; align-items:baseline; border-bottom:1px dashed #E7DFD3; }
-.ob-review-label { color:#6E5F53; }
-.ob-review-value { min-width:0; overflow-wrap:anywhere; text-align:right; }
-.ob-kiosk-header { background:#221611; min-height:66px; flex-shrink:0; border-bottom:1px solid #4A372B; padding-left:max(16px,env(safe-area-inset-left)) !important; padding-right:max(16px,env(safe-area-inset-right)) !important; }
-.ob-kiosk-brand { min-width:0; }
-.ob-kiosk-progress { display:flex; align-items:center; gap:12px; margin-left:auto; }
-.ob-progress-dots { display:flex; gap:6px; }
-.ob-reset-short { display:none; }
-.ob-reset-button { flex:none; }
-.ob-flow-footer { background:#221611; min-height:calc(68px + env(safe-area-inset-bottom)); height:auto; flex-shrink:0; padding:9px max(16px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left)) !important; }
-.ob-next { min-width:0; white-space:nowrap; }
-.ob-next-target { display:inline; }
-.ob-idle-actions { display:flex; gap:12px; }
-.origin-bar-app button,.origin-bar-app input,.origin-bar-app select { min-height:44px; }
-.origin-bar-app button { touch-action:manipulation; }
-.origin-bar-app input,.origin-bar-app select { font-size: 16px !important; }
-@media (prefers-reduced-motion: reduce) { .origin-bar-app * { animation: none !important; transition: none !important; } }
-@media (max-width: 640px) {
-  .ob-utility { min-height:calc(44px + env(safe-area-inset-top)); grid-template-columns: minmax(0,1fr) minmax(0,1fr); padding:env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left)); gap:8px; }
-  .ob-utility > span { display: none; }
-  .ob-utility a { min-width:0; font-size: 13px; letter-spacing: .08em; white-space:nowrap; }
-  .ob-label-wide { display: none; }
-  .ob-label-short { display: inline; }
-  .ob-welcome { background-image: linear-gradient(0deg, rgba(20,12,8,.98) 0%, rgba(20,12,8,.78) 64%, rgba(20,12,8,.32) 100%), url('/deldiet-cafe-interior.png'); background-position: 55% center; }
-  .ob-welcome-panel { align-items: center; text-align: center; }
-  .ob-welcome { grid-template-columns:minmax(0,1fr); gap:24px; padding:28px 18px !important; }.ob-welcome-panel,.ob-welcome-dossier{min-width:0;width:100%;}.ob-welcome-dossier{min-height:auto;margin-top:0;padding:20px;text-align:left;}.ob-welcome-dossier h2{margin:24px 0 10px;font-size: 34px}.ob-welcome-dossier>p{font-size: 15px}.ob-welcome-steps{margin-top:20px}.ob-welcome-steps span{min-height:50px;grid-template-columns:30px minmax(0,1fr);}.ob-welcome-steps small{display:none}.ob-welcome-actions{justify-content:center;}.ob-welcome-actions button{width:100%;}
-}
-@media (max-width: 1199px) { .ob-workspace-grid{grid-template-columns:minmax(0,1fr) 250px}.ob-journey-rail{display:none} }
-@media (max-width: 899px) { .ob-workspace-grid{display:block}.ob-cup-stage{display:none} }
-@media (max-width: 899px) { .ob-lot-passport{grid-template-columns:1fr}.ob-mobile-passport{display:block;flex:none;border-top:1px solid #5A4435;background:linear-gradient(90deg,#21140f,#342018);color:#F5EDE2}.ob-mobile-passport summary{min-height:62px;padding:9px max(14px,env(safe-area-inset-right)) 9px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;cursor:pointer;list-style:none}.ob-mobile-passport summary::-webkit-details-marker{display:none}.ob-mobile-passport b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size: 13px}.ob-mobile-passport span{display:block;margin-top:3px;color:#BBA890;font-size: 13px;line-height:1.35}.ob-mobile-passport strong{color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 16px}.ob-mobile-passport-panel{padding:12px max(14px,env(safe-area-inset-right)) 14px max(14px,env(safe-area-inset-left));display:grid;grid-template-columns:1fr 1fr;gap:1px;border-top:1px solid #4A372B;background:#291912}.ob-mobile-passport-panel div{padding:9px;background:#342219}.ob-mobile-passport-panel small{display:block;margin-bottom:4px;color:#D9FF66;font-family:'IBM Plex Mono',ui-monospace,monospace;font-size: 13px;letter-spacing:.08em;text-transform:uppercase}.ob-mobile-passport-panel p{margin:0;color:#D8C4A8;font-size: 13px;line-height:1.45} }
-@media (max-width: 720px) {
-  .ob-kiosk-header { min-height:86px; padding:9px max(14px,env(safe-area-inset-right)) 8px max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"brand reset" "progress progress"; gap:7px 10px; }
-  .ob-kiosk-brand { grid-area:brand; }.ob-reset-button{grid-area:reset}.ob-kiosk-progress { grid-area:progress; width:100%; margin:0; justify-content:space-between; }
-  .ob-progress-copy { display:inline !important; font-size: 13px !important; }
-  .ob-flow-footer { min-height:calc(68px + env(safe-area-inset-bottom)); padding:9px max(14px,env(safe-area-inset-right)) max(9px,env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left)) !important; display:grid !important; grid-template-columns:auto minmax(0,1fr); gap:10px !important; }
-  .ob-footer-subtotal { display:none !important; }
-  .ob-next { width:100%; justify-content:center; padding:12px 16px !important; }
-  .ob-truth-note { margin-bottom:14px; padding:10px 12px; font-size: 13px; }
-  .ob-truth-extra { display:none; }
-  .ob-choice-tabs { display:grid !important; grid-template-columns:1fr 1fr; gap:8px !important; }
-  .ob-choice-tabs button { width:100%; padding:8px 9px !important; white-space:normal !important; line-height:1.25; }
-  .ob-tab-wide { display:none; }.ob-tab-short{display:inline;}
-  .ob-review-row { grid-template-columns:minmax(0,1fr) auto; gap:4px 12px; align-items:start; }
-  .ob-review-label { grid-column:1; font-size: 13px !important; }
-  .ob-review-value { grid-column:1/-1; grid-row:2; text-align:left; font-size: 14px !important; }
-  .ob-review-price { grid-column:2; grid-row:1; font-size: 13px !important; }
-}
-@media (max-width: 360px) {
-  .ob-kiosk-header { padding-left:max(12px,env(safe-area-inset-left)) !important; padding-right:max(12px,env(safe-area-inset-right)) !important; }
-  .ob-kiosk-brand span { font-size: 16px !important; }
-  .ob-reset-wide { display:none; }.ob-reset-short{display:inline;}
-  .ob-progress-dots { gap:4px; }
-  .ob-narrow-stack { grid-template-columns:1fr !important; }
-  .ob-idle-actions { flex-direction:column; }
-}
-.ok-scroll::-webkit-scrollbar { width: 6px; }
-.ok-scroll::-webkit-scrollbar-thumb { background: #d8cfc2; border-radius: 99px; }
-`;
 
 const C = {
-  espresso: "#221611",
-  ink: "#2A1F18",
-  faint: "#6E5F53",
-  paper: "#F7F4EE",
-  card: "#FFFFFF",
-  line: "#E7DFD3",
+  espresso: "#203A2C",
+  ink: "#203127",
+  faint: "#647165",
+  paper: "#F7F5ED",
+  card: "#FFFEFA",
+  line: "#DEE2D5",
   leaf: "#4D7C57",
   leafSoft: "#EAF1EB",
-  cream: "#F3E9DA",
+  cream: "#EEEBDF",
 };
 
 const F = {
-  disp: "'Young Serif', Georgia, serif",
-  body: "'Albert Sans', system-ui, sans-serif",
-  mono: "'IBM Plex Mono', ui-monospace, monospace",
+  disp: "var(--sans)",
+  body: "var(--sans)",
+  mono: "var(--font-geist-mono), monospace",
 };
 
 /* ---------------- ROASTS (drive the accent color) ---------------- */
@@ -349,7 +249,7 @@ const readableAccent = (color) => color === ROASTS[0].color ? "#754019" : color;
 
 function Tag({ children, color = C.faint, bg = "transparent", border = C.line, wrap = false }) {
   return (
-    <span style={{ maxWidth: wrap ? "100%" : undefined, fontFamily: F.mono, fontSize: 13, lineHeight: wrap ? 1.35 : undefined, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: wrap ? "normal" : "nowrap", overflowWrap: wrap ? "anywhere" : undefined }}>
+    <span className="ob-tag" style={{ maxWidth: wrap ? "100%" : undefined, fontFamily: F.mono, fontSize: 13, lineHeight: wrap ? 1.35 : undefined, letterSpacing: 0.6, color, background: bg, border: `1px solid ${border}`, borderRadius: 999, padding: "3px 9px", textTransform: "uppercase", whiteSpace: wrap ? "normal" : "nowrap", overflowWrap: wrap ? "anywhere" : undefined }}>
       {children}
     </span>
   );
@@ -357,7 +257,7 @@ function Tag({ children, color = C.faint, bg = "transparent", border = C.line, w
 
 function SectionTitle({ kicker, title, sub, accent }) {
   return (
-    <div className="rise" style={{ marginBottom: 20 }}>
+    <div className="ob-section-title rise" style={{ marginBottom: 20 }}>
       <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 8 }}>{kicker}</div>
       <h2 className="ob-step-heading" tabIndex={-1} style={{ fontFamily: F.disp, fontSize: "clamp(24px, 3.4vw, 34px)", color: C.ink, lineHeight: 1.15, margin: 0 }}>{title}</h2>
       {sub && <p style={{ fontFamily: F.body, color: C.faint, fontSize: 14, marginTop: 8, maxWidth: 560 }}>{sub}</p>}
@@ -368,7 +268,7 @@ function SectionTitle({ kicker, title, sub, accent }) {
 function Pill({ active, onClick, children, accent }) {
   const activeText = accent === ROASTS[0].color ? C.espresso : "#fff";
   return (
-    <button type="button" aria-pressed={active} onClick={onClick} style={{
+    <button type="button" className="ob-pill" aria-pressed={active} onClick={onClick} style={{
       fontFamily: F.body, fontSize: 14, fontWeight: 600, padding: "8px 14px", borderRadius: 999, cursor: "pointer",
       border: `1.5px solid ${active ? accent : C.line}`, background: active ? accent : C.card, color: active ? activeText : C.ink,
       transition: "all .15s ease", whiteSpace: "nowrap",
@@ -379,13 +279,13 @@ function Pill({ active, onClick, children, accent }) {
 function Card({ active, onClick, accent, children, pad = 14, disabled = false }) {
   const activeText = accent === ROASTS[0].color ? C.espresso : "#fff";
   return (
-    <button type="button" onClick={onClick} disabled={disabled} aria-disabled={disabled} aria-pressed={active} className="text-left w-full" style={{
+    <button type="button" onClick={onClick} disabled={disabled} aria-disabled={disabled} aria-pressed={active} className="ob-option text-left w-full" style={{
       position: "relative", background: C.card, borderRadius: 14, padding: pad, cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? 0.48 : 1,
       border: `1.5px solid ${active ? accent : C.line}`, boxShadow: active ? `0 0 0 3px ${accent}22` : "0 1px 2px rgba(34,22,17,.04)",
       transition: "border-color .15s ease, box-shadow .15s ease", fontFamily: F.body, color: C.ink,
     }}>
       {active && (
-        <span style={{ position: "absolute", top: 10, right: 10, width: 20, height: 20, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <span className="ob-selection-check" style={{ position: "absolute", top: 10, right: 10, width: 20, height: 20, borderRadius: 999, background: accent, display: "flex", alignItems: "center", justifyContent: "center" }}>
           <Check size={12} color={activeText} strokeWidth={3} />
         </span>
       )}
@@ -418,12 +318,45 @@ function Seg({ options, value, onChange, accent }) {
 
 function UtilityBar() {
   return (
-    <div className="ob-utility">
-      <Link href="/"><ChevronLeft size={12} /><span className="ob-label-wide">Deldiet Coffeehouse &amp; Store</span><span className="ob-label-short">Deldiet Home</span></Link>
-      <span><MapPin size={11} /> St. John&apos;s concept · demo kiosk</span>
-      <Link href="/origin-exchange"><span className="ob-label-wide">Shop Origin Exchange</span><span className="ob-label-short">Origin Exchange</span><ChevronRight size={12} /></Link>
-    </div>
+    <nav className="ob-topbar" aria-label="Deldiet navigation">
+      <Link className="ob-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark-ink.svg" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
+      <span className="ob-topbar-context">THE ORIGIN BAR <span>Your coffee atelier</span></span>
+      <div className="ob-topbar-links"><Link href="/coffeehouse">Coffeehouse</Link><Link href="/origin-exchange">Origin Exchange<ArrowUpRight size={15}/></Link><button type="button" onClick={() => window.dispatchEvent(new Event("deldiet:search"))} aria-label="Explore Deldiet tools"><Search size={18}/><span>Explore</span></button></div>
+    </nav>
   );
+}
+
+function ChoiceSearch({ value, onChange, placeholder, label }) {
+  return <div className="ob-choice-search"><Search size={19}/><input aria-label={label} type="search" value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder}/>{value && <button type="button" onClick={() => onChange("")} aria-label={`Clear ${label.toLowerCase()}`}><X size={17}/></button>}</div>;
+}
+
+function StepNavigation({ step, sel, submitting, onGo }) {
+  const icons = [Globe2, Coffee, SlidersHorizontal, Sparkles, Layers, ClipboardCheck];
+  const descriptions = [sel.origin?.n || "Choose your beans", sel.drink?.n || "Find your favourite", "Milk & method", "The little extras", "Size & serve", "Your final look"];
+  const navigationRef = useRef(null);
+  useEffect(() => {
+    const active = navigationRef.current?.querySelector('[aria-current="step"]');
+    if (active) navigationRef.current.scrollLeft = Math.max(0, active.offsetLeft - navigationRef.current.offsetLeft - (navigationRef.current.clientWidth - active.clientWidth) / 2);
+  }, [step]);
+  return <nav className="ob-step-navigation" ref={navigationRef} aria-label="Build your cup steps">{STEP_LABELS.map((label, index) => {
+    const number = index + 1;
+    const available = canVisitOriginBarStep(number, sel, submitting);
+    const StepIcon = icons[index];
+    return <button key={label} type="button" aria-current={number === step ? "step" : undefined} disabled={!available} onClick={() => onGo(number)} title={!available ? number === 2 ? "Choose an origin first" : "Choose an origin and drink first" : `Edit ${label.toLowerCase()}`}><span className="ob-step-symbol">{number < step ? <Check size={17}/> : <StepIcon size={18}/>}</span><span><b><small>{String(number).padStart(2,"0")}</small>{label}</b><span>{descriptions[index]}</span></span></button>;
+  })}</nav>;
+}
+
+function CupSummary({ sel, roastObj, cupProps, parts, tags, safety, onGo, submitting }) {
+  return <aside className="ob-cup-summary" aria-label="Your live cup preview">
+    <div className="ob-summary-heading"><span>YOUR CUP, COMING TO LIFE</span><Coffee size={18}/></div>
+    <div className="ob-live-cup"><div className="ob-cup-halo"/><CupSVG uid="rail" {...cupProps.svg} width={180}/><span className="ob-live-label">Illustrated preview</span></div>
+    <div className="ob-summary-name"><span>{sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "A world of possibility"}</span><h2>{sel.name || sel.drink?.n || "A little more you."}</h2><p>{sel.drink ? `${roastObj.name} roast · ${sel.temp.toLowerCase()}` : "Every choice brings your cup a little closer."}</p></div>
+    <dl className="ob-summary-recipe"><div><dt>Milk</dt><dd>{sel.milk}</dd></div><div><dt>Method</dt><dd>{sel.drink ? sel.extraction : "Choose a drink"}</dd></div><div><dt>Size</dt><dd>{SIZES.find(size => size.id === sel.size)?.oz} oz · {sel.cup.split(" · ")[0]}</dd></div></dl>
+    <div className="ob-summary-notes">{tags.slice(0,3).map(tag => <span key={tag}>{tag}</span>)}</div>
+    <div className="ob-summary-total"><span>Estimated subtotal<small>CAD · confirmed by staff</small></span><b aria-live="polite">{money(parts.total)}</b></div>
+    {sel.origin && sel.drink && <button type="button" className="ob-summary-review" disabled={submitting} onClick={() => onGo(6)}>Review my cup<ArrowUpRight size={18}/></button>}
+    <details className="ob-summary-safety"><summary>Ingredients & caffeine<ChevronDown size={15}/></summary><p>{safety.caffeine}. {safety.allergens.length ? `Selected signals: ${safety.allergens.join(", ")}.` : "No selected allergen signals."} Shared-equipment cross-contact remains possible. Staff verification is required.</p></details>
+  </aside>;
 }
 
 /* ==================== SIGNATURE: THE LIVE CUP ==================== */
@@ -501,44 +434,11 @@ function CupSVG({ uid, roast, hasMilk, foam, whip, iced, blended, drizzle, boost
 /* ============================ SCREENS ============================ */
 
 function Welcome({ onBegin, onTasteMatch }) {
-  return (
-    <div className="ob-welcome flex items-center px-6 sm:px-10 lg:px-16" style={{ minHeight: "100%", paddingTop: 48, paddingBottom: 48 }}>
-      <div className="ob-welcome-panel">
-        <div className="rise"><Tag wrap color="#D8C4A8" border="#6A503C" bg="rgba(34,22,17,.72)">Origin-led · compatibility-aware · barista confirmed</Tag></div>
-        <div className="rise-1" style={{ margin: "26px 0 16px", padding: "12px 22px", borderRadius: 999, background: "rgba(247,244,238,.94)", boxShadow: "0 18px 50px rgba(0,0,0,.24)" }}>
-          <CupSVG uid="hero" roast={ROASTS[1]} hasMilk foam sizeIdx={2} width={116} />
-        </div>
-        <div className="rise-1" style={{ fontFamily: F.mono, fontSize: 13, color: "#D9FF66", letterSpacing: 2, textTransform: "uppercase", marginBottom: 9 }}>Deldiet Coffeehouse · in-store atelier</div>
-        <h1 className="rise-1" style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: "clamp(42px, 7vw, 72px)", lineHeight: 1.02, margin: 0 }}>
-          Craft a cup<br/>from somewhere real.
-        </h1>
-        <p className="rise-2" style={{ fontFamily: F.body, color: "#D6C6B2", fontSize: 15, maxWidth: 510, marginTop: 14, lineHeight: 1.65 }}>
-          Build your cup from the bean upward. Choose the origin, roast, drink, milk, extraction and finishing details while your cup and price update live.
-        </p>
-        <div className="ob-welcome-actions rise-2">
-          <button onClick={onBegin} style={{ fontFamily: F.body, color: "#241405", background: "#D9FF66", border: "none", boxShadow: "0 8px 24px rgba(217,255,102,.20)" }}>Build my cup →</button>
-          <button className="ob-secondary" onClick={onTasteMatch}>Match my taste</button>
-        </div>
-        <div className="rise-2" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: "#A9957E", marginTop: 26, textTransform: "uppercase" }}>
-          Demonstration catalogue · live cup preview · staff confirmation required
-        </div>
-      </div>
-      <aside className="ob-welcome-dossier rise-2" aria-label="What the Origin Bar creates">
-        <div><span>THE ORIGIN ATELIER</span><span>01—06</span></div>
-        <div>
-          <h2>One Cup Passport</h2>
-          <p>Your selected origin, roast, method, ingredients, allergen signals, illustrative caffeine range and subtotal stay visible from first choice to counter handoff.</p>
-          <div className="ob-welcome-steps">
-            <span><b>01</b>Choose a coffee origin<small>place + flavour</small></span>
-            <span><b>02</b>Match the drink<small>method + milk</small></span>
-            <span><b>03</b>Check the cup<small>safety + subtotal</small></span>
-            <span><b>04</b>Confirm with staff<small>demo request</small></span>
-          </div>
-        </div>
-        <small style={{ color: "#9F8D7C", fontFamily: F.mono, fontSize: 13, lineHeight: 1.55 }}>Origin and availability records are illustrative until Deldiet connects verified supplier, inventory and point-of-sale data.</small>
-      </aside>
-    </div>
-  );
+  return <section className="ob-entry" aria-labelledby="ob-welcome-title">
+    <div className="ob-entry-copy"><span className="ob-eyebrow">WELCOME TO THE ORIGIN BAR</span><h1 id="ob-welcome-title">Good coffee.<br/><em>Your signature.</em></h1><p>From the first bean to the finishing touch. Create a cup that feels completely, wonderfully yours.</p><div className="ob-entry-actions"><button type="button" className="ob-primary-action" onClick={onBegin}>Let’s build your cup<ArrowRight size={20}/></button><button type="button" className="ob-text-action" onClick={onTasteMatch}><Sparkles size={17}/>Help me find my flavour</button></div><div className="ob-entry-path"><span><b>01</b>Pick your origin</span><span><b>02</b>Make it yours</span><span><b>03</b>Review every detail</span></div><p className="ob-entry-note">Explore the demonstration menu. Staff confirm availability, ingredients and final pricing before preparation.</p></div>
+    <div className="ob-entry-visual"><Image src="/menu/deldiet-hot-cup.webp" alt="Deldiet coffee cup on a warm stone surface" fill unoptimized sizes="(max-width: 760px) 100vw, 50vw" priority/><span className="ob-entry-photo-label">THE EVERYDAY, MADE PERSONAL.</span><div className="ob-entry-stamp">Made<br/><em>by you.</em><Sparkles size={25}/></div><div className="ob-entry-photo-footer"><span>ORIGIN. ROAST. RITUAL.</span><span>One cup. Endless possibility.</span></div></div>
+    <div className="ob-entry-bottom"><span><Globe2 size={20}/>Coffee from five growing regions</span><span><SlidersHorizontal size={20}/>Every detail, in your hands</span><span><Coffee size={20}/>A cup that updates as you create</span></div>
+  </section>;
 }
 
 const TASTE_MATCHES = [
@@ -550,46 +450,26 @@ const TASTE_MATCHES = [
 
 function TasteMatch({ onBack, onApply }) {
   const [selected, setSelected] = useState(TASTE_MATCHES[0]);
-  return (
-    <div className="flex-1 overflow-y-auto ok-scroll" style={{ background: C.espresso, color: C.cream }}>
-      <div className="max-w-5xl mx-auto px-5 sm:px-8 py-10 sm:py-16">
-        <button onClick={onBack} className="inline-flex items-center gap-1.5" style={{ border: 0, background: "none", color: "#BBA890", fontSize: 14, cursor: "pointer" }}><ChevronLeft size={16}/> Back to Origin Bar</button>
-        <div className="grid lg:grid-cols-2 gap-10 items-start" style={{ marginTop: 32 }}>
-          <div>
-            <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 13, letterSpacing: ".16em", textTransform: "uppercase" }}>Transparent Taste Match</div>
-            <h1 style={{ margin: "15px 0 18px", fontFamily: F.disp, fontSize: "clamp(42px,6vw,72px)", lineHeight: .98, fontWeight: 400 }}>What should your coffee feel like?</h1>
-            <p style={{ maxWidth: 540, margin: 0, color: "#CDBEAE", fontSize: 16, lineHeight: 1.7 }}>Choose the profile that sounds closest. Deldiet recommends an editable origin, roast and drink—and shows the reason instead of hiding it behind a score.</p>
-            <div className="grid sm:grid-cols-2 gap-3" style={{ marginTop: 30 }}>
-              {TASTE_MATCHES.map((item) => <button key={item.id} aria-pressed={selected.id === item.id} onClick={() => setSelected(item)} style={{ minHeight: 122, padding: 18, border: `1.5px solid ${selected.id === item.id ? "#D9FF66" : "#5A4435"}`, background: selected.id === item.id ? "rgba(217,255,102,.10)" : "rgba(255,255,255,.035)", color: C.cream, textAlign: "left", cursor: "pointer" }}><b style={{ display: "block", fontSize: 16 }}>{item.label}</b><span style={{ display: "block", marginTop: 8, color: "#A9957E", fontSize: 13, lineHeight: 1.5 }}>{item.detail}</span></button>)}
-            </div>
-          </div>
-          <aside style={{ padding: 26, border: "1px solid #5A4435", background: "#2B1D16" }}>
-            <span style={{ fontFamily: F.mono, color: "#A9957E", fontSize: 13, letterSpacing: ".14em", textTransform: "uppercase" }}>Editable recommendation</span>
-            <div style={{ margin: "28px 0", padding: 24, background: "#F7F4EE", color: C.ink }}>
-              <div style={{ fontSize: 40 }}>{Object.values(ORIGINS).flat().find((o) => o.n === selected.country)?.f}</div>
-              <h2 style={{ margin: "12px 0 4px", fontFamily: F.disp, fontSize: 38, fontWeight: 400 }}>{selected.country}</h2>
-              <p style={{ margin: 0, fontFamily: F.mono, color: C.faint, fontSize: 13, textTransform: "uppercase" }}>{ROASTS.find((r) => r.id === selected.roast)?.name} roast · {selected.drink}</p>
-            </div>
-            <div style={{ paddingTop: 18, borderTop: "1px solid #5A4435" }}><b style={{ color: "#D9FF66", fontSize: 14 }}>Why this match</b><p style={{ margin: "8px 0 0", color: "#CDBEAE", fontSize: 14, lineHeight: 1.65 }}>{selected.why}</p></div>
-            <button onClick={() => onApply(selected)} style={{ width: "100%", minHeight: 54, marginTop: 28, border: 0, borderRadius: 999, background: "#D9FF66", color: "#241405", fontWeight: 750, fontSize: 15, cursor: "pointer" }}>Use this as my starting cup →</button>
-            <small style={{ display: "block", marginTop: 12, color: "#8F7D69", fontSize: 13, lineHeight: 1.5 }}>This is a preference match, not a health or dietary recommendation. Every choice remains editable.</small>
-          </aside>
-        </div>
-      </div>
-    </div>
-  );
+  return <main className="ob-taste-screen ob-scroll-region overflow-y-auto">
+    <button type="button" className="ob-text-action" onClick={onBack}><ChevronLeft size={17}/>Back to Origin Bar</button>
+    <div className="ob-taste-layout"><div><span className="ob-eyebrow">LET’S FIND YOUR STARTING POINT</span><h1>Follow your<br/><em>flavour.</em></h1><p>Pick the one that sounds like you. We’ll suggest a coffee to start with, and you can make every detail your own.</p><div className="ob-taste-options">{TASTE_MATCHES.map((item,index) => <button type="button" key={item.id} aria-pressed={selected.id === item.id} onClick={() => setSelected(item)}><span>0{index+1}</span><div><b>{item.label}</b><small>{item.detail}</small></div>{selected.id === item.id ? <CheckCircle2 size={22}/> : <Plus size={20}/>}</button>)}</div></div>
+    <aside className="ob-taste-match"><span className="ob-eyebrow">YOUR STARTING CUP</span><div className="ob-taste-image"><Image src={selected.id === "cold" ? "/menu/deldiet-cold-cup.webp" : "/menu/deldiet-hot-cup.webp"} alt={selected.id === "cold" ? "Deldiet iced coffee" : "Deldiet hot coffee"} fill unoptimized sizes="(max-width: 760px) 90vw, 35vw"/></div><h2>{Object.values(ORIGINS).flat().find(origin => origin.n === selected.country)?.f} {selected.country}</h2><p>{ROASTS.find(roast => roast.id === selected.roast)?.name} roast · {selected.drink}</p><div className="ob-taste-reason"><b>Why this match</b><p>{selected.why}</p></div><button type="button" className="ob-primary-action" onClick={() => onApply(selected)}>Make this cup mine<ArrowRight size={18}/></button><small>A preference match. Every choice remains editable.</small></aside></div>
+  </main>;
 }
 
 function OriginStep({ sel, set, accent }) {
-  const [continent, setContinent] = useState("Africa");
+  const [continent, setContinent] = useState(() => Object.keys(ORIGINS).find(region => ORIGINS[region].some(origin => origin.n === sel.origin?.n)) || "Africa");
+  const [query, setQuery] = useState("");
   const [beanFilter, setBeanFilter] = useState("All");
-  const list = ORIGINS[continent].filter((c) => beanFilter === "All" || c.b.includes(beanFilter[0]));
+  const source = query.trim() ? Object.entries(ORIGINS).flatMap(([region, origins]) => origins.map(origin => ({ ...origin, continent: region }))) : ORIGINS[continent].map(origin => ({ ...origin, continent }));
+  const list = source.filter(c => (beanFilter === "All" || c.b.includes(beanFilter[0])) && `${c.n} ${c.t} ${c.continent} ${c.b.map(bean => BEAN_NAMES[bean]).join(" ")}`.toLowerCase().includes(query.trim().toLowerCase()));
   const lot = sel.origin ? lotProfileFor(sel.origin) : null;
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 1 · Origin & roast"
-        title="Where should your beans come from?"
-        sub="Explore the current demonstration catalogue across five growing regions. Availability changes by harvest; pick the place, then set the roast." />
+        title="Start somewhere extraordinary."
+        sub="Choose a place and a flavour that catches your curiosity. Then find the roast you love." />
+      <ChoiceSearch value={query} onChange={setQuery} label="Search coffee origins" placeholder="Search country, flavour or bean type…"/>
       <div className="flex flex-wrap gap-2 rise" style={{ marginBottom: 10 }}>
         {["All", "Arabica", "Robusta", "Liberica", "Excelsa"].map((b) => (
           <Pill key={b} active={beanFilter === b} accent={accent} onClick={() => setBeanFilter(b)}>{b}</Pill>
@@ -597,19 +477,19 @@ function OriginStep({ sel, set, accent }) {
       </div>
       <div className="ob-horizontal-scroll flex gap-2 overflow-x-auto pb-2 rise" style={{ marginBottom: 14 }}>
         {Object.keys(ORIGINS).map((ct) => (
-          <Pill key={ct} active={continent === ct} accent={accent} onClick={() => setContinent(ct)}>{ct}</Pill>
+          <Pill key={ct} active={continent === ct} accent={accent} onClick={() => { setContinent(ct); setQuery(""); }}>{ct}</Pill>
         ))}
       </div>
       {list.length === 0 && (
         <p style={{ fontFamily: F.body, color: C.faint, fontSize: 14, padding: "20px 4px" }}>
-          No {beanFilter} lots on this continent right now — try another region or clear the filter.
+          No origins match these choices. <button type="button" className="ob-inline-reset" onClick={() => { setQuery(""); setBeanFilter("All"); }}>Clear filters</button>
         </p>
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {list.map((c) => {
           const active = sel.origin?.n === c.n;
           return (
-            <Card key={c.n} active={active} accent={accent} onClick={() => set({ origin: { ...c, continent } })}>
+            <Card key={c.n} active={active} accent={accent} onClick={() => set({ origin: c })}>
               <div className="flex items-start gap-3">
                 <span style={{ fontSize: 26, lineHeight: 1 }}>{c.f}</span>
                 <div style={{ minWidth: 0 }}>
@@ -628,7 +508,7 @@ function OriginStep({ sel, set, accent }) {
         })}
       </div>
       {sel.origin && lot && (
-        <article className="ob-lot-passport rise-1" aria-label={`Demonstration lot passport for ${sel.origin.n}`}>
+        <details className="ob-lot-passport rise-1" aria-label={`Demonstration lot passport for ${sel.origin.n}`}><summary><span>{sel.origin.f} {sel.origin.n} · explore the lot passport</span><ChevronDown size={18}/></summary><div className="ob-lot-expanded">
           <div>
             <div style={{ fontFamily: F.mono, color: "#D9FF66", fontSize: 13, letterSpacing: ".13em", textTransform: "uppercase" }}>Selected origin · field-level verification</div>
             <h3>{sel.origin.f} {sel.origin.n} dossier</h3>
@@ -640,10 +520,10 @@ function OriginStep({ sel, set, accent }) {
             <span><small>Producer / co-op</small>{lot.producer}</span><span><small>Process</small>{lot.process}</span>
             <span><small>Harvest</small>{lot.harvest}</span><span><small>Verification</small>Evidence pending</span>
           </div>
-        </article>
+        </div></details>
       )}
       <div style={{ marginTop: 28 }}>
-        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Choose your roast — the room warms with it</div>
+        <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.5, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Choose your roast</div>
       <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-4 gap-3">
           {ROASTS.map((r) => (
             <Card key={r.id} active={sel.roast === r.id} accent={r.color} onClick={() => set({ roast: r.id })}>
@@ -661,31 +541,29 @@ function OriginStep({ sel, set, accent }) {
 }
 
 function DrinkStep({ sel, set, accent }) {
-  const list = sel.tab === "classics" ? CLASSICS : SIGNATURES;
-  const pick = (d) => {
-    const compactOnly = ["Espresso", "Doppio", "Ristretto", "Macchiato", "Affogato", "Espresso con Panna"];
-    const temp = d.fam === "cold" || d.iced ? "Iced" : d.fam === "blended" ? "Blended" : "Hot";
-    set({
-      drink: d, extraShots: 0, temp,
-      size: compactOnly.includes(d.n) ? "seed" : sel.size,
-      extraction: EXTRACTIONS[d.fam][0],
-      milk: d.milk ? (sel.milkTouched ? sel.milk : "Organic whole") : "None — black",
-    });
-  };
+  const [browseTab, setBrowseTab] = useState(sel.tab);
+  const [query, setQuery] = useState("");
+  const catalogue = browseTab === "classics" ? CLASSICS : SIGNATURES;
+  const list = catalogue.filter(drink => `${drink.n} ${drink.d} ${drink.fam} ${(drink.tag || []).join(" ")}`.toLowerCase().includes(query.trim().toLowerCase()));
+  const pick = (drink) => set({ ...getDrinkDefaults(drink, sel, EXTRACTIONS), tab: browseTab });
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 2 · The make"
-        title="Now — what are we making?"
-        sub="Every house classic from the world's great coffee menus, or one of our signature creations. Your origin and roast carry through either way." />
+        title="What’s your kind of coffee?"
+        sub="A familiar favourite or something a little unexpected. Your chosen beans and roast come along for the ride." />
+      <ChoiceSearch value={query} onChange={setQuery} label="Search drinks" placeholder="Search flat white, chocolate, cold brew…"/>
       <div className="ob-choice-tabs flex gap-2 rise" style={{ marginBottom: 16 }}>
-        <Pill active={sel.tab === "classics"} accent={accent} onClick={() => set({ tab: "classics", drink: null })}><span className="ob-tab-wide">House classics · </span><span className="ob-tab-short">Classics · </span>{CLASSICS.length}</Pill>
-        <Pill active={sel.tab === "signatures"} accent={accent} onClick={() => set({ tab: "signatures", drink: null })}><span className="ob-tab-wide">Signature creations · </span><span className="ob-tab-short">Signatures · </span>{SIGNATURES.length}</Pill>
+        <Pill active={browseTab === "classics"} accent={accent} onClick={() => { setBrowseTab("classics"); setQuery(""); }}><span className="ob-tab-wide">House classics · </span><span className="ob-tab-short">Classics · </span>{CLASSICS.length}</Pill>
+        <Pill active={browseTab === "signatures"} accent={accent} onClick={() => { setBrowseTab("signatures"); setQuery(""); }}><span className="ob-tab-wide">Signature creations · </span><span className="ob-tab-short">Signatures · </span>{SIGNATURES.length}</Pill>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="ob-choice-result"><span>{list.length} drinks to discover</span>{sel.drink && <span><CheckCircle2 size={15}/>Selected: {sel.drink.n}</span>}</div>
+      {list.length === 0 && <div className="ob-no-results"><Coffee size={28}/><p>No drinks match that search.</p><button type="button" className="ob-inline-reset" onClick={() => setQuery("")}>Show this menu</button></div>}
+      <div className="ob-drink-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
         {list.map((d) => {
           const active = sel.drink?.n === d.n;
           return (
             <Card key={d.n} active={active} accent={accent} onClick={() => pick(d)}>
+              <span className={`ob-drink-symbol ob-drink-${d.fam}`}>{d.fam === "cold" || d.iced ? <Snowflake size={23}/> : d.fam === "blended" ? <Sparkles size={23}/> : <Coffee size={23}/>}</span>
               <div className="flex items-baseline justify-between gap-2" style={{ paddingRight: active ? 22 : 0 }}>
                 <span style={{ fontWeight: 700, fontSize: 15 }}>{d.n}</span>
                 <span style={{ fontFamily: F.mono, fontSize: 14, color: C.faint }}>{money(d.pr)}</span>
@@ -773,7 +651,7 @@ function EnhanceStep({ sel, set, accent }) {
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 4 · Enhance"
-        title="Flavours, optional add-ins & finishing touches"
+        title="A little something extra?"
         sub="Choose syrups, sweeteners, toppings and up to two optional functional ingredients. Bar staff confirm ingredient availability and suitability." />
       <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Optional add-ins · choose up to 2</div>
       <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 rise">
@@ -834,7 +712,7 @@ function FinishStep({ sel, set, accent }) {
   return (
     <div>
       <SectionTitle accent={accent} kicker="Step 5 · Finish"
-        title="Size it and send it"
+        title="The finishing details."
         sub="Our sizes grow like the plant does — seed to harvest. Bringing your own cup earns a little back." />
       <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: readableAccent(accent), textTransform: "uppercase", marginBottom: 10 }}>Cup size</div>
       <div className="ob-narrow-stack grid grid-cols-2 lg:grid-cols-4 gap-3 rise">
@@ -902,8 +780,8 @@ function ReviewStep({ sel, set, accent, parts, cupProps, tags, safety, onJump })
   ];
   return (
     <div>
-      <SectionTitle accent={accent} kicker="Step 6 · Review" title="One last look before we pour" />
-      <div className="grid lg:grid-cols-5 gap-6 items-start">
+      <SectionTitle accent={accent} kicker="Step 6 · Review" title="Your cup. Every detail." />
+      <div className="ob-review-layout grid lg:grid-cols-5 gap-6 items-start">
         <div className="lg:col-span-3 rise" style={{ background: C.card, border: `1.5px solid ${C.line}`, borderRadius: 16, padding: "16px 18px" }}>
           <ReviewGroup g={groups[0]} accent={accent} onJump={onJump}>
             <Row label="Origin" value={`${o.f} ${o.n} · ${o.b.map((b) => BEAN_NAMES[b]).join(" / ")}`} price={o.p > 0 ? `+${money(o.p)}` : "incl."} />
@@ -1225,7 +1103,8 @@ export default function OriginBarKiosk() {
 
   useEffect(() => {
     if (step < 1 || step > 6) return;
-    window.requestAnimationFrame(() => document.querySelector("#ob-scroll .ob-step-heading")?.focus());
+    const frame = window.requestAnimationFrame(() => document.querySelector("#ob-scroll .ob-step-heading")?.focus());
+    return () => window.cancelAnimationFrame(frame);
   }, [step]);
 
   useEffect(() => {
@@ -1287,7 +1166,7 @@ export default function OriginBarKiosk() {
   const submitting = requestState === "submitting";
   const canNext = !submitting && (step === 1 ? !!sel.origin : step === 2 ? !!sel.drink : step === 6 ? sel.safetyAck : true);
   const go = (n) => {
-    if (submitting) return;
+    if (!canVisitOriginBarStep(n, sel, submitting)) return;
     if (n < 6 && step === 6) {
       setSel((current) => ({ ...current, safetyAck: false }));
       setRequestError("");
@@ -1396,7 +1275,7 @@ export default function OriginBarKiosk() {
   const applyTasteMatch = (match) => {
     const origin = Object.values(ORIGINS).flat().find((item) => item.n === match.country);
     const drink = [...CLASSICS, ...SIGNATURES].find((item) => item.n === match.drink);
-    setSel({ ...FRESH, origin, roast: match.roast, drink, tab: SIGNATURES.includes(drink) ? "signatures" : "classics", extraction: EXTRACTIONS[drink?.fam]?.[0] || "Espresso machine", temp: drink?.iced || drink?.fam === "cold" ? "Iced" : "Hot" });
+    setSel({ ...FRESH, ...getDrinkDefaults(drink, FRESH, EXTRACTIONS), origin, roast: match.roast, tab: SIGNATURES.includes(drink) ? "signatures" : "classics" });
     setMatchReason(`${match.label}: ${match.why}`);
     setTasteMatchOpen(false);
     go(1);
@@ -1413,61 +1292,25 @@ export default function OriginBarKiosk() {
 
   return (
     <div className="origin-bar-app flex flex-col" style={{ height: "100dvh", background: C.paper, fontFamily: F.body, "--ob-accent": accent }}>
-      <style>{FONTS}</style>
       <UtilityBar />
       {step === 0 ? (
         tasteMatchOpen ? <TasteMatch onBack={() => setTasteMatchOpen(false)} onApply={applyTasteMatch}/> : <div className="ob-scroll-region flex-1 overflow-y-auto"><Welcome onBegin={() => go(1)} onTasteMatch={() => setTasteMatchOpen(true)} /></div>
       ) : (
         <>
-          <header className="ob-kiosk-header flex items-center justify-between px-4 sm:px-6">
-            <div className="ob-kiosk-brand flex items-center gap-2">
-              <Coffee size={16} color="#D8C4A8" />
-              <span style={{ fontFamily: F.disp, color: "#F5EDE2", fontSize: 18 }}>Origin Atelier</span>
-              <span className="hidden sm:inline" style={{ marginLeft: 8, padding: "5px 8px", border: "1px solid #5A4435", color: "#BBA890", fontFamily: F.mono, fontSize: 13, letterSpacing: ".1em", textTransform: "uppercase" }}>staff-review requests</span>
-            </div>
-            {step <= 6 && (
-              <div className="ob-kiosk-progress">
-                <span className="ob-progress-copy hidden sm:inline" style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.4, color: "#D8C4A8", textTransform: "uppercase" }}>
-                  {step}/6 · {STEP_LABELS[step - 1]}
-                </span>
-                <div className="ob-progress-dots" role="progressbar" aria-label="Origin Bar progress" aria-valuemin={1} aria-valuemax={6} aria-valuenow={step} aria-valuetext={`${step} of 6 · ${STEP_LABELS[step - 1]}`}>
-                  {STEP_LABELS.map((l, i) => (
-                    <span key={l} aria-hidden="true" style={{ width: 7, height: 7, borderRadius: 999, background: i < step ? accent : "#4A372B", transition: "background .2s ease" }} />
-                  ))}
-                </div>
-              </div>
-            )}
-            {step <= 6 && <button type="button" className="ob-reset-button" aria-label="Start over and clear this cup" onClick={reset} disabled={submitting} style={{ border: "1px solid #5A4435", borderRadius: 999, background: "none", color: "#D8C4A8", padding: "8px 12px", fontSize: 13, cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1 }}><span className="ob-reset-wide">Start over</span><span className="ob-reset-short">Reset</span></button>}
+          <header className="ob-builder-heading">
+            <div><span className="ob-eyebrow">{step <= 6 ? "A LITTLE MORE YOU, IN EVERY CUP" : "YOUR ORIGIN BAR REQUEST"}</span><h1>{step <= 6 ? "Make it yours." : "Beautifully considered."}</h1></div>
+            {step <= 6 && <div className="ob-builder-tools"><span className="ob-progress-caption">STEP {step} <span>/ 06</span></span><button type="button" className="ob-reset-button" aria-label="Start over and clear this cup" onClick={reset} disabled={submitting}><RotateCcw size={16}/><span>Start over</span></button></div>}
           </header>
+          {step >= 1 && step <= 6 && <StepNavigation step={step} sel={sel} submitting={submitting} onGo={go}/>}
           <main id="ob-scroll" className="ob-scroll-region flex-1 overflow-y-auto ok-scroll">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
-              <div className="ob-truth-note"><span aria-hidden="true">ⓘ</span><span><b>Staff-review mode.</b> Requests are saved for staff review; nothing is prepared or charged automatically. <span className="ob-truth-extra">Origins, pricing and availability remain sample catalogue data until Deldiet connects verified lot, inventory and point-of-sale records.</span></span></div>
+            <div className="ob-workspace-container">
+              <details className="ob-mode-note"><summary><span>Demonstration menu · staff confirmation required</span><ChevronDown size={15}/></summary><p>Requests go to staff for review when the service is connected. Nothing is prepared or charged automatically. Origins, pricing and availability are illustrative until verified lot, inventory and point-of-sale records are connected.</p></details>
               {requestError && <div ref={requestErrorRef} tabIndex={-1} className="ob-truth-note" role="alert" style={{ borderColor: "#B85C4D", background: "#FFF3EF", color: "#6E2E24" }}><span aria-hidden="true">!</span><span><b>Request not saved.</b> {requestError}</span></div>}
               {matchReason && step <= 5 && <div style={{ marginBottom: 18, padding: "12px 14px", borderLeft: `4px solid ${accent}`, background: "#fff", color: C.ink, fontSize: 13, lineHeight: 1.5 }}><b>Taste Match starting point:</b> {matchReason} Every choice remains editable.</div>}
               {step >= 1 && step <= 5 ? (
                 <div className="ob-workspace-grid">
-                  <aside className="ob-journey-rail" aria-label="Origin Bar journey">
-                    <span>Your journey</span>
-                    {STEP_LABELS.map((label, index) => <button key={label} className={step === index + 1 ? "active" : ""} aria-current={step === index + 1 ? "step" : undefined} disabled={index + 1 > step} onClick={() => index + 1 <= step && go(index + 1)}><b>{index + 1}</b>{label}</button>)}
-                  </aside>
-                  <div style={{ minWidth: 0 }}>{screen}</div>
-                  <aside className="ob-cup-stage">
-                      <span>Your cup · live</span>
-                      <CupSVG uid="rail" {...cupProps.svg} width={130} />
-                      <div style={{ marginTop: 10, fontFamily: F.body, fontSize: 14, color: C.ink, fontWeight: 600 }}>
-                        {sel.drink ? sel.drink.n : "—"}
-                      </div>
-                      <div style={{ fontFamily: F.mono, fontSize: 13, color: C.faint, marginTop: 2 }}>
-                        {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}
-                      </div>
-                      <div className="flex flex-wrap justify-center gap-1" style={{ marginTop: 10 }}>
-                        {tags.map((t) => <Tag key={t} color={readableAccent(accent)} border={`${accent}55`}>{t}</Tag>)}
-                      </div>
-                      <div style={{ borderTop: `1px dashed ${C.line}`, marginTop: 12, paddingTop: 10, fontFamily: F.mono, fontSize: 15, fontWeight: 600, color: readableAccent(accent) }}>
-                        {money(parts.total)} <small style={{ display: "block", marginTop: 3, color: C.faint, fontSize: 13 }}>illustrative subtotal</small>
-                      </div>
-                      <div className="ob-safety-rail"><b>Cup Passport</b><p>{safety.caffeine}<br/>{safety.allergens.length ? `Signals: ${safety.allergens.join(", ")}` : "No selected allergen signals · shared equipment"}</p></div>
-                  </aside>
+                  <div className="ob-choice-workspace" style={{ minWidth: 0 }}>{screen}</div>
+                  <CupSummary sel={sel} roastObj={roastObj} cupProps={cupProps} parts={parts} tags={tags} safety={safety} onGo={go} submitting={submitting}/>
                 </div>
               ) : screen}
             </div>
@@ -1475,27 +1318,23 @@ export default function OriginBarKiosk() {
           {step >= 1 && step <= 5 && (
             <details className="ob-mobile-passport">
               <summary>
-                <div><b>{sel.drink?.n || "Build your cup"} · {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}</b><span>Tap for Cup Passport · {safety.allergens.length} allergen signal{safety.allergens.length === 1 ? "" : "s"}</span></div>
-                <strong aria-live="polite">{money(parts.total)}</strong>
+                <div><b>{sel.drink?.n || "Build your cup"} · {sel.origin ? `${sel.origin.f} ${sel.origin.n}` : "origin pending"}</b><span>View your cup & ingredients</span></div>
+                <strong aria-live="polite">{money(parts.total)}<ChevronDown size={17}/></strong>
               </summary>
               <div className="ob-mobile-passport-panel">
+                <div className="ob-mobile-cup"><CupSVG uid="mobile-summary" {...cupProps.svg} width={110}/><span>{roastObj.name} roast · {sel.temp}</span></div>
+                <div><small>Your recipe</small><p>{sel.milk}<br/>{sel.extraction}<br/>{SIZES.find(size => size.id === sel.size)?.oz} oz · {sel.cup}</p></div>
                 <div><small>Caffeine</small><p>{safety.caffeine}</p></div>
                 <div><small>Safety</small><p>{safety.allergens.length ? safety.allergens.join(", ") : "No selected signals"}. Shared-equipment cross-contact remains possible.</p></div>
               </div>
             </details>
           )}
           {step >= 1 && step <= 6 && (
-            <footer className="ob-flow-footer flex items-center justify-between gap-3 px-4 sm:px-6">
-              <button type="button" onClick={() => go(step - 1)} disabled={submitting} className="flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#D8C4A8", background: "none", border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1, padding: "10px 4px" }}>
+            <footer className="ob-flow-footer flex items-center justify-between gap-3 px-4 sm:px-6" aria-label="Cup builder actions">
+              <button type="button" onClick={() => go(step - 1)} disabled={submitting} className="ob-back flex items-center gap-1" style={{ fontFamily: F.body, fontWeight: 600, fontSize: 14, color: "#D8C4A8", background: "none", border: "none", cursor: submitting ? "not-allowed" : "pointer", opacity: submitting ? .6 : 1, padding: "10px 4px" }}>
                 <ChevronLeft size={16} /> Back
               </button>
-              <div className="ob-footer-subtotal flex items-center gap-3">
-                <div className="sm:block hidden"><CupSVG uid="foot" {...cupProps.svg} width={34} /></div>
-                <div className="text-right">
-                  <div style={{ fontFamily: F.mono, fontSize: 13, letterSpacing: 1.6, color: "#BBA890", textTransform: "uppercase" }}>Subtotal · CAD</div>
-                  <div style={{ fontFamily: F.mono, fontSize: 19, fontWeight: 600, color: "#F5EDE2" }}>{money(parts.total)}</div>
-                </div>
-              </div>
+              <div className="ob-footer-context"><span>{!canNext && !submitting ? step === 1 ? "Choose an origin to continue" : step === 2 ? "Choose a drink to continue" : "Confirm the ingredient check above" : step === 6 ? "Ready for staff review" : "Your selections stay with you"}</span><b>{money(parts.total)} <small>CAD · estimated</small></b></div>
               <button type="button" onClick={next} disabled={!canNext} aria-busy={submitting} aria-label={step === 6 ? (submitting ? "Sending cup request" : `Send cup request, estimated subtotal ${money(parts.total)}`) : `Continue to ${STEP_LABELS[step]}`} className="ob-next flex items-center gap-1.5" style={{
                 fontFamily: F.body, fontWeight: 700, fontSize: 15, color: onAccent,
                 background: canNext ? accent : "#4A372B", border: "none", borderRadius: 999, padding: "13px 22px",

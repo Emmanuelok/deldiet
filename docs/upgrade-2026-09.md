@@ -50,3 +50,14 @@ Existing assets and the original Sites metadata are preserved. Changes are publi
 - Refined shared navigation, destination introductions and footer; provided responsive layouts and reduced-motion behaviour.
 - Updated the optional Sites route expectations for the removed page and new homepage.
 - Revision verification: production build and TypeScript passed with `/origins` absent from the route manifest; all 16 existing tests passed. Browser interaction testing has not been performed.
+
+## Origin Bar experience revision
+
+- Rebuilt the welcome and Taste Match screens with existing Deldiet photography, crisp vector branding, readable typography and the house palette.
+- Added a six-step navigator on desktop, tablet and mobile; guests can return to any eligible stage after editing earlier choices.
+- Added origin search across regions and drink search within each menu. Browsing categories retains the current drink and its correct request menu until a replacement is chosen.
+- Reopening the origin stage shows the selected country’s region. Manual picking and Taste Match use shared compatible defaults, including black coffee without unintended milk.
+- Redesigned selection cards, the live cup summary, ingredient disclosures, review layout, estimated subtotal and next-action guidance. Mobile cup details now include the live illustration and complete recipe.
+- Moved global Explore into the Origin Bar header so it no longer covers Back. Added compact landscape controls and safe-area spacing.
+- Preserved all catalogue arrays/prices/options, dynamic cup rendering, pricing calculations, recipe controls, safety acknowledgement, session drafts, receipt sharing/expiry, idle resets and submission/retry safeguards.
+- Verification: 20 automated checks pass, including four new navigation/recipe-default regressions. Production build passes. No interactive browser testing was performed; the existing staff-review database setup requirement remains unchanged.

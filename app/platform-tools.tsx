@@ -62,7 +62,7 @@ export default function PlatformTools() {
   useEffect(() => { if (!recovery) return; const timeout = window.setTimeout(() => setRecovery(null), 60000); return () => window.clearTimeout(timeout); }, [recovery]);
   const results = destinations.filter(d => (category === "All" || d[3] === category) && d.join(" ").toLowerCase().includes(query.toLowerCase()));
   return <>
-    <button className="dd-explore-button" aria-label="Explore all Deldiet tools" onClick={() => setOpen(true)}><Compass size={19}/><span>Explore</span></button>
+    {pathname !== "/origin-bar" && <button className="dd-explore-button" aria-label="Explore all Deldiet tools" onClick={() => setOpen(true)}><Compass size={19}/><span>Explore</span></button>}
     <dialog className="dd-search-dialog" ref={dialog} onCancel={() => setOpen(false)} onClick={e => { if (e.target === e.currentTarget) setOpen(false); }} aria-labelledby="dd-search-title">
       <div className="dd-search-content"><div className="dd-search-heading"><div><p className="eyebrow">THE DELDIET WORLD</p><h2 id="dd-search-title">Where will curiosity take you?</h2></div><button aria-label="Close search" onClick={() => setOpen(false)}><X/></button></div>
         <label className="dd-global-search"><Search size={22}/><input ref={input} type="search" value={query} onChange={e => setQuery(e.target.value)} placeholder="Try ‘brew timer’, ‘gifts’, ‘coffee’…" aria-label="Search Deldiet destinations"/><kbd>⌘ K</kbd></label>
