@@ -146,7 +146,7 @@ export default function PassportPage() {
   return (
     <main className={styles.shell}>
       <header className={styles.header}>
-        <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
+        <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark-ink.svg" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
         <div className={styles.headerTitle}><span>Deldiet Passport</span><small>Your coffee, connected</small></div>
         <nav aria-label="Deldiet experiences"><Link href="/origin-bar">Origin Bar</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
       </header>

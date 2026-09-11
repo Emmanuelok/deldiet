@@ -5,7 +5,9 @@
 .announcement-copy { font-size: 11px; opacity: .9; }
 .main-nav a { font-size: 13px; padding-block: 26px; }
 .main-nav a:hover, .main-nav a[aria-current=page] { color: var(--edit-orange); }
-.brand-logo-image { width: 137px; }
+.brand-logo-image { width: 137px; mix-blend-mode: normal; }
+.deldiet-product-mark img { mix-blend-mode: normal; }
+.footer-brand img { filter: none; opacity: 1; mix-blend-mode: normal; }
 .button { border-radius: 2px; transition: background .2s, color .2s, transform .2s; }
 .button:hover { transform: translateY(-2px); }
 :is(a, button, input, select, textarea):focus-visible { outline: 3px solid #c85332; outline-offset: 5px; }
@@ -158,7 +160,7 @@ footer { background: #1f3025; }
 .dd-footer-invitation h2 em { color: #f1dca5; }
 .dd-footer-invitation>a { color: #f1dca5; }
 .dd-footer-wordmark { margin: 25px -1vw 0; padding: 0; line-height: 0; }
-.dd-footer-wordmark img { width: 100%; height: auto; opacity: .9; filter: brightness(0) saturate(100%) invert(90%) sepia(13%) saturate(775%) hue-rotate(347deg) brightness(102%) contrast(90%); }
+.dd-footer-wordmark img { display: block; width: 100%; height: auto; opacity: 1; filter: none; }
 @media (min-width: 1650px) {
   .edit-ritual-stage { min-height: 660px; }
   .edit-product-frame { max-width: 530px; }

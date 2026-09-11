@@ -478,7 +478,7 @@ function CupSVG({ uid, roast, hasMilk, foam, whip, iced, blended, drizzle, boost
           )}
           <g pointerEvents="none">
             <rect x="42" y="116" width="56" height="20" rx="5" fill="#FFFDF6" fillOpacity=".86" stroke="#2A1F18" strokeOpacity=".12" />
-            <image href="/brand/deldiet-wordmark.png" x="47" y="120" width="46" height="13.7" preserveAspectRatio="xMidYMid meet" />
+            <image href="/brand/deldiet-wordmark-ink.svg" x="47" y="120" width="46" height="13.7" preserveAspectRatio="xMidYMid meet" />
           </g>
         </g>
         {whip && (

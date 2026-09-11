@@ -279,7 +279,7 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
 function DeldietMark({ className = "" }: { className?: string }) {
   return (
     <span className={`deldiet-product-mark ${className}`.trim()} aria-hidden="true">
-      <Image src="/brand/deldiet-wordmark.png" alt="" width={432} height={129} unoptimized />
+      <Image src="/brand/deldiet-wordmark-ink.svg" alt="" width={432} height={129} unoptimized />
     </span>
   );
 }
@@ -758,7 +758,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
 
       <header className="site-header">
         <Link className="brand" aria-label="Deldiet home" href="/">
-          <Image className="brand-logo-image" src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} priority unoptimized />
+          <Image className="brand-logo-image" src="/brand/deldiet-wordmark-ink.svg" alt="Deldiet" width={432} height={129} priority unoptimized />
         </Link>
         <nav ref={mobileMenuRef} id="primary-navigation" className={menuOpen ? "main-nav open" : "main-nav"} aria-label="Primary navigation">
           <a href="/coffeehouse" aria-current={view === "coffeehouse" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Coffeehouse</a>
@@ -1106,7 +1106,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       <footer>
         <div className="dd-footer-invitation"><h2>Good things<br/><em>are brewing.</em></h2><a href="/tasteprint">Find your flavour <Icon name="arrow"/></a></div>
         <div className="footer-top">
-          <div><Link className="footer-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} unoptimized/></Link><p>The world in your cup.<br/>St. John&apos;s · Newfoundland</p></div>
+          <div><Link className="footer-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark-ink.svg" alt="Deldiet" width={432} height={129} unoptimized/></Link><p>The world in your cup.<br/>St. John&apos;s · Newfoundland</p></div>
           <div><span>Explore</span><a href="/coffeehouse">Coffeehouse</a><a href="/tasteprint">Find your coffee</a><a href="/origin-bar">Origin Bar</a><a href="/build-a-cup">Build a cup</a><a href="/brew-lab">Brew Studio</a><a href="/my-collection">My collection</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop Deldiet</a><a href="/origin-exchange">Origin Exchange</a><a href="/passport">Deldiet Passport</a></div>
           <div><span>Deldiet</span><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Platform standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/journal">Field Journal</a></div>
           <div className="newsletter">
@@ -1119,7 +1119,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
             {requestErrorScope === "home-newsletter" && <small className="request-error" role="alert">{requestError}</small>}
           </div>
         </div>
-        <div className="dd-footer-wordmark" aria-hidden="true"><Image src="/brand/deldiet-wordmark.png" alt="" width={432} height={129} unoptimized /></div>
+        <div className="dd-footer-wordmark" aria-hidden="true"><Image src="/brand/deldiet-wordmark-butter.svg" alt="" width={432} height={129} unoptimized /></div>
         <div className="footer-bottom"><span>© 2026 Deldiet Coffee Company</span><span>Canada / CAD</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/accessibility">Accessibility</a></span></div>
       </footer>
 

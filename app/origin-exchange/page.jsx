@@ -46,7 +46,7 @@ const STYLES = `
 .oex-product-photo { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
 .oex-card:hover .oex-product-photo { transform: scale(1.035); }
 .oex-deldiet-mark { position:absolute; z-index:3; right:12px; bottom:12px; width:94px; min-height:28px; padding:5px 8px; display:grid; place-items:center; border:1px solid rgba(34,22,17,.14); border-radius:999px; background:rgba(255,253,246,.9); box-shadow:0 6px 18px rgba(34,22,17,.14); backdrop-filter:blur(8px); pointer-events:none; user-select:none; }
-.oex-deldiet-mark img { position:static!important; display:block; width:100%; height:auto; mix-blend-mode:multiply; }
+.oex-deldiet-mark img { position:static!important; display:block; width:100%; height:auto; mix-blend-mode:normal; }
 .oex-deldiet-mark-detail { width:132px; min-height:38px; padding:8px 11px; }
 .oex-deldiet-mark-lot { right:12px; bottom:10px; width:88px; min-height:26px; }
 .oex-deldiet-mark-compact { right:4px; bottom:4px; width:38px; min-height:13px; padding:2px 3px; border-radius:6px; box-shadow:0 2px 7px rgba(34,22,17,.14); }
@@ -263,7 +263,7 @@ const PRODUCT_VISUALS = {
 
 function DeldietProductMark({ detail = false, compact = false, lot = false }) {
   const className = ["oex-deldiet-mark", detail && "oex-deldiet-mark-detail", compact && "oex-deldiet-mark-compact", lot && "oex-deldiet-mark-lot"].filter(Boolean).join(" ");
-  return <span className={className} aria-hidden="true"><Image src="/brand/deldiet-wordmark.png" alt="" width={432} height={129} unoptimized /></span>;
+  return <span className={className} aria-hidden="true"><Image src="/brand/deldiet-wordmark-ink.svg" alt="" width={432} height={129} unoptimized /></span>;
 }
 
 function ProductArt({ p, detail = false }) {
