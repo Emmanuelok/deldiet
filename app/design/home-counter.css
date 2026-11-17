@@ -1,0 +1,349 @@
+.flavour-studio, .ritual-rooms, .roast-collection {
+  --counter-sans: var(--font-geist-sans, "Helvetica Neue"), Arial, sans-serif;
+  --counter-serif: "Deldiet Instrument", Georgia, serif;
+  --counter-gutter: clamp(22px, 5.4vw, 104px);
+  font-family: var(--counter-sans);
+}
+.flavour-studio {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #faf3e5;
+  scroll-margin-top: 72px;
+  background: radial-gradient(ellipse at 50% 114%, #183e3c 0%, transparent 52%), #071517;
+}
+.flavour-studio::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 51% 42%, var(--studio-light), transparent 47%),
+    linear-gradient(120deg, #142c2c 0%, transparent 36%, transparent 63%, #092526 100%);
+  opacity: .75;
+}
+.flavour-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, .87fr) minmax(0, 1.35fr) minmax(0, .80fr);
+  grid-template-areas: "intro lens result" "choices lens result";
+  align-items: center;
+  gap: 0 clamp(19px, 2.5vw, 48px);
+  max-width: 1900px;
+  margin: auto;
+  padding: clamp(64px, 6.7vw, 128px) var(--counter-gutter);
+}
+.flavour-intro { grid-area: intro; align-self: end; }
+.flavour-studio .studio-caption, .roast-collection .studio-caption, .ritual-kicker {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font: 610 .72rem/1.5 var(--counter-sans);
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.flavour-intro .studio-caption { color: #a2c7ba; }
+.studio-caption > i { width: 18px; height: 1px; background: currentColor; }
+.flavour-intro h2, .ritual-heading h2, .roast-collection h2 {
+  margin: 18px 0;
+  color: inherit;
+  font: 510 clamp(3.8rem, 6.3vw, 7.4rem)/.89 var(--counter-sans);
+  letter-spacing: -.075em;
+}
+.flavour-intro h2 em, .ritual-heading h2 em, .roast-collection h2 em {
+  font: italic 400 1.10em/.95 var(--counter-serif);
+  letter-spacing: -.052em;
+}
+.flavour-intro h2 em { color: #cae1ca; }
+.flavour-intro-text { margin: 0; max-width: 28ch; color: #c1ceca; font-size: clamp(15px, 1.1vw, 19px); line-height: 1.5; }
+.flavour-choices {
+  grid-area: choices;
+  align-self: start;
+  width: min(100%, 335px);
+  display: grid;
+  gap: 5px;
+  margin-top: clamp(24px, 2.4vw, 46px);
+}
+.flavour-choices button {
+  display: grid;
+  grid-template-columns: 41px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 54px;
+  padding: 6px 14px 6px 7px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: #d1dad5;
+  text-align: left;
+  font: 540 clamp(.92rem, 1.04vw, 1.18rem)/1.2 var(--counter-sans);
+  cursor: pointer;
+  transition: color .2s, background .2s, border-color .2s;
+}
+.flavour-choices button:hover, .flavour-choices button[aria-pressed=true] {
+  background: #d5eee810;
+  border-color: #b3d2c83e;
+  color: #fffaf0;
+}
+.flavour-choices button[aria-pressed=true] { box-shadow: inset 0 1px 0 #c2f4e411; }
+.flavour-swatch { display: block; width: 39px; height: 39px; border-radius: 50%; padding: 2px; border: 1px solid #c2ccc847; }
+.flavour-swatch img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.flavour-choices button[aria-pressed=true] .flavour-swatch { border-color: var(--studio-accent); }
+.flavour-choices button svg { opacity: 0; transform: translateX(-5px); transition: opacity .2s, transform .2s; }
+.flavour-choices button[aria-pressed=true] svg, .flavour-choices button:hover svg { opacity: 1; transform: none; color: var(--studio-accent); }
+.flavour-optics {
+  grid-area: lens;
+  position: relative;
+  isolation: isolate;
+  justify-self: center;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 630px;
+}
+.flavour-orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid #c9ddcf3d;
+  background: repeating-conic-gradient(from -90deg, #d7e3cd83 0deg .35deg, transparent .35deg 4deg);
+  mask-image: radial-gradient(closest-side, transparent calc(100% - 8px), black calc(100% - 7px));
+}
+.flavour-lens {
+  position: relative;
+  display: block;
+  isolation: isolate;
+  width: 89%;
+  aspect-ratio: 1;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid #b2ac85;
+  box-shadow: 0 0 0 4px #1f2725, 0 0 0 5px #a9c6b74f, 0 15px 45px #02080b99, inset 0 0 22px #000;
+  overflow: hidden;
+  cursor: zoom-in;
+  background: #46382c;
+}
+.flavour-lens.is-magnified { cursor: zoom-out; }
+.flavour-lens > img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.025);
+  transform-origin: var(--studio-x,50%) var(--studio-y,50%);
+  transition: transform .65s cubic-bezier(.2,.7,.2,1);
+  animation: flavour-appear .5s ease both;
+}
+.flavour-lens.is-magnified > img { transform: scale(1.68); }
+.flavour-lens-glass {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 3px #3a281149, inset 0 2px 10px #fff4c84d, inset -12px -10px 35px #4b180d38;
+}
+.flavour-magnify {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  white-space: nowrap;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #eee8c359;
+  color: #fff9ee;
+  background: #14211be6;
+  font: 550 12px/1.1 var(--counter-sans);
+}
+.flavour-reading {
+  grid-area: result;
+  position: relative;
+  padding: clamp(20px, 2.4vw, 46px) 0 clamp(20px, 2.4vw, 46px) clamp(18px, 2.3vw, 38px);
+  border-left: 1px solid #b2c6b740;
+}
+.flavour-read-in { animation: flavour-read-in .4s ease both; }
+.flavour-reading .studio-caption { color: var(--studio-accent); }
+.flavour-reading h3 {
+  margin: 12px 0 9px;
+  font: 400 clamp(2.7rem, 4.65vw, 6rem)/.98 var(--counter-serif);
+  color: #fff6df;
+  letter-spacing: -.058em;
+}
+.flavour-notes { color: #dfdfce; margin: 0; line-height: 1.5; font-size: clamp(15px, 1.08vw, 19px); }
+.flavour-specs { display: grid; gap: 9px; margin: 24px 0 27px; }
+.flavour-specs div { display: flex; align-items: baseline; gap: 12px; justify-content: space-between; }
+.flavour-specs dt, .flavour-specs dd { margin: 0; font-size: 13px; line-height: 1.3; }
+.flavour-specs dt { color: #a9b9b1; }
+.flavour-specs dd { color: #f0f2e7; }
+.flavour-build, .flavour-origin, .roast-collection a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  min-height: 44px;
+  border-radius: 999px;
+  text-decoration: none;
+  font: 620 14px/1.25 var(--counter-sans);
+}
+.flavour-build { background: var(--studio-accent); color: #221e1a; padding: 11px 17px; }
+.flavour-build svg, .roast-collection a svg { flex-shrink: 0; transition: transform .2s; }
+.flavour-build:hover svg, .roast-collection a:hover svg { transform: translateX(3px); }
+.flavour-origin { display: flex; width: fit-content; color: #e6e9dd; border-radius: 0; font-weight: 490; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: #92a09a; }
+.flavour-studio :is(a,button):focus-visible, .roast-collection a:focus-visible {
+  outline: 3px solid #fff2bb;
+  outline-offset: 4px;
+}
+
+.ritual-rooms {
+  padding: clamp(52px, 6.5vw, 112px) var(--counter-gutter) clamp(45px, 5vw, 85px);
+  color: #25271f;
+  background: #e8e6db;
+}
+.ritual-heading, .ritual-compare, .ritual-routes { max-width: 1660px; margin-inline: auto; }
+.ritual-heading { display: flex; align-items: end; justify-content: space-between; gap: 45px; margin-bottom: clamp(25px, 2.8vw, 50px); }
+.ritual-heading h2 { margin: 12px 0 0; font-size: clamp(48px, 5.3vw, 110px); }
+.ritual-heading h2 em { color: #526453; }
+.ritual-kicker { color: #485447; }
+.ritual-heading > p { max-width: 25ch; margin: 0 0 2px; font-size: clamp(15px, 1.08vw, 19px); line-height: 1.48; color: #4d5147; }
+.ritual-compare {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(360px, 36vw, 620px);
+  background: #30291f;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.ritual-frame { position: absolute; inset: 0; }
+.ritual-frame img { object-fit: cover; }
+.ritual-kitchen img { object-position: center 57%; }
+.ritual-cafe { clip-path: inset(0 calc(100% - var(--room-split)) 0 0); }
+.ritual-cafe img { object-position: center 52%; }
+.ritual-divider { position: absolute; z-index: 1; pointer-events: none; left: var(--room-split); inset-block: 0; width: 2px; background: #f3f3e6; box-shadow: 0 0 8px #29231850; }
+.ritual-divider span {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  color: #1c302b;
+  background: #f6f4e9;
+  box-shadow: 0 4px 15px #261e1840;
+}
+.ritual-compare input {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+.ritual-compare:focus-within { outline: 3px solid #266859; outline-offset: 4px; }
+.ritual-routes { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); border-bottom: 1px solid #aeb2a5; }
+.ritual-routes a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding: clamp(16px, 2.1vw, 32px) clamp(14px, 2.8vw, 46px) clamp(16px, 2.1vw, 32px) 0;
+  color: inherit;
+  text-decoration: none;
+}
+.ritual-routes a + a { padding-left: clamp(14px, 2.8vw, 46px); padding-right: 0; border-left: 1px solid #bdc0b5; }
+.ritual-routes small { display: block; font-size: 13px; color: #50594f; line-height: 1.4; }
+.ritual-routes span { display: block; margin-top: 5px; font-size: clamp(20px, 2.05vw, 39px); font-weight: 560; line-height: 1.1; letter-spacing: -.052em; }
+.ritual-routes svg { width: 32px; height: 32px; flex: none; transition: transform .2s; }
+.ritual-routes a:hover svg { transform: translate(3px,-3px); }
+
+.roast-collection {
+  position: relative;
+  display: flex;
+  isolation: isolate;
+  align-items: center;
+  min-height: clamp(310px, 30vw, 540px);
+  overflow: hidden;
+  color: #fff6e7;
+  background: #112235;
+}
+.roast-collection > img { object-fit: cover; object-position: 70% 53%; z-index: -2; }
+.roast-collection::before { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg,#0a1729e8 0%,#091a2cc4 27%,transparent 65%); }
+.roast-collection-inner { margin: 0 auto; width: 100%; max-width: 1900px; padding: clamp(34px, 4.4vw, 84px) var(--counter-gutter); }
+.roast-collection .studio-caption { color: #f4cc8e; }
+.roast-collection h2 { max-width: 8ch; font-size: clamp(50px, 5.5vw, 105px); line-height: .98; margin: 15px 0 24px; }
+.roast-collection h2 em { color: #f5c386; }
+.roast-collection a { color: #fff3dc; border: 1px solid #f4ddad84; padding: 10px 17px; background: #08162680; }
+
+@keyframes flavour-appear { from { opacity: .58; } to { opacity: 1; } }
+@keyframes flavour-read-in { from { opacity: .3; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 1100px) and (min-width: 761px) {
+  .flavour-workspace { column-gap: 16px; grid-template-columns: minmax(0,.90fr) minmax(0,1.12fr) minmax(0,.88fr); padding-inline: clamp(28px,3.7vw,42px); }
+  .flavour-intro h2 { font-size: clamp(49px, 6.4vw, 72px); }
+  .flavour-reading { padding-left: 14px; }
+  .flavour-choices button { gap: 9px; font-size: 14px; }
+  .flavour-build { font-size: 13px; padding-inline: 12px; }
+}
+@media (max-width: 760px) {
+  .flavour-workspace { grid-template-columns: minmax(0,1fr) minmax(0,1fr); grid-template-areas: "intro intro" "choices choices" "lens result"; gap: 0 19px; padding-block: 48px; }
+  .flavour-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; align-items: end; }
+  .flavour-intro .studio-caption { grid-column: 1/-1; }
+  .flavour-intro h2 { font-size: clamp(48px, 7vw, 75px); margin: 10px 0 0; }
+  .flavour-intro-text { justify-self: end; }
+  .flavour-choices { width: 100%; grid-template-columns: repeat(3,minmax(0,1fr)); margin: 22px 0 28px; gap: 5px; }
+  .flavour-choices button { display: flex; justify-content: center; min-height: 48px; gap: 7px; padding: 5px 7px; border-color: #bdd3c729; text-align: center; font-size: 13px; }
+  .flavour-swatch { flex: none; width: 26px; height: 26px; }
+  .flavour-choices button svg { display: none; }
+  .flavour-reading { border-left: 0; padding: 0; }
+  .flavour-reading h3 { font-size: clamp(46px, 8vw, 68px); }
+  .flavour-specs { margin: 14px 0 18px; }
+  .ritual-heading { align-items: start; flex-direction: column; gap: 13px; }
+  .ritual-heading > p { max-width: none; }
+  .ritual-compare { height: clamp(250px, 60vw, 390px); }
+}
+@media (max-width: 520px) {
+  .flavour-workspace { gap: 0; grid-template-columns: minmax(0,1fr); grid-template-areas: "intro" "choices" "lens" "result"; padding-bottom: 38px; }
+  .flavour-intro { display: block; }
+  .flavour-intro h2 { font-size: clamp(55px, 12vw, 69px); }
+  .flavour-intro h2 br { display: none; }
+  .flavour-intro-text { margin-top: 10px; max-width: 38ch; }
+  .flavour-choices { margin: 17px 0 13px; gap: 4px; }
+  .flavour-choices button { display: flex; flex-direction: column; gap: 5px; padding: 7px 1px 8px; border-radius: 12px; font-size: 12px; }
+  .flavour-optics { max-width: 310px; width: 85%; }
+  .flavour-reading { border-top: 1px solid #c8ddc937; margin-top: 18px; padding-top: 16px; }
+  .flavour-read-in { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,.87fr); align-items: start; column-gap: 14px; }
+  .flavour-reading .studio-caption, .flavour-reading h3, .flavour-notes { grid-column: 1; }
+  .flavour-reading h3 { margin: 5px 0; }
+  .flavour-specs { grid-column: 2; grid-row: 1/4; align-self: center; gap: 8px; margin: 0; }
+  .flavour-specs div { gap: 7px; }
+  .flavour-notes { font-size: 14px; }
+  .flavour-build, .flavour-origin { margin-top: 15px; white-space: normal; font-size: 12px; gap: 6px; }
+  .flavour-build { padding: 8px 11px; }
+  .flavour-origin { justify-self: start; }
+  .ritual-heading h2 { font-size: clamp(43px, 10vw, 57px); }
+  .ritual-routes a { align-items: end; padding-block: 14px 18px; gap: 6px; }
+  .ritual-routes small { font-size: 11px; }
+  .ritual-routes span { font-size: 20px; }
+  .ritual-routes svg { width: 20px; height: 20px; }
+  .roast-collection { min-height: 370px; align-items: end; }
+  .roast-collection > img { object-position: 71% center; }
+  .roast-collection::before { background: linear-gradient(0deg,#0a1629f2 0%,#0a16299c 42%,transparent 85%); }
+  .roast-collection h2 { max-width: none; font-size: clamp(41px,10vw,56px); margin: 8px 0 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flavour-studio *, .ritual-rooms *, .roast-collection * { animation: none; transition: none; }
+}

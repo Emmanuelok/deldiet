@@ -37,6 +37,8 @@ test("offers both hero films, a poster, and a playback control", async () => {
 
 test("links the tasting counter to the selected profile and keeps the official social channels", async () => {
   const page = await renderPage("/");
+  assert.ok(/<button\b[^>]*aria-label="Magnify the [^"]+ tasting photograph"/i.test(page), "the tasting photograph should offer magnification");
+  assert.ok(/<input\b[^>]*type="range"[^>]*aria-label="Compare the coffeehouse and kitchen photographs"/i.test(page), "the two rooms should have a keyboard-accessible comparison control");
   const flavourButtons = [...page.matchAll(/<button\b[^>]*aria-controls="tasting-notes"[^>]*>/gi)];
   assert.equal(flavourButtons.length, 3);
   assert.equal(flavourButtons.filter(([tag]) => tag.includes('aria-pressed="true"')).length, 1);

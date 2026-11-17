@@ -7,6 +7,7 @@ import CoffeeAtHome from "./design/formats";
 import { ShopProductSheet, ShopSpread } from "./design/shop";
 import Link from "next/link";
 import HomeCounter from "./design/home-counter";
+import Cinema from "./design/cinema";
 import DepartmentMasthead, {type Department} from "./design/department-masthead";
 import "./design/editorial.css";
 import "./design/coffeehouse.css";
@@ -407,7 +408,6 @@ function hasDepartmentMasthead(view: DeldietView): view is Department {
 }
 
 export default function DeldietExperience({ view = "home" }: { view?: DeldietView }) {
-  const heroVideoRef = useRef<HTMLVideoElement>(null);
   const [region, setRegion] = useState("All origins");
   const [activeOrigin, setActiveOrigin] = useState(origins[0]);
   const [format, setFormat] = useState("All");
@@ -427,7 +427,6 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
   const [reservationTime, setReservationTime] = useState("Morning");
   const [selectedProduct, setSelectedProduct] = useState<RetailProduct | null>(null);
   const [selectedVariant, setSelectedVariant] = useState("");
-  const [heroPlaying, setHeroPlaying] = useState(true);
   const [journeyIntent, setJourneyIntent] = useState<JourneyIntent>("taste");
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [conciergeMessage, setConciergeMessage] = useState("");
@@ -466,53 +465,6 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
     const timer = window.setTimeout(() => setToast(""), 2400);
     return () => window.clearTimeout(timer);
   }, [toast]);
-
-  useEffect(() => {
-    const video = heroVideoRef.current;
-    if (!video) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let cancelled = false;
-
-    const syncPlaybackState = () => {
-      if (!cancelled) setHeroPlaying(!video.paused && !video.ended);
-    };
-    const startMotion = async () => {
-      if (reducedMotion.matches) {
-        video.pause();
-        syncPlaybackState();
-        return;
-      }
-      video.muted = true;
-      try {
-        await video.play();
-      } catch {
-        // Mobile browsers can block autoplay in low-power or data-saving modes.
-      }
-      syncPlaybackState();
-    };
-    const handleMotionPreference = () => {
-      if (reducedMotion.matches) {
-        video.pause();
-        syncPlaybackState();
-      } else {
-        void startMotion();
-      }
-    };
-
-    video.addEventListener("play", syncPlaybackState);
-    video.addEventListener("pause", syncPlaybackState);
-    video.addEventListener("ended", syncPlaybackState);
-    reducedMotion.addEventListener("change", handleMotionPreference);
-    void startMotion();
-
-    return () => {
-      cancelled = true;
-      video.removeEventListener("play", syncPlaybackState);
-      video.removeEventListener("pause", syncPlaybackState);
-      video.removeEventListener("ended", syncPlaybackState);
-      reducedMotion.removeEventListener("change", handleMotionPreference);
-    };
-  }, []);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -622,24 +574,6 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
 
   function updateQuantity(id: string, delta: number) {
     setCart((current) => current.map((item) => item.id === id ? { ...item, quantity: item.quantity + delta } : item).filter((item) => item.quantity > 0));
-  }
-
-  async function toggleHeroMotion() {
-    const video = heroVideoRef.current;
-    if (!video) return;
-    if (video.paused) {
-      video.muted = true;
-      try {
-        await video.play();
-        setHeroPlaying(true);
-      } catch {
-        setHeroPlaying(false);
-        setToast("Motion could not start on this device. Check Low Power or data-saving mode.");
-      }
-    } else {
-      video.pause();
-      setHeroPlaying(false);
-    }
   }
 
   async function saveRequest(scope: string, input: ServiceRequestInput) {
@@ -788,46 +722,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       {hasDepartmentMasthead(view) && <DepartmentMasthead view={view}/>}
 
       {view === "home" && <>
-        <section className="ed-film" aria-labelledby="hero-title">
-          <video
-            ref={heroVideoRef}
-            className="hero-video"
-            muted
-            loop
-            playsInline
-            preload="auto"
-            poster="/deldiet-hero-motion-poster.webp"
-            aria-hidden="true"
-            onPlay={() => setHeroPlaying(true)}
-            onPause={() => setHeroPlaying(false)}
-            onError={() => setHeroPlaying(false)}
-          >
-            <source media="(max-width: 640px)" src="/deldiet-hero-motion-mobile.mp4" type="video/mp4" />
-            <source src="/deldiet-hero-motion.mp4" type="video/mp4" />
-          </video>
-          <div className="ed-film-veil" />
-          <div className="ed-film-inner">
-            <p className="ed-kicker"><i aria-hidden="true"/> Specialty coffee <span aria-hidden="true">/</span> St. John’s, NL</p>
-            <h1 id="hero-title">Coffee<br/><em>without borders.</em></h1>
-            <p className="ed-film-deck">Follow a bean from its origin to your cup. Find your flavour, then make it yours.</p>
-            <div className="ed-film-actions">
-              <a href="/build-a-cup" className="ed-primary">Build a cup <Icon name="arrow" /></a>
-              <a href="/origins" className="ed-link">Explore origins <Icon name="diagonal" size={18}/></a>
-            </div>
-          </div>
-          <div className="ed-film-transport">
-            <a href="#tasting-counter" className="ed-scroll"><span aria-hidden="true">↓</span> Discover your flavour</a>
-            <button type="button" className="hero-mobile-motion" aria-label={heroPlaying ? "Pause cinematic hero motion" : "Play cinematic hero motion"} aria-pressed={heroPlaying} onClick={toggleHeroMotion}>
-              <span className="ed-film-round"><Icon name={heroPlaying ? "pause" : "play"} size={18} /></span>
-              <span>{heroPlaying ? "Pause film" : "Play film"}</span>
-            </button>
-          </div>
-        </section>
-        <a className="ed-menu-strip" href="/coffeehouse#cafe-menu">
-          <span><span className="ed-sun" aria-hidden="true"><Icon name="sunburst" size={30}/></span> At the coffeehouse</span>
-          <span className="ed-menu-sample">Espresso <i/> Pour-over <i/> Cold brew</span>
-          <span className="ed-menu-end">See the menu <Icon name="arrow" size={19}/></span>
-        </a>
+        <Cinema/>
         <HomeCounter origins={origins}/>
       </>}
 
@@ -910,39 +805,35 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
 
       {view === "journal" && <FieldJournal origins={origins}/>}
 
-      <footer>
-        <div className="footer-social">
-          <div>
-            <h2>Coffee in <em>good company.</em></h2>
-            <p>Coffee stories, origins and everyday rituals.</p>
+      <footer className="dc-footer">
+        <div className="dc-footer-grid">
+          <div className="dc-footer-about">
+            <Link href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} unoptimized/></Link>
+            <p>St. John’s, Newfoundland<br/>Canada</p>
+            <nav aria-label="Deldiet social media">{socialProfiles.map((profile) => <a key={profile.name} href={profile.href} target="_blank" rel="noopener noreferrer" aria-label={`Deldiet Coffee on ${profile.name} (opens in a new tab)`}><Icon name={profile.icon} size={19}/></a>)}</nav>
           </div>
-          <nav className="footer-social-links" aria-label="Deldiet social media">
-            {socialProfiles.map((profile) => (
-              <a key={profile.name} href={profile.href} target="_blank" rel="noopener noreferrer" aria-label={`Deldiet Coffee on ${profile.name} (opens in a new tab)`}>
-                <Icon name={profile.icon} size={21}/>
-                <span>{profile.name}</span>
-              </a>
-            ))}
+          <nav className="dc-foot-nav" aria-label="Coffee experiences">
+            <h2>Explore</h2>
+            <a href="/coffeehouse">Coffeehouse</a><a href="/origins">Origins</a><a href="/build-a-cup">Build a cup</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop</a><a href="/discover">Discover Deldiet</a><a href="/tasteprint">Tasteprint</a><a href="/passport">Passport</a>
           </nav>
-        </div>
-        <div className="footer-top">
-          <div><Link className="footer-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} unoptimized/></Link><p>The world in your cup.<br/>St. John&apos;s · Newfoundland</p></div>
-          <div><span>Explore</span><a href="/discover">Discover Deldiet</a><a href="/tasteprint">Find my Tasteprint</a><a href="/coffeehouse">Coffeehouse</a><a href="/origins">Coffee origins</a><a href="/origin-bar">Origin Bar</a><a href="/build-a-cup">Build a cup</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop Deldiet</a><a href="/origin-exchange">Origin Exchange</a><a href="/passport">Deldiet Passport</a></div>
-          <div><span>Deldiet</span><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Platform standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/journal">Field Journal</a></div>
-          <div className="newsletter">
-            <span>From origin to inbox</span>
-            <p>Save a Field Notes signup request for new harvests, café experiences and sourcing stories. Mailing automation is not connected yet.</p>
+          <nav className="dc-foot-nav" aria-label="More from Deldiet">
+            <h2>Inside Deldiet</h2>
+            <a href="/journal">Field Journal</a><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Our standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/origin-bar">Origin Bar</a><a href="/origin-exchange">Origin Exchange</a>
+          </nav>
+          <div className="dc-foot-contact">
+            <h2>Field Notes</h2>
+            <p>Register your interest in coffeehouse news and stories from the field. Mailings haven’t started yet.</p>
             <form onSubmit={submitNewsletter}>
-              <input aria-label="Email address" autoComplete="email" placeholder="Email address" type="email" required value={newsletterEmail} onChange={(event) => setNewsletterEmail(event.target.value)}/>
+              <input aria-label="Email address" autoComplete="email" placeholder="Your email address" type="email" required value={newsletterEmail} onChange={(event) => setNewsletterEmail(event.target.value)}/>
               <button type="submit" aria-label="Save Field Notes signup request" disabled={Boolean(requestPending)}><Icon name="arrow" /></button>
             </form>
             {requestErrorScope === "home-newsletter" && <small className="request-error" role="alert">{requestError}</small>}
+            <button type="button" className="dc-foot-ask" aria-expanded={conciergeOpen} onClick={() => setConciergeOpen(!conciergeOpen)}>Ask Deldiet <Icon name="diagonal" size={14}/></button>
           </div>
         </div>
-        <div className="footer-bottom"><span>© 2026 Deldiet Coffee Company</span><span>Canada / CAD</span><span><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/accessibility">Accessibility</a></span></div>
+        <div className="dc-legal"><span>© 2026 Deldiet Coffee Company</span><span>Canada · CAD</span><nav aria-label="Policies"><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="/accessibility">Accessibility</a></nav></div>
       </footer>
 
-      <button aria-label="Ask Deldiet" className="concierge-button" onClick={() => setConciergeOpen(!conciergeOpen)} aria-expanded={conciergeOpen}><Icon name="spark"/><span>Ask Deldiet</span></button>
       {conciergeOpen && <div className="concierge-panel">
         <div><span><Icon name="spark"/> Coffee concierge</span><button aria-label="Close concierge" onClick={() => setConciergeOpen(false)}><Icon name="close"/></button></div>
         <h3>What can we help with?</h3>

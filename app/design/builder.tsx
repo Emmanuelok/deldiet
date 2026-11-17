@@ -37,6 +37,27 @@ const finishes = ["Pure", "Cacao", "Vanilla bean", "Brown sugar", "Cinnamon"];
 const temperatures = ["Hot", "Iced"];
 const sections = ["Origin", "Drink", "Milk & finish"];
 const storageKey = "deldiet-brewprint-v1";
+const garnishes: Record<string, { color: string; radius: number; count: number }> = {
+  Cacao: { color: "#3b1d0f", radius: 1.05, count: 150 },
+  "Vanilla bean": { color: "#2f2015", radius: .55, count: 100 },
+  "Brown sugar": { color: "#c98239", radius: 1.25, count: 70 },
+  Cinnamon: { color: "#914216", radius: .85, count: 170 },
+};
+
+function FinishLayer({ finish, iced, milk }: { finish: string; iced: boolean; milk: boolean }) {
+  const garnish = garnishes[finish];
+  if (!garnish) return null;
+  // The optical surface in each of the four photographs, in the same square coordinate system.
+  const [cx, cy, rx, ry] = iced ? [208, 100, 79, 20] : milk ? [198, 143, 79, 29] : [200, 157, 87, 15];
+  return <svg className="cs-garnish" viewBox="0 0 420 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    {Array.from({ length: garnish.count }, (_, i) => {
+      const angle = i * 2.39996;
+      const radius = Math.sqrt(((i * 139 + 37) % 197) / 197);
+      return <circle key={i} cx={cx + Math.cos(angle) * rx * radius} cy={cy + Math.sin(angle) * ry * radius}
+        r={garnish.radius * (.42 + ((i * 31) % 13) / 13)} opacity={.3 + ((i * 13) % 11) / 17} fill={garnish.color} />;
+    })}
+  </svg>;
+}
 
 function recipePrice(recipe: Recipe) {
   let cents = 550;
@@ -108,10 +129,18 @@ export default function CupStudio({ origins, serviceMode, onAdd, notify }: {
   const iced = recipe.temperature === "Iced";
   const price = recipePrice(recipe);
   const isSaved = sameRecipe(recipe, saved);
-  const cupImage = iced ? "/menu/deldiet-cold-cup.webp" : "/menu/deldiet-hot-cup.webp";
+  const hasMilk = recipe.milk !== "No milk";
+  const cupImage = `/barista/${iced ? "iced" : "hot"}-${hasMilk ? "milk" : "black"}.webp`;
 
   function update(key: keyof Recipe, value: string) {
-    setRecipe(current => ({ ...current, [key]: value }));
+    setRecipe(current => {
+      const next = { ...current, [key]: value };
+      if (key === "style") {
+        if (value === "Cold brew") next.temperature = "Iced";
+        if ((value === "Flat white" || value === "Cappuccino") && current.milk === "No milk") next.milk = "Whole milk";
+      }
+      return next;
+    });
   }
 
   function saveRecipe() {
@@ -138,26 +167,32 @@ export default function CupStudio({ origins, serviceMode, onAdd, notify }: {
       <div className="cs-shell">
         <header className="cs-intro">
           <h1 id="cs-title">Build a <em>cup.</em></h1>
-          <p>Pick your origin, dial in the drink and give it your own finish.</p>
+          <p>Choose the coffee, then make the recipe your own.</p>
         </header>
 
         <div className="cs-art" style={{ "--cs-accent": origin.accent } as CSSProperties}>
-          <span className="cs-code" aria-hidden="true" key={origin.code}>{origin.code}</span>
-          <span className="cs-halo" aria-hidden="true" />
-          <Image key={cupImage} src={cupImage} alt="" width={iced ? 306 : 341} height={iced ? 560 : 520}
-            priority unoptimized className={iced ? "cs-cup is-iced" : "cs-cup"} />
-          <div className="cs-art-head"><span>{origin.country}</span><span>{origin.roast} roast</span></div>
-          <div className="cs-art-foot">
-            <span className="cs-art-style">{recipe.style}</span>
+          <div className="cs-scene" key={cupImage}>
+            <Image src={cupImage} alt={iced ? (hasMilk ? "Milk swirling into iced coffee in a fluted glass" : "Black coffee over ice in a fluted glass") : (hasMilk ? "A ceramic coffee cup with textured milk and a rosetta" : "Hot black coffee in a clear glass cup")}
+              fill priority unoptimized sizes="(max-width: 860px) 100vw, 55vw" className="cs-cup" />
+            <FinishLayer finish={recipe.finish} iced={iced} milk={hasMilk} />
+          </div>
+          <div className="cs-vignette" aria-hidden="true"/>
+          <div className="cs-art-head">
+            <span className="cs-roast"><i aria-hidden="true"/>{origin.roast} roast</span>
             <fieldset className="cs-temp">
               <legend className="cs-sr">Serving temperature</legend>
               {temperatures.map(temp => (
                 <label key={temp} className={recipe.temperature === temp ? "is-served" : ""}>
                   <input type="radio" name="Serving temperature" checked={recipe.temperature === temp} onChange={() => update("temperature", temp)} />
-                  {temp === "Hot" ? <Sun size={16} aria-hidden="true" /> : <Snowflake size={15} aria-hidden="true" />}{temp}
+                  {temp === "Hot" ? <Sun size={16} aria-hidden="true" /> : <Snowflake size={16} aria-hidden="true" />}{temp}
                 </label>
               ))}
             </fieldset>
+          </div>
+          <div className="cs-art-foot">
+            <span className="cs-location">{originName}</span>
+            <strong className="cs-art-style">{recipe.style}</strong>
+            <p>{origin.notes.join(" · ")}</p>
           </div>
         </div>
 
@@ -182,7 +217,7 @@ export default function CupStudio({ origins, serviceMode, onAdd, notify }: {
                     </label>
                   ))}
                 </div>
-                <p className="cs-tasting"><strong>Tasting notes</strong><span>{origin.notes.join(" · ")}</span></p>
+
               </fieldset>
             )}
             {step === 1 && <ChoiceRow label="Choose your drink" choices={styles} value={recipe.style} onChange={value => update("style", value)} />}
