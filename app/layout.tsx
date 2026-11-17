@@ -13,6 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const socialPreviewImage = {
+  url: "/brand/og-espresso-pour.jpg",
+  width: 1200,
+  height: 630,
+  type: "image/jpeg",
+  alt: "Espresso pours into a glass cup against a crimson background beside the Deldiet logo and the words “The world in your cup.”",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.deldiet.coffee"),
   title: "Deldiet — The World in Your Cup",
@@ -23,9 +31,9 @@ export const metadata: Metadata = {
     type: "website", siteName: "Deldiet", locale: "en_CA",
     title: "Deldiet — The World in Your Cup",
     description: "Explore coffee origins and discover your next daily ritual.",
-    images: [{ url: "/brand/og-deldiet.png", width: 1200, height: 630, alt: "Deldiet — The world in your cup. Coffee, without borders." }],
+    images: [socialPreviewImage],
   },
-  twitter: { card: "summary_large_image", title: "Deldiet — The World in Your Cup", description: "Explore coffee origins and discover your next daily ritual.", images: ["/brand/og-deldiet.png"] },
+  twitter: { card: "summary_large_image", title: "Deldiet — The World in Your Cup", description: "Explore coffee origins and discover your next daily ritual.", images: [socialPreviewImage] },
   description:
     "Explore traceable coffee origins, build your exact cup, and bring the same coffee home in every format you brew.",
   other: {
