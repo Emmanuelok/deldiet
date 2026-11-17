@@ -5,6 +5,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { createIdempotencyKey, submitServiceRequest, type ServiceRequestInput } from "@/lib/request-client";
 
+const socialProfiles = [
+  { name: "Instagram", icon: "instagram", href: "https://www.instagram.com/deldietcoffee/" },
+  { name: "X", icon: "x", href: "https://x.com/deldietcoffee" },
+  { name: "YouTube", icon: "youtube", href: "https://www.youtube.com/@deldietcoffee" },
+] as const;
+
 type Origin = {
   id: string;
   country: string;
@@ -396,6 +402,9 @@ function Icon({ name, size = 20 }: { name: string; size?: number }) {
     leaf: <><path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15Z"/><path d="M7 17c3-4 6-7 11-10"/></>,
     play: <path d="m9 7 8 5-8 5V7Z"/>,
     pause: <><path d="M9 7v10"/><path d="M15 7v10"/></>,
+    instagram: <><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor" stroke="none"/></>,
+    x: <><path d="m4 3 12.5 18H20L7.5 3H4Z"/><path d="m20 3-7 8M4 21l7-8"/></>,
+    youtube: <><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor" stroke="none"/></>,
   };
   return <svg aria-hidden="true" viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">{paths[name]}</svg>;
 }
@@ -1285,6 +1294,20 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
       {view === "journal" && <section className="journal-banner" id="journal"><div><p className="eyebrow light">The field journal · No. 08</p><h2>Why altitude<br/>changes everything.</h2><p className="journal-summary">Altitude changes temperature, ripening speed and density. The result is not a guarantee of quality—but it is a useful clue when read beside variety, climate, process and producer practice.</p><a className="button button-light" href="/origins">Explore the origin library <Icon name="arrow" /></a></div><div className="journal-rings" aria-hidden="true"><i/><i/><i/><i/></div></section>}
 
       <footer>
+        <div className="footer-social">
+          <div>
+            <h2>Follow the Deldiet journey</h2>
+            <p>Coffee stories, origins and everyday rituals.</p>
+          </div>
+          <nav className="footer-social-links" aria-label="Deldiet social media">
+            {socialProfiles.map((profile) => (
+              <a key={profile.name} href={profile.href} target="_blank" rel="noopener noreferrer" aria-label={`Deldiet Coffee on ${profile.name} (opens in a new tab)`}>
+                <Icon name={profile.icon} size={21}/>
+                <span>{profile.name}</span>
+              </a>
+            ))}
+          </nav>
+        </div>
         <div className="footer-top">
           <div><Link className="footer-brand" href="/" aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} unoptimized/></Link><p>The world in your cup.<br/>St. John&apos;s · Newfoundland</p></div>
           <div><span>Explore</span><a href="/coffeehouse">Coffeehouse</a><a href="/origins">Coffee origins</a><a href="/origin-bar">Origin Bar</a><a href="/build-a-cup">Build a cup</a><a href="/coffee-at-home">Coffee at home</a><a href="/shop">Shop Deldiet</a><a href="/origin-exchange">Origin Exchange</a><a href="/passport">Deldiet Passport</a></div>
