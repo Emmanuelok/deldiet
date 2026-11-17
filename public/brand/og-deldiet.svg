@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+<defs><radialGradient id="g"><stop stop-color="#56603c"/><stop offset="1" stop-color="#171812"/></radialGradient></defs>
+<rect width="1200" height="630" fill="#171812"/><circle cx="990" cy="300" r="420" fill="url(#g)"/>
+<g stroke="#d9ff66" fill="none" opacity=".20"><ellipse cx="1005" cy="320" rx="250" ry="250"/><ellipse cx="1005" cy="320" rx="170" ry="250"/><ellipse cx="1005" cy="320" rx="85" ry="250"/><path d="M755 320h500M782 210h446M782 430h446"/></g>
+<path d="M906 200h190v133c0 53-43 96-95 96s-95-43-95-96V200Z" fill="#f6f2e8"/><path d="M1096 225h24c63 0 63 86 0 86h-24" stroke="#f6f2e8" stroke-width="20" fill="none"/><ellipse cx="1001" cy="200" rx="95" ry="24" fill="#d9ff66"/><ellipse cx="1001" cy="200" rx="74" ry="13" fill="#171812"/><path d="M955 153c-30-30 30-36 0-65M1002 151c-30-30 30-36 0-65M1049 153c-30-30 30-36 0-65" fill="none" stroke="#d9ff66" stroke-width="4" stroke-linecap="round"/>
+<text x="70" y="108" fill="#d9ff66" font-family="DejaVu Sans,sans-serif" font-size="44" font-weight="bold" letter-spacing="-2">deldiet.</text>
+<text x="70" y="254" fill="#f6f2e8" font-family="DejaVu Serif,serif" font-size="77">The world</text><text x="70" y="346" fill="#f6f2e8" font-family="DejaVu Serif,serif" font-size="77">in your cup.</text>
+<text x="74" y="418" fill="#c3c7b3" font-family="DejaVu Sans,sans-serif" font-size="22">Find your origin. Make it your ritual.</text>
+<path d="M70 515h1060" stroke="#62674e"/><circle cx="78" cy="560" r="6" fill="#d9ff66"/><text x="98" y="567" fill="#f6f2e8" font-family="DejaVu Sans,sans-serif" font-size="18" letter-spacing="3">COFFEE, WITHOUT BORDERS.</text><text x="955" y="567" fill="#d9ff66" font-family="DejaVu Sans,sans-serif" font-size="18">deldiet.coffee</text></svg>
