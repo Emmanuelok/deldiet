@@ -1,0 +1,37 @@
+.dept-film {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  min-height: clamp(390px, 48vw, 540px);
+  overflow: hidden;
+  padding: clamp(48px, 6vw, 100px) var(--ed-gutter, 6vw);
+  background: #211914;
+  color: #fff7e7;
+}
+.dept-film .dept-still { z-index: -3; object-fit: cover; object-position: 50% 54%; }
+.dept-veil {
+  position: absolute; z-index: -2; inset: 0;
+  background: linear-gradient(90deg, rgb(12 10 8 / 80%) 0%, rgb(12 10 8 / 55%) 34%, rgb(12 10 8 / 5%) 70%);
+}
+.dept-right { justify-content: flex-end; }
+.dept-right .dept-veil { background: linear-gradient(270deg, rgb(16 11 9 / 85%) 0%,rgb(16 11 9 / 64%) 38%,rgb(16 11 9 / 4%) 72%); }
+.dept-content { width: min(44%, 660px); }
+.dept-film .dept-label { display: flex; align-items: center; gap: .8rem; margin: 0; color: var(--dept-accent); font: 600 clamp(.77rem, .9vw, .95rem)/1.4 var(--sans); letter-spacing: .14em; text-transform: uppercase; }
+.dept-label::before { content: ""; width: 34px; height: 1px; background: currentColor; }
+.dept-film h1 { width: min(100%, 13ch); margin: 15px 0 14px; color: #fff7e7; font: 400 clamp(3.1rem, 6.1vw, 6.7rem)/.97 var(--serif, Georgia, serif); letter-spacing: -.04em; text-wrap: balance; }
+.dept-film .dept-description { width: min(100%, 40ch); margin: 0; color: #fff5e7; font: 440 clamp(1rem,1.15vw,1.23rem)/1.48 var(--sans); }
+.dept-film .dept-content a { display: inline-flex; align-items: center; gap: 14px; align-self: start; min-height: 44px; margin-top: 22px; padding: 8px 0; border-bottom: 1px solid var(--dept-accent); color: #fff9ef; font: 640 .98rem/1.3 var(--sans); text-decoration: none; }
+.dept-content a svg { color: var(--dept-accent); transition: transform .18s; }
+.dept-content a:hover svg { transform: translateY(3px); }
+.dept-film a:focus-visible { outline: 3px solid var(--dept-accent); outline-offset: 5px; }
+@media (max-width: 750px) {
+  .dept-film, .dept-film.dept-right { min-height: clamp(425px, 86vw, 525px); padding: 175px max(22px, 5.3vw) 30px; align-items: flex-end; justify-content: flex-start; }
+  .dept-film .dept-still { object-position: var(--dept-focus) center; }
+  .dept-film .dept-veil { background: linear-gradient(0deg,rgb(13 10 7 / 96%) 0%,rgb(13 10 7 / 68%) 31%,rgb(13 10 7 / 0%) 75%); }
+  .dept-content { width: 100%; }
+  .dept-film h1 { margin: 9px 0; font-size: clamp(3.05rem,8.6vw,4.2rem); width: min(100%,16ch); }
+  .dept-film .dept-description { font-size: 1rem; }
+  .dept-film .dept-content a { margin-top: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .dept-content a svg { transition:none; } }

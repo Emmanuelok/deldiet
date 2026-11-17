@@ -1,5 +1,5 @@
 /* Only the branded offline page is stored. Never cache accounts, APIs, forms or commerce. */
-const CACHE = 'deldiet-offline-v1';
+const CACHE = 'deldiet-offline-v2';
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.add('/offline.html')));
 });

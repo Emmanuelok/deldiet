@@ -1,0 +1,53 @@
+@font-face { font-family: "Deldiet Instrument"; src: url("/editorial/fonts/instrument-serif-regular.woff") format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
+.di-page {
+  --sans: var(--font-geist-sans, "Helvetica Neue"), Arial, sans-serif;
+  --di-ink: #1c2c24; --di-paper: #fbf7ee; --di-accent: #ddb981;
+  --di-line: #c7bcaa; --di-pad: clamp(20px, 6vw, 112px);
+  min-height: 100vh; background: var(--di-paper); color: var(--di-ink);
+  font-family: var(--sans); line-height: 1.55;
+}
+.di-page[data-notice=terms] { --di-accent: #e0bf9e; }
+.di-page[data-notice=accessibility] { --di-accent: #adccbb; }
+.di-page :is(a,button):focus-visible { outline: 3px solid #1366ad; outline-offset: 3px; }
+.di-header { display: flex; justify-content: space-between; align-items: center; min-height: 76px; padding: 0 var(--di-pad); background: #15241f; color: #fff7e8; border-bottom: 1px solid #756749; }
+.di-header > a { min-height: 44px; display: inline-flex; align-items: center; }
+.di-header img { display: block; width: clamp(105px,10vw,150px); height: auto; filter: brightness(0) invert(.94); }
+.di-home,.di-footer a { color: inherit; text-decoration: none; font-size: .92rem; font-weight: 600; }
+.di-page a:hover { text-decoration: underline; text-underline-offset: 4px; }
+.di-cover,.di-reading { padding-inline: var(--di-pad); }
+.di-cover {
+  position: relative; padding-block: clamp(32px,4.6vw,78px);
+  background: linear-gradient(112deg,#eae3d3,#faf7ed 57%,#eee9dc); border-bottom: 1px solid #c6bdab;
+  display: grid; grid-template-columns: minmax(0,1.15fr) minmax(260px,.85fr); align-items: end; gap: clamp(30px,7vw,125px);
+}
+.di-cover .di-label { display: inline-flex; align-items: center; gap: 9px; color: #465848; }
+.di-cover .di-label::before { content: ""; width: 23px; height: 2px; background: #9d7248; }
+.di-label { margin: 0; text-transform: uppercase; font: 650 .77rem/1.4 var(--font-geist-mono),monospace; letter-spacing: .09em; }
+.di-cover h1 {
+  margin: 11px 0 0; font: 400 clamp(3rem, 4.65vw, 5.3rem)/1.02 "Deldiet Instrument",Georgia,serif;
+  letter-spacing: -.045em; text-wrap: balance;
+}
+.di-lead { margin: 0; max-width: 49ch; font-size: clamp(1rem,1.24vw,1.4rem); line-height: 1.58; }
+.di-reading { display: grid; grid-template-columns: minmax(155px,.4fr) minmax(0,1fr); align-items: start; gap: clamp(36px,8.5vw,160px); padding-block: clamp(40px,6vw,100px); max-width: 1600px; margin: auto; }
+.di-outline { position: sticky; top: 28px; display: grid; align-content: start; }
+.di-outline .di-label { margin-bottom: 17px; }
+.di-outline a { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-block: 8px; border-top: 1px solid var(--di-line); color: inherit; text-decoration: none; font-weight: 520; font-size: .95rem; }
+.di-outline a:last-child { border-bottom: 1px solid var(--di-line); }
+.di-article { width: min(100%, 780px); }
+.di-article section + section { margin-top: clamp(24px,3vw,44px); padding-top: clamp(22px,2.4vw,38px); border-top: 1px solid var(--di-line); }
+.di-article h2 { margin: 0; scroll-margin-top: 22px; font: 400 clamp(1.9rem,2.5vw,3rem)/1.08 "Deldiet Instrument",Georgia,serif; letter-spacing: -.035em; }
+.di-article section p { max-width: 66ch; margin: 14px 0 0; font-size: clamp(1rem,1.15vw,1.23rem); line-height: 1.72; }
+.di-note { border-top: 1px solid var(--di-ink); padding-top: 20px; margin: 36px 0 0; font-size: .87rem; color: #596052; }
+.di-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px var(--di-pad); background: #15241f; color: #f4eddf; }
+.di-footer nav { display: flex; flex-wrap: wrap; gap: 5px 20px; }
+.di-footer a { min-height: 44px; display: inline-flex; align-items: center; }
+.di-footer a[aria-current=page] { color: var(--di-accent); }
+@media (max-width: 760px) {
+  .di-header { min-height: 62px; }
+  .di-cover { grid-template-columns: 1fr; gap: 14px; padding-block: 30px; }
+  .di-lead { max-width: 58ch; }
+  .di-reading { grid-template-columns: 1fr; gap: 35px; }
+  .di-outline { position: static; }
+  .di-cover h1 { font-size: clamp(2.6rem,8.6vw,3.85rem); }
+}
+@media (max-width: 450px) { .di-footer { flex-direction: column; align-items: flex-start; gap: 0; } }
