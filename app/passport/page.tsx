@@ -43,6 +43,24 @@ const BREW_METHODS = {
   "Cold brew": { ratio: 8, dose: 80, temp: 20, seconds: 43200, grind: "Very coarse", steps: ["Combine coffee and cool water", "Stir until every ground is wet", "Cover and steep for 12 hours", "Filter, chill and dilute to taste"] },
 } as const;
 
+const PASSPORT_BREWERS: Record<string, string> = {
+  "Espresso machine": "Whole bean and correctly matched grind",
+  "Pour-over": "Whole bean and correctly matched grind",
+  "French press": "Whole bean and correctly matched grind",
+  "AeroPress": "Whole bean and correctly matched grind",
+  "Batch brewer": "Whole bean and correctly matched grind",
+  "Capsule machine": "Nespresso Original-compatible capsules",
+  "Single-serve brewer": "K-Cup-compatible brew cups",
+  "Whole bean grinder": "Whole bean coffee to grind for your brewing method",
+  "No equipment": "Ready-to-drink coffee, concentrate or pocket pour-over",
+};
+
+const PREVIOUS_BREWER_NAMES: Record<string, string> = {
+  "Nespresso Original": "Capsule machine",
+  "Keurig brewer": "Single-serve brewer",
+  "Pour-over setup": "Pour-over",
+};
+
 const ORIGIN_STAMPS = [
   ["ET", "Ethiopia", "Floral altitude"], ["CO", "Colombia", "Balanced sweetness"],
   ["BR", "Brazil", "Cacao structure"], ["KE", "Kenya", "Juicy acidity"],
@@ -56,6 +74,7 @@ export default function PassportPage() {
   const [tab, setTab] = useState<Tab>("overview");
   const [taste, setTaste] = useState<TasteProfile>({ note: "Chocolate & nuts", roast: "Medium", brew: "Espresso machine", adventure: "2" });
   const [brewer, setBrewer] = useState("Espresso machine");
+  const [preferencesLoaded, setPreferencesLoaded] = useState(false);
   const [contact, setContact] = useState<Contact>({ name: "", email: "", phone: "" });
   const [plan, setPlan] = useState({ plan: "Explorer", format: "Whole bean", cadence: "Every 4 weeks", brewMethod: "Espresso machine", quantity: "2", selectionMode: "Taste Graph chooses" });
   const [gift, setGift] = useState({ giftType: "Origin journey", occasion: "Birthday", deliveryWindow: "Within 2 weeks", recipientMode: "Let recipient take the Taste Graph", budget: "75", message: "" });
@@ -78,15 +97,23 @@ export default function PassportPage() {
         const stored = JSON.parse(window.localStorage.getItem("deldiet-passport-v1") || "null") as { taste?: TasteProfile; brewer?: string } | null;
         const savedTaste = stored?.taste;
         if (savedTaste && ["Chocolate & nuts", "Caramel & sweet", "Floral & citrus", "Fruit-forward", "Deep & earthy"].includes(savedTaste.note) && ["Light", "Medium", "Medium-dark"].includes(savedTaste.roast) && ["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine"].includes(savedTaste.brew) && ["1", "2", "3", "4", "5"].includes(savedTaste.adventure)) setTaste(savedTaste);
-        if (stored?.brewer && ["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine", "Single-serve brewer"].includes(stored.brewer)) setBrewer(stored.brewer);
+        if (typeof stored?.brewer === "string") {
+          const savedBrewer = PREVIOUS_BREWER_NAMES[stored.brewer] || stored.brewer;
+          if (Object.hasOwn(PASSPORT_BREWERS, savedBrewer)) setBrewer(savedBrewer);
+        }
       } catch { /* local preview may be empty */ }
+      setPreferencesLoaded(true);
     });
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem("deldiet-passport-v1", JSON.stringify({ taste, brewer }));
-  }, [taste, brewer]);
+    if (!preferencesLoaded) return;
+    try {
+      const previous = JSON.parse(window.localStorage.getItem("deldiet-passport-v1") || "{}");
+      window.localStorage.setItem("deldiet-passport-v1", JSON.stringify({ ...previous, taste, brewer }));
+    } catch { /* The Passport still works in memory when storage is unavailable. */ }
+  }, [taste, brewer, preferencesLoaded]);
 
   useEffect(() => {
     if (!timerRunning || secondsLeft <= 0) return;
@@ -175,11 +202,12 @@ export default function PassportPage() {
   }
 
   return (
-    <main className={styles.shell}>
+    <main className={styles.shell} data-section={tab}>
+      <a className="skip-link" href="#passport-workspace">Skip to Passport workspace</a>
       <header className={styles.header}>
         <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
-        <div className={styles.headerTitle}><span>Deldiet Passport</span><small>Your coffee, connected</small></div>
-        <nav aria-label="Deldiet experiences"><Link href="/origin-bar">Origin Bar</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
+        <div className={styles.headerTitle}><Compass size={18} aria-hidden="true"/><span>Deldiet Passport</span></div>
+        <nav aria-label="Deldiet experiences"><Link href="/shop">Shop</Link><Link href="/origin-bar">Origin Bar</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
       </header>
 
       <div className={styles.statusBar}><span><i/> Interactive customer preview</span><p>Taste and brewer preferences save only on this device. Account sync, payment and automatic fulfilment are not connected yet.</p></div>
@@ -191,7 +219,7 @@ export default function PassportPage() {
           <div className={styles.sidebarFoot}><Award size={19}/><div><b>Circle preview</b><small>Rewards activate when a verified account programme launches.</small></div></div>
         </aside>
 
-        <section className={styles.workspace}>
+        <section className={styles.workspace} id="passport-workspace">
           {notice && <div className={`${styles.notice} ${notice.tone === "error" ? styles.noticeError : styles.noticeSuccess}`} role={notice.tone === "error" ? "alert" : "status"}><span>{notice.tone === "success" ? <Check size={17}/> : <RotateCcw size={17}/>}</span><p>{notice.text}</p><button aria-label="Dismiss message" onClick={() => setNotice(null)}>×</button></div>}
 
           {tab === "overview" && <Overview taste={taste} brewer={brewer} setBrewer={setBrewer} onNavigate={chooseTab} onReorder={addMatchToBag} topMatch={matches[0]} />}
@@ -208,15 +236,20 @@ export default function PassportPage() {
   );
 }
 
-function PageIntro({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
-  return <div className={styles.pageIntro}><p>{eyebrow}</p><h1>{title}</h1><span>{copy}</span></div>;
+function PageIntro({ eyebrow, title, copy, photo }: { eyebrow: string; title: string; copy: string; photo: string }) {
+  return (
+    <div className={styles.pageIntro}>
+      <div><p className={styles.kicker}>{eyebrow}</p><h1>{title}</h1><p>{copy}</p></div>
+      <Image src={photo} alt="" width={627} height={627} unoptimized sizes="(max-width: 520px) 36vw, 260px" />
+    </div>
+  );
 }
 
 function Overview({ taste, brewer, setBrewer, onNavigate, onReorder, topMatch }: { taste: TasteProfile; brewer: string; setBrewer: (value: string) => void; onNavigate: (tab: Tab) => void; onReorder: () => void; topMatch: typeof COFFEES[number] & { score: number } }) {
   return <>
-    <PageIntro eyebrow="One profile · every Deldiet experience" title="Good morning, coffee person." copy="Your Passport connects discovery, brewing, replenishment and origin learning. This guest preview keeps preferences on this device until verified accounts launch." />
+    <PageIntro eyebrow="Deldiet Passport" title="Your coffee Passport." copy="Find your coffee, save your brewer and plan your next cup. This guest Passport keeps your preferences on this device." photo="/products/field-notebook.webp" />
     <div className={styles.metricRow}>
-      <article><Compass size={20}/><span>Countries explored</span><b>4</b><small>Preview stamps</small></article>
+      <article><Compass size={20}/><span>Sample origins</span><b>4</b><small>Preview stamps</small></article>
       <article><Heart size={20}/><span>Current taste</span><b>{taste.note}</b><small>{taste.roast} roast</small></article>
       <article><Award size={20}/><span>Circle balance</span><b>0</b><small>Programme not active</small></article>
       <article><Package size={20}/><span>Next rhythm</span><b>Not scheduled</b><small>Build a request</small></article>
@@ -224,9 +257,9 @@ function Overview({ taste, brewer, setBrewer, onNavigate, onReorder, topMatch }:
     <div className={styles.overviewGrid}>
       <article className={styles.matchCard}>
         <div><p className={styles.kicker}>Your current match</p><h2>{topMatch.name}</h2><span>{topMatch.origin}</span><p>{topMatch.notes}</p><div className={styles.actionRow}><button className={styles.primary} onClick={onReorder}>Add match to bag <ArrowRight size={16}/></button><button className={styles.secondary} onClick={() => onNavigate("finder")}>Retake Taste Graph</button></div></div>
-        <div className={styles.matchArt}><Image src={topMatch.image} alt={`${topMatch.name} coffee package`} fill unoptimized sizes="(max-width: 700px) 100vw, 360px"/><span>Deldiet match</span></div>
+        <div className={styles.matchArt}><Image src={topMatch.image} alt={`${topMatch.name} coffee package`} fill unoptimized sizes="(max-width: 700px) 100vw, 360px"/></div>
       </article>
-      <article className={styles.compatibilityCard}><p className={styles.kicker}>Machine & format match</p><h2>What do you brew with?</h2><p>Save one brewer to filter recommendations and prevent incompatible formats.</p><label><span>Primary brewer</span><select value={brewer} onChange={(event) => setBrewer(event.target.value)}>{["Espresso machine", "Pour-over", "French press", "AeroPress", "Batch brewer", "Capsule machine", "Single-serve brewer"].map((item) => <option key={item}>{item}</option>)}</select></label><div className={styles.compatible}><Check size={15}/><span>{brewer === "Capsule machine" ? "Nespresso Original-compatible capsules" : brewer === "Single-serve brewer" ? "K-Cup-compatible brew cups" : "Whole bean and correctly matched grind"}</span></div></article>
+      <article className={styles.compatibilityCard}><p className={styles.kicker}>Machine & format match</p><h2>What do you brew with?</h2><p>Save one brewer to filter recommendations and prevent incompatible formats.</p><label><span>Primary brewer</span><select value={brewer} onChange={(event) => setBrewer(event.target.value)}>{Object.keys(PASSPORT_BREWERS).map((item) => <option key={item}>{item}</option>)}</select></label><div className={styles.compatible}><Check size={15}/><span>{PASSPORT_BREWERS[brewer]}</span></div></article>
     </div>
     <div className={styles.sectionHeading}><div><p className={styles.kicker}>Origin Passport</p><h2>A map made by tasting.</h2></div><button onClick={() => onNavigate("finder")}>Find the next country <ArrowRight size={16}/></button></div>
     <div className={styles.stampGrid}>{ORIGIN_STAMPS.map(([code, country, note]) => <article key={code} className={styles.stampMuted}><span>{code}</span><div><b>{country}</b><small>{note}</small></div><em>Preview</em></article>)}</div>
@@ -248,7 +281,7 @@ const QUESTION_OPTIONS: Array<{ key: keyof TasteProfile; label: string; options:
 
 function TasteGraph({ taste, updateTaste, matches, onAdd, onContinue }: { taste: TasteProfile; updateTaste: (key: keyof TasteProfile, value: string) => void; matches: Array<typeof COFFEES[number] & { score: number }>; onAdd: () => void; onContinue: () => void }) {
   return <>
-    <PageIntro eyebrow="Adaptive coffee finder" title="Build your Taste Graph." copy="Four transparent choices create a first recommendation. Save future cup ratings to make the graph more useful over time." />
+    <PageIntro eyebrow="Adaptive coffee finder" title="Your Taste Graph." copy="Choose the flavours, roast and brew method you enjoy. See how each choice changes your coffee match." photo="/products/guji-reserve.webp" />
     <div className={styles.finderGrid}>
       <div className={styles.questionStack}>{QUESTION_OPTIONS.map((question, index) => <fieldset key={question.key}><legend><span>{String(index + 1).padStart(2, "0")}</span>{question.label}</legend><div className={styles.choiceGrid}>{question.options.map((option) => <button type="button" key={option} className={taste[question.key] === option ? styles.selected : ""} aria-pressed={taste[question.key] === option} onClick={() => updateTaste(question.key, option)}>{question.key === "adventure" ? <><b>{option}</b><small>{option === "1" ? "Comforting" : option === "5" ? "Surprise me" : ""}</small></> : option}</button>)}</div></fieldset>)}</div>
       <aside className={styles.resultPanel}><p className={styles.kicker}>Live recommendation</p><div className={styles.tasteRadar} aria-label={`Taste profile: ${taste.note}, ${taste.roast}, adventure ${taste.adventure} of 5`}><i style={{ "--taste": `${Number(taste.adventure) * 20}%` } as CSSProperties}/><span>{taste.adventure}/5</span></div><h2>{matches[0].name}</h2><p className={styles.resultOrigin}>{matches[0].origin}</p><strong>{matches[0].notes}</strong><p>{matches[0].why}</p><div className={styles.actionRow}><button className={styles.primary} onClick={onAdd}>Add 250 g to bag</button><button className={styles.secondary} onClick={onContinue}>Build a Rhythm</button></div><div className={styles.runnerUps}><span>Also suited</span>{matches.slice(1, 3).map((item) => <div key={item.id}><b>{item.name}</b><small>{item.origin}</small></div>)}</div></aside>
@@ -267,7 +300,7 @@ function SelectField({ label, value, options, onChange }: { label: string; value
 function RhythmForm({ plan, setPlan, contact, setContact, pending, onSubmit }: { plan: PlanState; setPlan: (value: PlanState) => void; contact: Contact; setContact: (value: Contact) => void; pending: string; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
   const estimate = plan.plan === "Atlas" ? 68 : plan.plan === "Explorer" ? 38 : 22;
   return <>
-    <PageIntro eyebrow="Flexible replenishment" title="Set your Deldiet Rhythm." copy="Choose the coffee, format and timing. This creates a plan request for Deldiet review; it does not start billing or an automatic shipment." />
+    <PageIntro eyebrow="Flexible replenishment" title="Set your coffee rhythm." copy="Choose a coffee, format and cadence for Deldiet to review. Billing and shipments begin only after confirmation." photo="/products/house-01.webp" />
     <form className={styles.formGrid} onSubmit={onSubmit}>
       <div className={styles.formBody}>
         <fieldset className={styles.planPicker}><legend>Choose a plan</legend>{[["Explorer", "Two coffees chosen around your graph"], ["Atlas", "Four rotating origins and tasting lessons"], ["House", "One familiar coffee, repeated your way"]].map(([name, copy]) => <button type="button" key={name} className={plan.plan === name ? styles.selected : ""} aria-pressed={plan.plan === name} onClick={() => setPlan({ ...plan, plan: name })}><span>{name}</span><small>{copy}</small></button>)}</fieldset>
@@ -287,7 +320,7 @@ function RhythmForm({ plan, setPlan, contact, setContact, pending, onSubmit }: {
 
 function BrewLab({ method, setMethod, recipe, servings, setServings, strength, setStrength, dose, water, timeLabel, running, secondsLeft, setRunning, reset }: { method: keyof typeof BREW_METHODS; setMethod: (value: keyof typeof BREW_METHODS) => void; recipe: typeof BREW_METHODS[keyof typeof BREW_METHODS]; servings: number; setServings: (value: number) => void; strength: number; setStrength: (value: number) => void; dose: number; water: number; timeLabel: string; running: boolean; secondsLeft: number; setRunning: (value: boolean) => void; reset: () => void }) {
   return <>
-    <PageIntro eyebrow="Interactive recipe studio" title="Brew with fewer guesses." copy="Scale a Deldiet starting recipe, follow the sequence and use the built-in timer. Grinder, water and coffee age can change the result—adjust by taste." />
+    <PageIntro eyebrow="Interactive recipe studio" title="The Brew Lab." copy="Scale a recipe, follow the brewing steps and start the timer when you’re ready." photo="/products/deldiet-dripper.webp" />
     <div className={styles.methodTabs} role="group" aria-label="Choose brew method">{Object.keys(BREW_METHODS).map((item) => <button key={item} className={method === item ? styles.selected : ""} onClick={() => setMethod(item as keyof typeof BREW_METHODS)} aria-pressed={method === item}>{item}</button>)}</div>
     <div className={styles.brewGrid}>
       <article className={styles.brewControls}><p className={styles.kicker}>Recipe controls</p><div className={styles.stepper}><span>Servings</span><button aria-label="Decrease servings" onClick={() => setServings(Math.max(1, servings - 1))}>−</button><b>{servings}</b><button aria-label="Increase servings" onClick={() => setServings(Math.min(8, servings + 1))}>+</button></div><fieldset><legend>Strength</legend><div className={styles.threeWay}>{[[1, "Gentle"], [2, "Balanced"], [3, "Bold"]].map(([value, label]) => <button key={value} onClick={() => setStrength(Number(value))} className={strength === value ? styles.selected : ""} aria-pressed={strength === value}>{label}</button>)}</div></fieldset><div className={styles.recipeMetrics}><span><small>Coffee</small><b>{dose} g</b></span><span><small>{method === "Espresso" ? "Beverage" : "Water"}</small><b>{water} g</b></span><span><small>Temperature</small><b>{recipe.temp}°C</b></span><span><small>Grind</small><b>{recipe.grind}</b></span></div></article>
@@ -300,7 +333,7 @@ function BrewLab({ method, setMethod, recipe, servings, setServings, strength, s
 
 function GiftForm({ gift, setGift, contact, setContact, pending, onSubmit }: { gift: GiftState; setGift: (value: GiftState) => void; contact: Contact; setContact: (value: Contact) => void; pending: string; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
   return <>
-    <PageIntro eyebrow="Recipient-led gifting" title="Give a coffee journey, not a guess." copy="Schedule an origin journey, café ritual or brew kit. The recipient can take the Taste Graph before anything is finalized." />
+    <PageIntro eyebrow="Recipient-led gifting" title="Build a coffee gift." copy="Plan an origin journey, café ritual or brew kit. Let the recipient choose their own coffee, or select one for them." photo="/products/celebration-box.webp" />
     <form className={styles.editorialForm} onSubmit={onSubmit}>
       <div className={styles.formFields}><SelectField label="Gift format" value={gift.giftType} options={["Origin journey", "Café ritual", "Brew kit", "Digital drink gift"]} onChange={(value) => setGift({ ...gift, giftType: value })}/><SelectField label="Occasion" value={gift.occasion} options={["Birthday", "Thank you", "Celebration", "Client gift", "Just because"]} onChange={(value) => setGift({ ...gift, occasion: value })}/><SelectField label="Timing" value={gift.deliveryWindow} options={["As soon as available", "Within 2 weeks", "Within 1 month", "Choose with Deldiet"]} onChange={(value) => setGift({ ...gift, deliveryWindow: value })}/><SelectField label="Who chooses the coffee?" value={gift.recipientMode} options={["Let recipient take the Taste Graph", "I will choose for them"]} onChange={(value) => setGift({ ...gift, recipientMode: value })}/><label className={styles.selectField}><span>Budget · CAD</span><input type="number" min="25" max="2500" required value={gift.budget} onChange={(event) => setGift({ ...gift, budget: event.target.value })}/></label><label className={`${styles.selectField} ${styles.wide}`}><span>Gift message <small>optional</small></span><textarea maxLength={500} value={gift.message} onChange={(event) => setGift({ ...gift, message: event.target.value })}/></label></div>
       <div className={styles.contactBlock}><h2>Your contact</h2><ContactFields contact={contact} setContact={setContact}/></div>
@@ -311,7 +344,7 @@ function GiftForm({ gift, setGift, contact, setContact, pending, onSubmit }: { g
 
 function TeamForm({ team, setTeam, contact, setContact, pending, onSubmit }: { team: TeamState; setTeam: (value: TeamState) => void; contact: Contact; setContact: (value: Contact) => void; pending: string; onSubmit: (event: FormEvent<HTMLFormElement>) => void }) {
   return <>
-    <PageIntro eyebrow="Coffee for groups" title="Plan the whole coffee system." copy="Scope recurring workplace coffee, hospitality service, an event bar, equipment or training in one structured brief." />
+    <PageIntro eyebrow="Coffee for groups" title="Coffee for your team." copy="Plan workplace coffee, hospitality service, an event bar, equipment or training with one brief." photo="/products/espresso-pair.webp" />
     <div className={styles.teamServices}>{[[Coffee, "Office coffee", "Replenishment by team size, brewer and taste."], [Sparkles, "Event coffee bar", "A staffed Deldiet ritual for gatherings."], [Building2, "Hospitality", "Coffee, equipment and service standards for guest teams."], [Gauge, "Training & equipment", "Brewer planning, setup and practical team guidance."]].map(([Icon, name, copy]) => { const C = Icon as typeof Coffee; return <article key={String(name)}><C size={22}/><b>{String(name)}</b><p>{String(copy)}</p></article>; })}</div>
     <form className={styles.editorialForm} onSubmit={onSubmit}><div className={styles.formFields}><SelectField label="Programme" value={team.programme} options={["Office coffee", "Event coffee bar", "Hospitality programme", "Training & equipment"]} onChange={(value) => setTeam({ ...team, programme: value })}/><SelectField label="Service cadence" value={team.serviceCadence} options={["One-time", "Weekly", "Every 2 weeks", "Monthly", "Not sure yet"]} onChange={(value) => setTeam({ ...team, serviceCadence: value })}/><SelectField label="Current setup" value={team.brewSetup} options={["We need equipment", "Espresso machine", "Batch brewer", "Single-serve", "Mixed setup"]} onChange={(value) => setTeam({ ...team, brewSetup: value })}/><label className={styles.selectField}><span>People served</span><input type="number" min="5" max="5000" required value={team.headcount} onChange={(event) => setTeam({ ...team, headcount: event.target.value })}/></label><label className={styles.selectField}><span>City</span><input required maxLength={120} value={team.city} onChange={(event) => setTeam({ ...team, city: event.target.value })}/></label><label className={`${styles.selectField} ${styles.wide}`}><span>What should Deldiet know? <small>optional</small></span><textarea maxLength={1000} value={team.notes} onChange={(event) => setTeam({ ...team, notes: event.target.value })}/></label></div><div className={styles.contactBlock}><h2>Programme contact</h2><ContactFields contact={contact} setContact={setContact}/></div><div className={styles.submitStrip}><div><MapPin size={22}/><p><b>Scope first, quote second.</b><span>No availability, staffing, equipment or final price is assumed by this request.</span></p></div><button className={styles.primary} type="submit" disabled={Boolean(pending)}>{pending === "passport-team" ? "Saving…" : "Save programme brief"}<ArrowRight size={16}/></button></div></form>
   </>;
