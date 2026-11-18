@@ -4,28 +4,32 @@ export default function PrivacyPage() {
   return (
     <InfoPage
       id="privacy"
-      label={"Privacy notice · operational preview"}
-      title={"What Deldiet stores."}
-      intro={"When you send an interest, concierge, order-review, replenishment-plan, gift, workplace, Origin Bar or Origin Exchange request, Deldiet stores the contact details and selections you submit, plus a timestamp and reference. Card and banking details are not collected by this build."}
+      label="Deldiet privacy notice"
+      title="Your details and your coffee."
+      intro="Deldiet uses the contact details and selections you submit to process your request or order. Origin Atelier uses Stripe Checkout to collect payment details and confirm payment status."
       sections={[
         {
-          heading: "Passport on this device",
-          body: "The guest Passport preview can store non-contact preferences—such as taste choices, brewer type and saved catalogue identifiers—in your browser's local storage. It does not store your request email, phone, message, tracking token or Origin Bar cup name. You can clear it using your browser's site-data controls.",
+          heading: "Atelier payments",
+          body: "When you continue to Stripe Checkout, your recipe, selected items and collection details are sent to Stripe with the checkout session. Payment and contact information entered at checkout is processed by Stripe. Authorized Deldiet staff can view the order and recipe in Stripe to arrange fulfilment. Deldiet’s Atelier does not receive or store your full card number.",
         },
         {
-          heading: "Purpose",
-          body: "Request data is stored only to identify the request, prevent duplicate submissions, and support future follow-up by authorized Deldiet staff. It is not a confirmed reservation, order, subscription, quote or payment.",
+          heading: "Recipes on this device",
+          body: "The Atelier can remember your draft recipe in this browser so you can return to it. Guest Passport preferences also use browser storage. You can clear these saved preferences through your browser’s site-data controls. A secure session cookie associates your Stripe checkout with this browser so the return page can check your payment status.",
         },
         {
-          heading: "Retention and access",
-          body: "Automated retention, deletion, staff assignment and email notification are not connected yet. Avoid entering sensitive information. Before public launch, Deldiet must configure authorized staff access, a retention schedule, deletion handling and a verified privacy contact.",
+          heading: "Other requests",
+          body: "When you submit an interest, concierge, order-review, gift, workplace or Origin Exchange request, Deldiet stores the contact details and selections you provide, a timestamp and a reference. Those details support staff review and help prevent duplicate submissions.",
+        },
+        {
+          heading: "Request retention and access",
+          body: "For the existing request-intake service, automated retention, deletion, staff assignment and email notification are not connected yet. Deldiet must configure authorized staff access, a retention schedule, deletion handling and a verified privacy contact before operating that service publicly. Stripe transaction records are managed through the merchant account.",
         },
         {
           heading: "Your choices",
-          body: "You can use the catalogue, Taste Graph and Brew Lab without submitting contact details. Contact details are required only when you ask Deldiet to save a request for review. If you submit, keep the reference shown on screen. A formal access or deletion request channel will be published before public operations begin.",
+          body: "You can explore the Atelier and other catalogue pages without providing contact or payment information. Stripe collects checkout information when you proceed to payment. Keep your payment receipt or request reference for any follow-up with Deldiet.",
         },
       ]}
-      note={"Last updated 10 August 2026 · This notice describes the current platform build and must be replaced or approved by Deldiet before commercial launch."}
+      note="Last updated 17 November 2026. Stripe’s privacy notice is available on its checkout page."
     />
   );
 }

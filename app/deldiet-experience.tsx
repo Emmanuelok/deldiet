@@ -702,7 +702,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           <a href="/coffeehouse" aria-current={view === "coffeehouse" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Coffeehouse</a>
           <a href="/origins" aria-current={view === "origins" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Origins</a>
           <a href="/build-a-cup" aria-current={view === "build" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Build a cup</a>
-          <a href="/origin-bar" onClick={() => setMenuOpen(false)}>Origin Bar</a>
+          <a href="/origin-bar" onClick={() => setMenuOpen(false)}>Origin Atelier</a>
           <a href="/coffee-at-home" aria-current={view === "formats" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Coffee at home</a>
           <a href="/shop" aria-current={view === "shop" ? "page" : undefined} onClick={() => setMenuOpen(false)}>Shop</a>
           <a href="/origin-exchange" onClick={() => setMenuOpen(false)}>Exchange</a>
@@ -818,7 +818,7 @@ export default function DeldietExperience({ view = "home" }: { view?: DeldietVie
           </nav>
           <nav className="dc-foot-nav" aria-label="More from Deldiet">
             <h2>Inside Deldiet</h2>
-            <a href="/journal">Field Journal</a><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Our standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/origin-bar">Origin Bar</a><a href="/origin-exchange">Origin Exchange</a>
+            <a href="/journal">Field Journal</a><a href="/events">Events</a><a href="/trace">Trace a lot</a><a href="/standards">Our standards</a><a href="/clarity">Clarity</a><a href="/business">Business</a><a href="/origin-bar">Origin Atelier</a><a href="/origin-exchange">Origin Exchange</a>
           </nav>
           <div className="dc-foot-contact">
             <h2>Field Notes</h2>

@@ -153,10 +153,10 @@ test("keeps supporting pages readable and connected to home", async () => {
   }
 });
 
-test("preserves Origin Bar and Exchange as distinct destinations", async () => {
-  for (const [path, expected] of [["/origin-bar", /Craft a cup/i], ["/origin-exchange", /Follow the bean/i]]) {
+test("renders Origin Atelier and preserves the focused Exchange destination", async () => {
+  for (const [path, expected] of [["/origin-bar", /<h1\b[^>]*id="atelier-title"[^>]*>Origin\s*<em>Atelier[.!]?<\/em>/i], ["/origin-exchange", /Follow the bean/i]]) {
     const page = await renderPage(path);
-    assert.ok(expected.test(page), `${path} should render its original focused experience`);
+    assert.ok(expected.test(page), `${path} should render its focused experience`);
     assert.doesNotMatch(page, /<main\b[^>]*class="[^"]*\bed-shell\b/i);
   }
 });
