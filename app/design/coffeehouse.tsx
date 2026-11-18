@@ -153,7 +153,7 @@ export default function Coffeehouse({
       <div className="house-visit-copy"><p className="house-rubric"><MapPin size={14}/> St. John’s, Newfoundland</p>
         <h2 id="house-visit-title">A seat at <em>our table.</em></h2><p>Register interest in a table or a guided tasting at our planned coffeehouse. The address, opening hours and access details will follow once confirmed.</p>
         <div className="house-links"><button type="button" className="house-gold" onClick={onPlanVisit}>Register visit interest <ArrowRight size={16}/></button><a className="house-textlink" href="/events">Tastings and events <ArrowUpRight size={15}/></a></div>
-        <a className="house-origin-link" href="/origin-bar">Explore Origin Bar <ArrowUpRight size={14}/></a>
+        <a className="house-origin-link" href="/origin-bar">Explore Origin Atelier <ArrowUpRight size={14}/></a>
       </div>
     </section>
   </div>;

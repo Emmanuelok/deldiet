@@ -207,7 +207,7 @@ export default function PassportPage() {
       <header className={styles.header}>
         <Link href="/" className={styles.logo} aria-label="Deldiet home"><Image src="/brand/deldiet-wordmark.png" alt="Deldiet" width={432} height={129} priority unoptimized /></Link>
         <div className={styles.headerTitle}><Compass size={18} aria-hidden="true"/><span>Deldiet Passport</span></div>
-        <nav aria-label="Deldiet experiences"><Link href="/shop">Shop</Link><Link href="/origin-bar">Origin Bar</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
+        <nav aria-label="Deldiet experiences"><Link href="/shop">Shop</Link><Link href="/origin-bar">Origin Atelier</Link><Link href="/origin-exchange">Origin Exchange</Link><Link href="/"><ArrowLeft size={15}/> Home</Link></nav>
       </header>
 
       <div className={styles.statusBar}><span><i/> Interactive customer preview</span><p>Taste and brewer preferences save only on this device. Account sync, payment and automatic fulfilment are not connected yet.</p></div>
