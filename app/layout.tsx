@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 const socialPreviewImage = {
-  url: "/brand/og-espresso-pour.jpg",
+  url: "/brand/crimson/espresso-pour.jpg",
   width: 1200,
   height: 630,
   type: "image/jpeg",
@@ -24,7 +24,7 @@ const socialPreviewImage = {
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.deldiet.coffee"),
   title: "Deldiet — The World in Your Cup",
-  manifest: "/manifest.webmanifest",
+  manifest: "/manifest.webmanifest?v=crimson",
   applicationName: "Deldiet",
   appleWebApp: { capable: true, title: "Deldiet", statusBarStyle: "default" },
   openGraph: {
@@ -40,9 +40,14 @@ export const metadata: Metadata = {
     "codex-preview": "development",
   },
   icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }, { url: "/icons/icon-32.png", sizes: "32x32", type: "image/png" }],
-    apple: [{ url: "/icons/icon-180.png", sizes: "180x180", type: "image/png" }],
-    shortcut: "/favicon.svg",
+    icon: [
+      { url: "/brand/crimson/icon-16.png", sizes: "16x16", type: "image/png" },
+      { url: "/brand/crimson/icon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/crimson/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/brand/crimson/favicon.svg", sizes: "any", type: "image/svg+xml" },
+    ],
+    apple: [{ url: "/brand/crimson/icon-180.png", sizes: "180x180", type: "image/png" }],
+    shortcut: "/brand/crimson/favicon.ico",
   },
 };
 
