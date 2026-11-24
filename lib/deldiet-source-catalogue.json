@@ -1,0 +1,31 @@
+{
+  "blends": [
+    {
+      "id": "blend-95",
+      "name": "Truffle Mocha",
+      "collection": "Edition 24 · Blend concept",
+      "pack": "Obsidian metal tin + glass tasting vault",
+      "media": {
+        "preview": "/products/concepts/truffle-mocha.webp",
+        "original": "/products/concepts/truffle-mocha.webp",
+        "width": 390,
+        "height": 522,
+        "alt": "Truffle Mocha packaging concept: a black tin with a gold label and a glass tasting tube"
+      }
+    }
+  ],
+  "formats": [
+    {
+      "id": "packaging-24",
+      "name": "Obsidian metal tin + glass tasting vault",
+      "collection": "Edition 24 · Packaging concept",
+      "media": {
+        "preview": "/products/concepts/obsidian-tasting-vault.webp",
+        "original": "/products/concepts/obsidian-tasting-vault.webp",
+        "width": 1100,
+        "height": 613,
+        "alt": "Four packaging mockups pairing a black metal tin with a glass tasting tube"
+      }
+    }
+  ]
+}
