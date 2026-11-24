@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { ArrowDown, ArrowRight, Check, Plus, Search, X } from "lucide-react";
 import { useId, useState } from "react";
+import { filterBlends, type Blend } from "../../lib/blend-catalogue";
+import importedCatalogue from "../../lib/deldiet-source-catalogue.json";
 
 type SupplyItem = {
   id: string;
@@ -32,6 +34,14 @@ const fieldObjects = [
   { id: "canvas-tote", x: "81%", y: "69%" },
 ];
 
+const sourceBlends: readonly Blend[] = importedCatalogue.blends;
+const sourceFormats: readonly Blend[] = importedCatalogue.formats;
+const SOURCE_PAGE_SIZE = 24;
+const SOURCE_CATEGORIES = [
+  ...(sourceBlends.length ? ["Blends"] : []),
+  ...(sourceFormats.length ? ["Packaging"] : []),
+];
+
 const coffeeShelf = ["guji-reserve", "house-01", "world-flight"];
 
 const roastObjects = [
@@ -49,14 +59,29 @@ export function ShopSpread<T extends SupplyItem>(props: ShopProps<T>) {
   const { products, visibleProducts, categories, category, query, photos, onCategory, onSearch, onOpen, onQuickAdd } = props;
 
   const [sort, setSort] = useState("featured");
+  const [sourceLimit, setSourceLimit] = useState(SOURCE_PAGE_SIZE);
+  const allCategories = [...categories, ...SOURCE_CATEGORIES];
+  const sourceCategory = category === "Blends" || category === "Packaging";
+  const sourceResults = sourceCategory ? filterBlends(category === "Blends" ? sourceBlends : sourceFormats, query) : [];
+  const resultCount = sourceCategory ? sourceResults.length : visibleProducts.length;
+
+  function chooseCategory(value: string) {
+    setSourceLimit(SOURCE_PAGE_SIZE);
+    onCategory(value);
+  }
+
+  function updateSearch(value: string) {
+    setSourceLimit(SOURCE_PAGE_SIZE);
+    onSearch(value);
+  }
   const listedProducts = sort === "featured" ? visibleProducts : [...visibleProducts].sort((a, b) =>
     sort === "price-asc" ? a.price - b.price : b.price - a.price
   );
   const shelf = coffeeShelf.flatMap((id) => products.filter((product) => product.id === id));
 
   function showCategory(value: string) {
-    onSearch("");
-    onCategory(value);
+    updateSearch("");
+    chooseCategory(value);
   }
 
   return (
@@ -96,29 +121,53 @@ export function ShopSpread<T extends SupplyItem>(props: ShopProps<T>) {
           <div><p className="supply-label">All merchandise</p><h2 id="supply-catalogue-title">Shop the collection</h2></div>
           <div className="supply-search">
             <Search size={20} aria-hidden="true" />
-            <input type="search" value={query} onChange={(event) => onSearch(event.target.value)} placeholder="Search the catalogue" aria-label="Search Deldiet shop" />
-            {query && <button type="button" aria-label="Clear search" onClick={() => onSearch("")}><X size={17} aria-hidden="true" /></button>}
+            <input type="search" value={query} onChange={(event) => updateSearch(event.target.value)} placeholder="Search the catalogue" aria-label="Search Deldiet shop" />
+            {query && <button type="button" aria-label="Clear search" onClick={() => updateSearch("")}><X size={17} aria-hidden="true" /></button>}
           </div>
         </div>
         <div className="supply-controls">
           <div className="supply-filters" role="group" aria-label="Filter merchandise by category">
-            {categories.map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => onCategory(value)}>{value === "All" ? "All objects" : value}</button>)}
+            {allCategories.map((value) => <button type="button" key={value} aria-pressed={category === value} onClick={() => chooseCategory(value)}>{value === "All" ? "All objects" : value}</button>)}
           </div>
           <label className="supply-category-select">Category
-            <select value={category} onChange={(event) => onCategory(event.target.value)}>
-              {categories.map((value) => <option key={value} value={value}>{value === "All" ? "All objects" : value}</option>)}
+            <select value={category} onChange={(event) => chooseCategory(event.target.value)}>
+              {allCategories.map((value) => <option key={value} value={value}>{value === "All" ? "All objects" : value}</option>)}
             </select>
           </label>
-          <label className="supply-sort"><span>Sort</span><select aria-label="Sort products" value={sort} onChange={(event) => setSort(event.target.value)}>
+          {!sourceCategory && <label className="supply-sort"><span>Sort</span><select aria-label="Sort products" value={sort} onChange={(event) => setSort(event.target.value)}>
             <option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option>
-          </select></label>
-          <p className="supply-count" aria-live="polite" aria-atomic="true">{visibleProducts.length} {visibleProducts.length === 1 ? "item" : "items"}</p>
+          </select></label>}
+          <p className="supply-count" aria-live="polite" aria-atomic="true">{resultCount} {resultCount === 1 ? "item" : "items"}</p>
         </div>
-        {visibleProducts.length === 0 ? (
+        {resultCount === 0 ? (
           <div className="supply-empty">
             <h3>No matches.</h3><p>Try another search or browse all categories.</p>
             <button className="supply-cta" type="button" onClick={() => showCategory("All")}>Show all objects <ArrowRight size={17} aria-hidden="true" /></button>
           </div>
+        ) : sourceCategory ? (
+          <>
+            <p className="supply-label">Design catalogue · not currently for sale</p>
+            <div className="supply-grid">
+              {sourceResults.slice(0, sourceLimit).map((item) => (
+                <article className="supply-item" key={item.id}>
+                  {item.media && <div className="supply-item-scene">
+                    <div className="supply-item-image">
+                      <Image src={item.media.preview} alt={item.media.alt} width={item.media.width} height={item.media.height} style={{ objectFit: "contain" }}
+                        unoptimized sizes="(max-width: 650px) 50vw, (max-width: 1000px) 33vw, 25vw" />
+                    </div>
+                  </div>}
+                  <div className="supply-item-meta"><span>{item.collection}</span></div>
+                  <h3>{item.name}</h3>
+                  {item.description && <p>{item.description}</p>}
+                  {item.pack && <p>{item.pack}</p>}
+                  {item.media?.original && <a className="supply-card-detail" href={item.media.original}
+                    target="_blank" rel="noopener noreferrer">View full image <ArrowRight size={13} aria-hidden="true" /></a>}
+                </article>
+              ))}
+            </div>
+            {sourceLimit < sourceResults.length && <button type="button" className="supply-cta"
+              onClick={() => setSourceLimit((value) => value + SOURCE_PAGE_SIZE)}>Show more <ArrowDown size={16} aria-hidden="true" /></button>}
+          </>
         ) : (
           <div className="supply-grid">
             {listedProducts.map((item) => (
